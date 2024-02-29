@@ -2,6 +2,10 @@
 # This program first consolidates datasources into the main dataset
 # It then analyzes this dataset
 
+source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+source(file.path(programs,"libraries.R"), echo=FALSE)
+source(file.path(programs,"config.R"), echo=FALSE)
 
 # ###########################
 # SECTION A: Consolidate datasources

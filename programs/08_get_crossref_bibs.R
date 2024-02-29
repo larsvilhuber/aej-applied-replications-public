@@ -1,5 +1,9 @@
 # This program collects bibtex information for all the DOIs read by the replicators from crossref
 
+source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+source(file.path(programs,"libraries.R"), echo=FALSE)
+source(file.path(programs,"config.R"), echo=FALSE)
 
 if ( file.exists(bibtex_all) ) {
   message("Skipping processing of ",bibtex_all," as it already exists")

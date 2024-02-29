@@ -1,5 +1,9 @@
 # This program collects bibliographic information for all the DOIs read by the replicators from crossref
-# To do: Need to also use exit questionnaire DOIs, some of which are not on replication lists
+
+source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+source(file.path(programs,"libraries.R"), echo=FALSE)
+source(file.path(programs,"config.R"), echo=FALSE)
 
 # Read dataframes of the 3 datasets created in previous files
 repllist.doi <- readRDS(file=file.path(dataloc,"replication_list_pub.Rds")) %>% select(DOI)

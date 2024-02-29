@@ -1,5 +1,10 @@
 # needs rjson, tidyr, dplyr
 
+source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+source(file.path(programs,"libraries.R"), echo=FALSE)
+source(file.path(programs,"config.R"), echo=FALSE)
+
 # we combine the generic Zenodo API with the file identifier
 
 download.file(paste0(zenodo.api,zenodo.id),destfile=file.path(dataloc,"metadata.json"))

@@ -1,5 +1,10 @@
 # We clean up additional variables on repllist (which is manually coded)
 
+source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+source(file.path(programs,"libraries.R"), echo=FALSE)
+source(file.path(programs,"config.R"), echo=FALSE)
+
 # Read the compiled replication lists
 repllist2 <- readRDS(file=file.path(dataloc,"replication_list_pub.Rds"))
 
