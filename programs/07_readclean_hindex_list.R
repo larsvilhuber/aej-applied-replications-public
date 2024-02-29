@@ -17,9 +17,7 @@ source(file.path(programs,"config.R"), echo=FALSE)
 
 
 #' ## Get the h-index data
-#' The data is originally in a Google Spreadsheet. We downloaded it by hand from (URL HERE) on DATE.
-#'
-#'     that should show up in the name!!! Clean up h-index data.
+#' The data is originally in a Google Spreadsheet. We downloaded it by hand from there.
 #'
 #+ data prep
 h.index <- read.csv(paste(hindexloc,HindexRaw,sep="/"),header = TRUE)

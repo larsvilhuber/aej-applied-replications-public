@@ -1,4 +1,6 @@
 # This program creates the list of files for which to capture hindex data
+# It is not run as part of the full reproducible workflow, it was used
+# to generate RA assignments to manually parse WoS website.
 
 source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
 source(file.path(basepath,"global-libraries.R"),echo=FALSE)
