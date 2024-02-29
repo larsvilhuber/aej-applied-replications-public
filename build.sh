@@ -11,9 +11,9 @@ exit 0
 fi
 
 PWD=$(pwd)
-repo=${PWD##*/}
+. config.sh
 tag=${1}
-space=larsvilhuber
+
 BUILD=no
 
 ## maybe it's local only

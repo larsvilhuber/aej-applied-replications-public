@@ -11,9 +11,9 @@ exit 0
 fi
 
 PWD=$(pwd)
-repo=${PWD##*/}
-tag=${1:-2023-03-12}
-space=larsvilhuber
+. config.sh
+tag=${1:-$tag}
+
 case $USER in
   *vilhuber|*herbert)
   WORKSPACE=$PWD
