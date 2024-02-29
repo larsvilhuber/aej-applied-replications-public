@@ -1,113 +1,0 @@
-
-R version 4.2.0 (2022-04-22) -- "Vigorous Calisthenics"
-Copyright (C) 2022 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
-
-R is free software and comes with ABSOLUTELY NO WARRANTY.
-You are welcome to redistribute it under certain conditions.
-Type 'license()' or 'licence()' for distribution details.
-
-  Natural language support but running in an English locale
-
-R is a collaborative project with many contributors.
-Type 'contributors()' for more information and
-'citation()' on how to cite R or R packages in publications.
-
-Type 'demo()' for some demos, 'help()' for on-line help, or
-'help.start()' for an HTML browser interface to help.
-Type 'q()' to quit R.
-
-[Previously saved workspace restored]
-
-> # This file is used from the command line.
-> # Alternatively, the README.Rmd can be "knit" manually. 
-> # The result should be the same if using the container.
-> 
-> rmarkdown::render("README.Rmd",quiet=FALSE)
-
-
-processing file: README.Rmd
-  |                                                                              |                                                                      |   0%  |                                                                              |...                                                                   |   5%
-   inline R code fragments
-
-  |                                                                              |......                                                                |   9%
-label: setup (with options) 
-List of 1
- $ include: logi FALSE
-
-  |                                                                              |..........                                                            |  14%
-  ordinary text without R code
-
-  |                                                                              |.............                                                         |  18%
-label: setup_config (with options) 
-List of 1
- $ eval: logi TRUE
-
-  |                                                                              |................                                                      |  23%
-  ordinary text without R code
-
-  |                                                                              |...................                                                   |  27%
-label: setup_libraries (with options) 
-List of 1
- $ eval: logi TRUE
-
-  |                                                                              |......................                                                |  32%
-  ordinary text without R code
-
-  |                                                                              |.........................                                             |  36%
-label: download_replication
-  |                                                                              |.............................                                         |  41%
-  ordinary text without R code
-
-  |                                                                              |................................                                      |  45%
-label: get_crossref (with options) 
-List of 1
- $ eval: logi TRUE
-
-  |                                                                              |...................................                                   |  50%
-  ordinary text without R code
-
-  |                                                                              |......................................                                |  55%
-label: doi_diagnostics (with options) 
-List of 3
- $ echo : logi TRUE
- $ eval : logi TRUE
- $ cache: logi TRUE
-
-  |                                                                              |.........................................                             |  59%
-  ordinary text without R code
-
-  |                                                                              |.............................................                         |  64%
-label: doi_diagnostics2 (with options) 
-List of 2
- $ echo: logi FALSE
- $ eval: logi TRUE
-
-  |                                                                              |................................................                      |  68%
-  ordinary text without R code
-
-  |                                                                              |...................................................                   |  73%
-label: clean_replication (with options) 
-List of 1
- $ cache: logi TRUE
-
-  |                                                                              |......................................................                |  77%
-  ordinary text without R code
-
-  |                                                                              |.........................................................             |  82%
-label: download_hindex (with options) 
-List of 2
- $ eval : logi TRUE
- $ cache: logi TRUE
-
-  |                                                                              |............................................................          |  86%
-label: clean_hindex (with options) 
-List of 2
- $ eval : logi TRUE
- $ cache: logi TRUE
-
-Quitting from lines 118-120 (README.Rmd) 
-Error in loadNamespace(x) : there is no package called 'reshape'
-Calls: <Anonymous> ... loadNamespace -> withRestarts -> withOneRestart -> doWithOneRestart
-
-Execution halted
