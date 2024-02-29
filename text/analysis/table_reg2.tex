@@ -1,0 +1,48 @@
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:13 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Citations vs Confidential Data} 
+  \label{reg2} 
+\begin{tabular}{@{\extracolsep{-15pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 2.490^{***} &  &  \\ 
+  & (0.477) &  &  \\ 
+  & & & \\ 
+ tophindex &  & 1.210^{***} &  \\ 
+  &  & (0.248) &  \\ 
+  & & & \\ 
+ lowhindex &  &  & 1.420^{*} \\ 
+  &  &  & (0.758) \\ 
+  & & & \\ 
+ confidential\_data & 12.500^{*} & 9.750^{*} & 3.080 \\ 
+  & (6.610) & (5.660) & (6.470) \\ 
+  & & & \\ 
+ avghindex:confidential\_data & -1.300 &  &  \\ 
+  & (0.795) &  &  \\ 
+  & & & \\ 
+ tophindex:confidential\_data &  & -0.590 &  \\ 
+  &  & (0.448) &  \\ 
+  & & & \\ 
+ lowhindex:confidential\_data &  &  & -0.117 \\ 
+  &  &  & (1.230) \\ 
+  & & & \\ 
+ Constant & 6.960^{*} & 12.100^{***} & 19.100^{***} \\ 
+  & (4.080) & (3.420) & (4.000) \\ 
+  & & & \\ 
+\textit{N} & \multicolumn{1}{c}{189} & \multicolumn{1}{c}{189} & \multicolumn{1}{c}{189} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\multicolumn{4}{l}{Notes: *** Significant at the 1 percent level, ** Significant at the 5 percent level} \\ 
+\multicolumn{4}{l}{* Significant at the 10 percent level.} \\ 
+\multicolumn{4}{l}{Avghindex is the average hindex about the article's authors,  tophindex the maximum} \\ 
+\multicolumn{4}{l}{ hindex among them and lowhindex the lowest. Avghindex:confidential stands for} \\ 
+\multicolumn{4}{l}{the interaction between a dummy taking value 1 if the article uses confidential  } \\ 
+\multicolumn{4}{l}{data, and the aforementioned average hindex of authors.} \\ 
+\end{tabular} 
+\end{table} 

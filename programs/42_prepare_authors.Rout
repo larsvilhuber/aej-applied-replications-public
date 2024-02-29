@@ -1,0 +1,282 @@
+
+R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> # Get author and institution information
+> # Output files:
+> #  - openalex.authors.Rds - all works for in-scope authors
+> #  - openalex.hindex - per-author-year hindex
+> # Intermediate files:
+> # - file.path(interwrk,"authors.df.Rds"))
+> # - file.path(interwrk,"citations.df.Rds"))
+> # - file.path(interwrk,"authorlist.aej.df.Rds"))
+> # Auxiliary files:
+> # - file.path(openalexloc,"blacklist.xlsx")
+> # Requires 16GB of memory at least.
+> 
+> source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+> source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: devtools
+Loading required package: usethis
+Loading required package: rprojroot
+Loading required package: tictoc
+Loading required package: ggplot2
+Loading required package: bindrcpp
+Loading required package: Rcpp
+> source(file.path(programs,"libraries.R"), echo=FALSE)
+Loading required package: rcrossref
+Loading required package: readr
+Loading required package: tidyr
+Loading required package: data.table
+
+Attaching package: ‘data.table’
+
+The following object is masked from ‘package:tictoc’:
+
+    shift
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: xtable
+Loading required package: rjson
+Loading required package: stargazer
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+Loading required package: knitr
+Loading required package: stringr
+Loading required package: readxl
+Loading required package: fastDummies
+Loading required package: skimr
+Loading required package: sandwich
+Loading required package: pastecs
+
+Attaching package: ‘pastecs’
+
+The following objects are masked from ‘package:data.table’:
+
+    first, last
+
+The following object is masked from ‘package:tidyr’:
+
+    extract
+
+The following objects are masked from ‘package:dplyr’:
+
+    first, last
+
+Loading required package: formattable
+
+Attaching package: ‘formattable’
+
+The following object is masked from ‘package:xtable’:
+
+    digits
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
+  Use `force = TRUE` to force installation
+> source(file.path(programs,"config.R"), echo=FALSE)
+> 
+> library(openalexR)
+Thank you for using openalexR!
+To acknowledge our work, please cite the package by calling `citation("openalexR")`.
+To suppress this message, add `openalexR.message = suppressed` to your .Renviron file.
+> 
+> # Get list of articles for in-scope authors
+> # Vector of DOIs
+> 
+> # First, get the DOIs from the previous program
+> 
+> if ( file.exists(doi.file.Rds)) {
++   filtered.df <- readRDS(file= doi.file.Rds)
++   nrow(filtered.df)
++ } else {
++   stop(paste0("File missing: ",doi.file.Rds))
++ }
+[1] 630
+> 
+> 
+> # utility function
+> 
+> get_works <- function(list,filter="doi") {
++   if ( filter == "doi" ) {
++   works <- oa_fetch(entity = "works", doi = list, verbose = FALSE)
++   }
++   if ( filter == "author") {
++     works <- oa_fetch(entity = "works", author.id = list,
++                       verbose = FALSE)
++   }
++   return(works)
++ }
+> # Get metadata for each DOI
+> 
+> 
+> if ( file.exists(openalex.Rds) ) {
++   message(paste0("File already exists: ",openalex.Rds))
++   message("Loading file from previous version.")
++ } else {
++ 
++   stop(paste0("File missing: ",openalex.Rds))
++ }
+File already exists: /home/rstudio/data/openalex/openalex-aejae.Rds
+Loading file from previous version.
+> 
+> works_from_dois <- readRDS(file=openalex.Rds)
+> nrow(works_from_dois)
+[1] 630
+> 
+> # unpack the author data
+> 
+> 
+> authorlist.aej.df <- works_from_dois %>%
++   select(author,article_id=id) %>%
++   tidyr::unnest(author) %>%
++   filter(!is.na(au_id)) %>%
++   select(au_id,au_display_name,institution_display_name,article_id) %>%
++   distinct(au_id,.keep_all = TRUE)
+> nrow(authorlist.aej.df)
+[1] 1138
+> 
+> saveRDS(authorlist.aej.df,file.path(interwrk,"authorlist.aej.df.Rds"))
+> # Extract author IDs: au_id
+> author_ids <- unique(c(authorlist.aej.df$au_id))
+> 
+> # Get works for each author ID
+> if ( file.exists(openalex.authors.Rds) ) {
++   message(paste0("File already exists: ",openalex.authors.Rds))
++   message("Loading file from previous version.")
++ } else {
++ 
++   tic.clear()
++   tic("Query to openAlex for authors")
++   works_list <- get_works(author_ids,filter="author")
++   toc(log=TRUE)
++ 
++   # Query to openAlex for authors: 3601.608 sec elapsed
++   # 179,606 obs
++   # There are duplicates!
++   nrow(works_list %>% distinct(id))
++   # [1] 165949
++   saveRDS(works_list %>%
++             distinct(id,.keep_all = TRUE) %>%
++            select(id,doi.url=doi,display_name,author,
++                    so,so_id,cited_by_count,counts_by_year,
++                    publication_date,publication_year,
++                    type),file=openalex.authors.Rds)
++ }
+File already exists: /home/rstudio/data/openalex/openalex-aejae-authors.Rds
+Loading file from previous version.
+> 
+> # We now have authors data, with all citations
+> 
+> works_list <- readRDS(file=openalex.authors.Rds)
+> nrow(works_list)
+[1] 166051
+> names(works_list)
+ [1] "id"               "doi.url"          "display_name"     "author"           "so"               "so_id"           
+ [7] "cited_by_count"   "counts_by_year"   "publication_date" "publication_year" "type"            
+> table(works_list$type)
+
+        article            book    book-chapter     book-series         dataset    dissertation       editorial 
+         140698            2794            7328               1            5309             583              54 
+        erratum          letter           other        paratext     peer-review reference-entry          report 
+             78              10             261             433             135             162            8205 
+> 
+> #
+> # article            book    book-chapter
+> # 140698            2794            7328
+> # book-series         dataset    dissertation
+> # 1            5309             583
+> # editorial         erratum          letter
+> # 54              78              10
+> # other        paratext     peer-review
+> # 261             433             135
+> # reference-entry          report
+> # 162            8205
+> 
+> # we have a blacklist of known bad matches
+> blacklist.au_id <- read_excel(file.path(openalexloc,"blacklist.xlsx")) %>%
++   select(au_id)
+> nrow(blacklist.au_id %>% distinct(au_id))
+[1] 1
+> 
+> # citations per year
+> authors.df.all <- works_list %>%
++   tidyr::unnest(author) %>%
++   # au_id now exists
++   # remove blacklist authors
++   # note that this COMPLETE removes them, because of full bad match
++   anti_join(blacklist.au_id) %>%
++   select(article_id=id,starts_with("au"),
++          institution_id,institution_ror,institution_display_name,
++          institution_country_code,cited_by_count,type,
++          doi.url,publication_year,publication_date,counts_by_year) %>%
++   distinct(article_id,au_id,.keep_all = TRUE)
+Joining with `by = join_by(au_id)`
+> nrow(authors.df.all)
+[1] 751532
+> nrow(authors.df.all %>% distinct(au_id))
+[1] 232069
+> # > nrow(authors.df.all)
+> # [1] 751532 (was: 779935 before blacklist)
+> # > nrow(authors.df.all %>% distinct(au_id))
+> # [1] 232069 (was: 231886 before blacklist)
+> 
+> # But this gets us all the data for ALL the co-authors on papers that are out of scope.
+> # We only want the data for the authors in our sample.
+> 
+> authors.df <- right_join(authors.df.all,
++                          authorlist.aej.df %>% select(au_id),
++                          by="au_id") %>%
++               #### This gets us 1138 (minus blacklist) authors as of Oct 2023 #####
++               filter(publication_year < 2019 ) %>%
++               filter(publication_date < '2018-07-01') %>%
++               filter(!is.na(article_id))
+> # double-check
+> authors.df %>% distinct(au_id) %>% nrow()
+[1] 1114
+> # [1] 1114
+> 
+> # clean up
+> rm(authors.df.all)
+> # save it
+> saveRDS(authors.df,file=file.path(interwrk,"authors.df.Rds"))
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  23.92    2.14   24.84 

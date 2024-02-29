@@ -1,0 +1,1539 @@
+
+R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> ### R code from vignette source 'results2.Rnw'
+> 
+> ###################################################
+> ### code chunk number 1: set-parent-results
+> ###################################################
+> #set_parent('Replication_aejae.Rnw')
+> #set_parent('results1.Rnw')
+> source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+> source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: devtools
+Loading required package: usethis
+Loading required package: rprojroot
+Loading required package: tictoc
+Loading required package: ggplot2
+Loading required package: bindrcpp
+Loading required package: Rcpp
+> source(file.path(programs,"libraries.R"), echo=FALSE)
+Loading required package: rcrossref
+Loading required package: readr
+Loading required package: tidyr
+Loading required package: data.table
+
+Attaching package: ‘data.table’
+
+The following object is masked from ‘package:tictoc’:
+
+    shift
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: xtable
+Loading required package: rjson
+Loading required package: stargazer
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+Loading required package: knitr
+Loading required package: stringr
+Loading required package: readxl
+Loading required package: fastDummies
+Loading required package: skimr
+Loading required package: sandwich
+Loading required package: pastecs
+
+Attaching package: ‘pastecs’
+
+The following objects are masked from ‘package:data.table’:
+
+    first, last
+
+The following object is masked from ‘package:tidyr’:
+
+    extract
+
+The following objects are masked from ‘package:dplyr’:
+
+    first, last
+
+Loading required package: formattable
+
+Attaching package: ‘formattable’
+
+The following object is masked from ‘package:xtable’:
+
+    digits
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
+  Use `force = TRUE` to force installation
+> #source(file.path(TexBase,"libraries.R"), echo=FALSE)
+> source(file.path(programs,"config.R"), echo=FALSE)
+> 
+> # Read analysis data
+> exit_all <- readRDS(file=file.path(dataloc,"00_exit_all.Rds"))
+> complete_sample <- readRDS(file=file.path(dataloc,"00_complete_sample.Rds"))
+> 
+> ###################################################
+> ### code chunk number 2: results
+> ###################################################
+> 
+> # Create confidential data breakdown
+> con_df <- exit_all %>% group_by(year,confdata) %>% summarise(n=n()) %>%
++   spread(confdata,n) %>% select(year,`Confidential Data` = Confidential)
+`summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
+> 
+> # Create table
+> tab_results.raw <- exit_all %>% filter(confdata=="Other") %>% group_by(year,replicated) %>%
++   summarise(n=n()) %>% spread(replicated,n) %>%
++   left_join(con_df,by="year") %>% ungroup() %>%
++   #select(Year=year,`Confidential Data`,Unsuccessful=No,Successful=Yes,Partial,`No Recorded Result`=`<NA>`)
++   select(Year=year,Successful=Yes,Partial,`Confidential Data`,`Other failure`=No)
+`summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
+> 
+> # Add sum rows/cols
+> tab_results <- tab_results.raw
+> tab_results$Total <- rowSums(tab_results[,2:5],na.rm = T)
+> 
+> 
+> row_sum <- colSums(tab_results[,2:6],na.rm=TRUE)
+> 
+> tab_results <- bind_rows(tab_results,row_sum)
+> tab_results[11,1] = c("Total")
+> 
+> # Add col percent
+> col_pct <- round(tab_results[11,2:6]*100/as.numeric(tab_results[11,6],2),1)
+> tab_results <- bind_rows(tab_results,col_pct)
+> 
+> tab_results[12,1]=c("Percent")
+> 
+> total.attempted <- as.numeric(tab_results$Total[tab_results$Year=="Total"])
+> 
+> 
+> ###################################################
+> ### code chunk number 4: tab1
+> ###################################################
+> 
+> #!!!!!!!!!!!!!!!! CAUTION: We are playing around here with variable names that
+> #!!!!!!!!!!!!!!!!  explicitly differ only by some spaces at the end!!!!
+> #!!!!!!!!!!!!!!!! There probably is a better way to do this...
+> 
+> # Print table
+> tab_results %>% mutate_all(.funs = as.character) -> tab_results.char
+> 
+> tab_results.char[is.na(tab_results.char)] <- ""
+> tab_results.char[12,2] <-paste0(tab_results.char[12,2],"%")
+> tab_results.char[12,3] <-paste0(tab_results.char[12,3],"%")
+> tab_results.char[12,4] <-paste0(tab_results.char[12,4],"%")
+> tab_results.char[12,5] <-paste0(tab_results.char[12,5],"%")
+> tab_results.char[12,6] <-paste0(tab_results.char[12,6],"%")
+> 
+> stargazer(tab_results.char, digits=2,
++           out=file.path(TexIncludes,"table_results_by_year.tex"),
++           type="latex",title = "Reproduction Results",
++           label="tab:results:year",
++           style="aer",
++           flip=FALSE, summary=FALSE, rownames = FALSE,
++           column.sep.width = cw)
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:10 PM
+\begin{table}[!htbp] \centering 
+  \caption{Reproduction Results} 
+  \label{tab:results:year} 
+\begin{tabular}{@{\extracolsep{0.4pt}} cccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Year & Successful & Partial & Confidential Data & Other failure & Total \\ 
+\hline \\[-1.8ex] 
+2009 & 4 & 4 & 5 & 1 & 14 \\ 
+2010 & 7 & 3 & 2 & 1 & 13 \\ 
+2011 & 10 & 2 & 5 & 7 & 24 \\ 
+2012 & 8 & 13 & 2 & 3 & 26 \\ 
+2013 & 4 & 3 &  &  & 7 \\ 
+2014 & 7 & 11 & 3 & 2 & 23 \\ 
+2015 & 4 & 12 & 2 &  & 18 \\ 
+2016 & 8 & 7 & 4 & 1 & 20 \\ 
+2017 & 13 & 8 & 3 & 2 & 26 \\ 
+2018 & 3 & 3 & 2 & 1 & 9 \\ 
+Total & 68 & 66 & 28 & 18 & 180 \\ 
+Percent & 37.8\% & 36.7\% & 15.6\% & 10\% & 100\% \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> ### Alternate table
+> 
+> tab_results.summary <- tab_results %>%
++   ungroup() %>%
++   filter(Year == "Total") %>%
++   select(-Year) %>%
++   pivot_longer(cols = everything()) %>%
++   mutate(Percent = round(100*value/ total.attempted,2),
++          ` ` = "%") %>%
++   rename(Outcome = name,`No. of Articles`= value)
+> 
+> 
+> stargazer(tab_results.summary, digits=2,
++           out=file.path(TexIncludes,"table_results.tex"),
++           type="latex",title = "Reproduction Results",
++           label="tab:results",
++           style="aer",
++           flip=FALSE, summary=FALSE, rownames = FALSE,
++           font.size = fs,column.sep.width = cw)
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:11 PM
+\begin{table}[!htbp] \centering 
+  \caption{Reproduction Results} 
+  \label{tab:results} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} cccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Outcome & No. of Articles & Percent &   \\ 
+\hline \\[-1.8ex] 
+Successful & 68 & 37.78 & \% \\ 
+Partial & 66 & 36.67 & \% \\ 
+Confidential Data & 28 & 15.56 & \% \\ 
+Other failure & 18 & 10 & \% \\ 
+Total & 180 & 100 & \% \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+> 
+> ### Alternate table with both attempted and data available cases
+> 
+> tab_results.summary   %>%
++   filter(Outcome!="Total") %>%
++   filter(Outcome!="Confidential Data") %>%
++   mutate(`Cond. on Data` = round(100*`No. of Articles`/sum(`No. of Articles`),2)) %>%
++   select(-Percent,-` `) %>%
++   rename(`No. of Articles ` = `No. of Articles`) -> tmp
+> 
+> tmp %>% bind_rows(tmp %>% summarize(`Cond. on Data` = sum(`Cond. on Data`),
++                                     `No. of Articles `=sum(`No. of Articles `)) %>%
++                     mutate(Outcome = "Total")) %>%
++   mutate('  ' = "%") -> tmp2
+> 
+> left_join(tab_results.summary,tmp2) %>%
++   mutate_all(.funs = as.character) -> tmp3
+Joining with `by = join_by(Outcome)`
+> tmp3[is.na(tmp3)]  <- ""
+> 
+> stargazer(tmp3, digits=2,
++           out=file.path(TexIncludes,"table_results_both.tex"),
++           type="latex",title = "Reproduction Results",
++           label="tab:results",
++           style="aer",
++           flip=FALSE, summary=FALSE, rownames = FALSE,
++           column.sep.width = cw)
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:11 PM
+\begin{table}[!htbp] \centering 
+  \caption{Reproduction Results} 
+  \label{tab:results} 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Outcome & No. of Articles & Percent &   & No. of Articles  & Cond. on Data &    \\ 
+\hline \\[-1.8ex] 
+Successful & 68 & 37.78 & \% & 68 & 44.74 & \% \\ 
+Partial & 66 & 36.67 & \% & 66 & 43.42 & \% \\ 
+Confidential Data & 28 & 15.56 & \% &  &  &  \\ 
+Other failure & 18 & 10 & \% & 18 & 11.84 & \% \\ 
+Total & 180 & 100 & \% & 152 & 100 & \% \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+> 
+> # some numbers.
+> 
+> tab_absence <- readRDS(file=file.path(interwrk,"00_tab_absence.Rds"))
+> 
+> # Calculating -
+> conf.absent   <- as.numeric(tab_absence$Total[tab_absence$Reason == "Confidential Data"])
+> missing       <- as.numeric(tab_absence$Total[tab_absence$Reason == "No Data or Reason"])
+> conf.failed   <- as.numeric(tab_results$`Confidential Data`[tab_results$Year=="Total"])
+> conf.total    <- as.numeric(conf.absent) + as.numeric(conf.failed)
+> 
+> total.assessed <- as.numeric(tab_absence[4,ncol(tab_absence)-1])
+> total.attempted.nonconf <- total.attempted - conf.failed
+> total.excluded <- as.numeric(nrow(complete_sample) - total.attempted.nonconf)
+> 
+> attempted.success <- as.numeric(tab_results$Successful[tab_results$Year=="Total"])
+> attempted.partial <- as.numeric(tab_results$Partial[tab_results$Year=="Total"])
+> # conf.failed is already computed above
+> attempted.other <- as.numeric(tab_results$`Other failure`[tab_results$Year=="Total"])
+> attempted.fail <- attempted.other + conf.failed
+> attemptrate    <- round(total.attempted/nrow(complete_sample) * 100,2)
+> successrate    <- round(attempted.success/total.attempted.nonconf * 100,2)
+> partialrate    <- round(attempted.partial/total.attempted.nonconf*100,2)
+> fullpartialrate    <- round((attempted.success + attempted.partial)/total.attempted.nonconf*100,2)
+> 
+> confrate       <- round(conf.total/total.assessed*100,2)
+> missingrate    <- round(missing/total.assessed*100,2)
+> failrate       <- round(attempted.fail/total.attempted.nonconf*100,2)
+> excluderate    <- round(total.excluded/total.assessed*100,2)
+> 
+> attempted.success.rate   <-round(attempted.success/total.attempted * 100,2)
+> assessed.success.rate   <-round(attempted.success/total.assessed * 100,2)
+> totalfail      <-round(attempted.fail/total.attempted * 100,2)
+> 
+> attempted.partial.rate   <-round(attempted.partial/total.attempted * 100,2)
+> 
+> total_report_nondouble <- missing+conf.total+attempted.success+attempted.partial+attempted.fail
+> totalsuccessoverall<-round(attempted.success/total_report_nondouble * 100,2)
+> totalpartialoverall<-round(attempted.partial/total_report_nondouble * 100,2)
+> totalfailoverall<-round(attempted.fail/total_report_nondouble * 100,2)
+> confassessed  <-round(conf.total/total.assessed * 100,2)
+> 
+> successcat    <- c(attempted.success.rate,successrate)
+> partialcat    <-c(attempted.partial.rate,partialrate)
+> failcat       <-c(totalfail,failrate)
+> 
+> 
+> ###################################################
+> ### code chunk number 3: figsum
+> ###################################################
+> # mysummary1=cbind(missingrate,confrate)
+> # mysummary2=cbind(failcat,partialcat,successcat)
+> # png(file="../text/figure/summarysuccess.png")
+> # par(mfrow = c(1, 2))
+> #     barcenter1 <- barplot(mysummary1,beside=T,names.arg=c("Missing","Confidential"), col=c("cadetblue4", "cadetblue3"),font = 1, font.lab = 1, font.axis = 1,cex.names = 0.8,cwidth=0.4,ylim=range(pretty(c(0, mysummary1))))
+> #     mtext("Percent", side = 2, line = 2,font=0.8)
+> #     barcenter2 <- barplot(mysummary2,beside=T,names.arg=c("Fail","Partial","Success"),col=c("#56B4E9","aliceblue"),font = 1, font.lab = 1, font.axis = 1,cex.names = 0.8, legend.text = c("Over eligible articles","Over non-confidential articles"), args.legend = list(x = "topright",
+> #                            inset = c(-0.15, 0), cex=0.8),ylim=range(pretty(c(0, mysummary2))))
+> #     mtext("Percent", side = 2, line = 2,font=0.8)
+> # dev.off()
+> 
+> # mydata <- data.frame(Barplot1=missingrate, Barplot2=confrate,
+> #                      Barplot3=failcat, Barplot4=partialcat, Barplot5=successcat)
+> # barplot(as.matrix(mydata), main="Interesting", ylab="Total", beside=TRUE,
+> #         col=terrain.colors(5))
+> # legend(13, 12, c("Label1","Label2","Label3","Label4","Label5"), cex=0.6,
+> #        fill=terrain.colors(5))
+> 
+> 
+> # write tex to load in abstract and intro
+> cat(conf.total, 						file=file.path(TexIncludes,"conf.total.tex"))
+> cat(total.assessed, 				file=file.path(TexIncludes,"total.assessed.tex"))
+> cat(total.attempted.nonconf,file=file.path(TexIncludes,"total.attempted.nonconf.tex"))
+> cat(attempted.partial, 			file=file.path(TexIncludes,"attempted.partial.tex"))
+> cat(total.attempted, 				file=file.path(TexIncludes,"total.attempted.tex"))
+> cat(total.excluded,         file = file.path(TexIncludes,"total.excluded.tex"))
+> 
+> cat(attempted.success, 			file=file.path(TexIncludes,"attempted.success.tex"))
+> cat(attempted.fail, 			file=file.path(TexIncludes,"attempted.fail.tex"))
+> cat(attemptrate, 						file=file.path(TexIncludes,"attemptrate.tex"))
+> cat(successrate, 						file=file.path(TexIncludes,"successrate.tex"))
+> cat(partialrate, 						file=file.path(TexIncludes,"partialrate.tex"))
+> cat(fullpartialrate, 						file=file.path(TexIncludes,"fullpartialrate.tex"))
+> cat(confrate, 							file=file.path(TexIncludes,"confrate.tex"))
+> cat(excluderate,            file=file.path(TexIncludes,"excluderate.tex"))
+> 
+> cat(attempted.success.rate, 					file=file.path(TexIncludes,"attempted.success.rate.tex"))
+> cat(assessed.success.rate, 					file=file.path(TexIncludes,"assessed.success.rate.tex"))
+> cat(attempted.partial.rate, 					file=file.path(TexIncludes,"attempted.partial.rate.tex"))
+> cat(missing, 					file=file.path(TexIncludes,"missing.tex"))
+> cat(conf.failed, 					file=file.path(TexIncludes,"conffailed.tex"))
+> cat(conf.absent, 					file=file.path(TexIncludes,"confabsent.tex"))
+> cat(confassessed, 					file=file.path(TexIncludes,"confassessed.tex"))
+> cat(totalsuccessoverall, 					file=file.path(TexIncludes,"totalsuccessoverall.tex"))
+> 
+> 
+> # Create confidential data breakdown
+> #con_df <- exit_merge %>% group_by(year,confdata) %>% summarise(n = n()) %>%
+> #  spread(confdata,n) %>% select(year,`Confidential Data` = Confidential)
+> 
+> # Create table
+> tab_reason <- exit_all %>%
++   filter(replicated %in% c("No") & confdata == "Other") %>%
++   group_by(year,reason) %>%
++   summarise(n=n()) %>% spread(reason,n) %>%
++   select(Year=year,`Most Numbers Differ`,`Missing Data`,`Corrupted Data`,
++          `Missing Code`,`Code Error`,`Software Unavailable`,Other)
+`summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
+> 
+> tab_reason.summary <- tab_reason %>%
++   ungroup() %>%
++   select(-Year) %>%
++   mutate_all(replace_na, replace = 0) %>%
++   summarise_all(.funs=sum) %>%
++   pivot_longer(cols = everything()) %>%
++   rename(Cause = name,`No. of Articles`= value)
+> 
+> # Add sum row and col
+> tab_reason$Total <- rowSums(tab_reason[,2:ncol(tab_reason)],na.rm = T)
+> 
+> 
+> row_sum <- colSums(tab_reason[,2:ncol(tab_reason)],na.rm=TRUE)
+> 
+> tab_reason <- bind_rows(tab_reason,row_sum)
+> tab_reason[nrow(tab_reason),1] = c("Total")
+> 
+> #  Some nnumbers for the text
+> faildata <- as.numeric(tab_reason$`Missing Data`[tab_reason$Year == "Total"])
+> cat(faildata, 					file=file.path(TexIncludes,"faildata.tex"))
+> failcode<-as.numeric(tab_reason$`Code Error`[tab_reason$Year == "Total"])
+> cat(failcode, 					file=file.path(TexIncludes,"failcode.tex"))
+> failcorrupted<-as.numeric(tab_reason$`Corrupted Data`[tab_reason$Year == "Total"])
+> cat(failcorrupted, 					file=file.path(TexIncludes,"failcorrupted.tex"))
+> failsoftware<-as.numeric(tab_reason$`Software Unavailable`[tab_reason$Year == "Total"])
+> cat(failsoftware, 					file=file.path(TexIncludes,"failsoftware.tex"))
+> failother<-as.numeric(tab_reason$Other[tab_reason$Year == "Total"])
+> cat(failother, 					file=file.path(TexIncludes,"failother.tex"))
+> failall <- as.numeric(tab_reason$Total[tab_reason$Year == "Total"])
+> cat(failall, 					file=file.path(TexIncludes,"failall.tex"))
+> 
+> 
+> ###################################################
+> ### code chunk number 6: tab3
+> ###################################################
+> # Print table
+> 
+> tab_reason.char <- tab_reason %>% mutate_all(.funs = as.character)
+`mutate_all()` ignored the following grouping variables:
+• Column `Year`
+ℹ Use `mutate_at(df, vars(-group_cols()), myoperation)` to silence the message.
+> tab_reason.char[is.na(tab_reason.char)]  <- ""
+> 
+> stargazer(tab_reason.char,
++           out=file.path(TexIncludes,"table_reason_year.tex"),
++           type="latex",title = "Reason for Unsuccessful Reproduction",
++           label="tab:reason:year",style="aer",
++           flip=FALSE, summary=FALSE, rownames = FALSE,
++           font.size = fs,
++           column.sep.width = cw,
++           notes=c("Note: Articles for which a reproduction was attempted,",
++                   "the reproduction was unsuccessful, with valid Exit Q4",
++                   "(see Appendix)."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:11 PM
+\begin{table}[!htbp] \centering 
+  \caption{Reason for Unsuccessful Reproduction} 
+  \label{tab:reason:year} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Year & Most Numbers Differ & Missing Data & Corrupted Data & Missing Code & Code Error & Software Unavailable & Other & Total \\ 
+\hline \\[-1.8ex] 
+2009 &  &  & 1 &  &  &  &  & 1 \\ 
+2010 &  &  &  & 1 &  &  &  & 1 \\ 
+2011 &  & 2 &  &  &  &  & 5 & 7 \\ 
+2012 &  & 1 & 1 &  & 1 &  &  & 3 \\ 
+2014 &  & 1 &  &  &  & 1 &  & 2 \\ 
+2016 &  & 1 &  &  &  &  &  & 1 \\ 
+2017 & 1 & 1 &  &  &  &  &  & 2 \\ 
+2018 &  &  & 1 &  &  &  &  & 1 \\ 
+Total & 1 & 6 & 3 & 1 & 1 & 1 & 5 & 18 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{9}{l}{Note: Articles for which a reproduction was attempted,} \\ 
+\multicolumn{9}{l}{the reproduction was unsuccessful, with valid Exit Q4} \\ 
+\multicolumn{9}{l}{(see Appendix).} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> stargazer(tab_reason.summary,
++           out=file.path(TexIncludes,"table_reason.tex"),
++           type="latex",title = "Reason for Unsuccessful Reproduction",
++           label="tab:reason",style="aer",
++           flip=FALSE, summary=FALSE, rownames = FALSE,
++           #font.size = fs,
++           column.sep.width = cw,
++           notes=c("Note: Articles for which a reproduction was attempted,",
++                         "the reproduction was unsuccessful, with valid Exit Q4",
++                         "(see Appendix). Question was not asked for articles",
++                         "with partial reproduction success."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:11 PM
+\begin{table}[!htbp] \centering 
+  \caption{Reason for Unsuccessful Reproduction} 
+  \label{tab:reason} 
+\begin{tabular}{@{\extracolsep{0.4pt}} cc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Cause & No. of Articles \\ 
+\hline \\[-1.8ex] 
+Most Numbers Differ & 1 \\ 
+Missing Data & 6 \\ 
+Corrupted Data & 3 \\ 
+Missing Code & 1 \\ 
+Code Error & 1 \\ 
+Software Unavailable & 1 \\ 
+Other & 5 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{2}{l}{Note: Articles for which a reproduction was attempted,} \\ 
+\multicolumn{2}{l}{the reproduction was unsuccessful, with valid Exit Q4} \\ 
+\multicolumn{2}{l}{(see Appendix). Question was not asked for articles} \\ 
+\multicolumn{2}{l}{with partial reproduction success.} \\ 
+\end{tabular} 
+\end{table} 
+> ###################################################
+> ### code chunk number 7: tab4
+> ###################################################
+> # Create table
+> tab_reason2 <- exit_all %>%
++   filter(replicated %in% c("No","Partial") & confdata == "Other") %>%
++   group_by(year,reason) %>%
++   summarise(n=n()) %>% spread(reason,n) %>%
++   select(Year=year,`Missing Data`,`Corrupted Data`,`Code Error`,`Software Unavailable`,Other)
+`summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
+> 
+> 
+> # Add sum row and col
+> tab_reason2$Total <- rowSums(tab_reason2[,2:6],na.rm = T)
+> 
+> 
+> row_sum <- colSums(tab_reason2[,2:6],na.rm=TRUE)
+> 
+> tab_reason2 <- bind_rows(tab_reason2,row_sum)
+> tab_reason2[11,1] = c("Total")
+> 
+> tab_reason2[is.na(tab_reason2)] <- 0
+> # Print table
+> stargazer(tab_reason2,
++           out=file.path(TexIncludes,"table_reason2.tex"),
++           type="latex",title = "Reason for Unsuccessful or Partial Reproduction",
++           label="tab:reason2",style="aer",
++           flip=FALSE, summary=FALSE, rownames = FALSE,
++           font.size = fs,column.sep.width = cw,
++           notes=c("Note: Sample of reproduced and scored papers, i.e, assessed papers for which we attempted reproduction."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:11 PM
+\begin{table}[!htbp] \centering 
+  \caption{Reason for Unsuccessful or Partial Reproduction} 
+  \label{tab:reason2} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Year & Missing Data & Corrupted Data & Code Error & Software Unavailable & Other & Total \\ 
+\hline \\[-1.8ex] 
+2009 & 0 & 1 & 0 & 0 & 4 & 5 \\ 
+2010 & 0 & 0 & 0 & 0 & 3 & 3 \\ 
+2011 & 2 & 0 & 0 & 0 & 7 & 9 \\ 
+2012 & 1 & 1 & 1 & 0 & 13 & 16 \\ 
+2013 & 0 & 0 & 0 & 0 & 3 & 3 \\ 
+2014 & 1 & 0 & 0 & 1 & 11 & 13 \\ 
+2015 & 0 & 0 & 0 & 0 & 12 & 12 \\ 
+2016 & 1 & 0 & 0 & 0 & 7 & 8 \\ 
+2017 & 1 & 0 & 0 & 0 & 8 & 9 \\ 
+2018 & 0 & 1 & 0 & 0 & 3 & 4 \\ 
+Total & 6 & 3 & 1 & 1 & 71 & 0 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{7}{l}{Note: Sample of reproduced and scored papers, i.e, assessed papers for which we attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> ###################################################
+> ### code chunk number 8: tab5
+> ###################################################
+> #unique(main$Program_Run_Clean[main$replicated=="yes"])
+> #unique(main$Directory_Change[main$replicated=="yes"])
+> 
+> table(exit_all$Directory_Change,useNA = "always")
+
+No, the changes to the code were more involved.                                             Yes 
+                                             57                                              43 
+                                           <NA> 
+                                             80 
+> table(exit_all$Program_Run_Clean,useNA = "always")
+
+No, I needed to make changes in the code.           Yes, no changes were necessary. 
+                                      100                                        28 
+                                     <NA> 
+                                       52 
+> 
+> table(exit_all$Directory_Change,exit_all$Program_Run_Clean,useNA = "always")
+                                                 
+                                                  No, I needed to make changes in the code.
+  No, the changes to the code were more involved.                                        57
+  Yes                                                                                    43
+  <NA>                                                                                    0
+                                                 
+                                                  Yes, no changes were necessary. <NA>
+  No, the changes to the code were more involved.                               0    0
+  Yes                                                                           0    0
+  <NA>                                                                         28   52
+> 
+> table(exit_all$change,exit_all$replicated,useNA = "always")
+                  
+                   No Partial Yes <NA>
+  Complex Change    0      33  24    0
+  Directory Change  0      24  19    0
+  None              0       9  19    0
+  <NA>             43       3   6    0
+> 
+> 
+> 
+> ### New code table: simpler
+> 
+> table_dir <- exit_all %>%
++   filter(!is.na(replicated)) %>%
++   filter(replicated != "No") %>%
++   filter(confdata == "Other") %>%
++   mutate(replicated = if_else(replicated=="Yes","Fully",replicated),
++          change = replace_na(change,"Missing"),
++          change = if_else(change=="None","No Change",change))
+> nrow(table_dir)
+[1] 134
+> 
+> table(table_dir$change,table_dir$replicated,useNA = "ifany") %>%
++   xtable(caption="Code Changes for Successful Reproductions",
++          label="tab:code") -> tab_code.summary
+> 
+> notes <- list(pos=list(0), command="")
+> notes$pos <- list(-1,nrow(tab_code.summary))
+> notes$command <- c("\\\\","\\hline\\multicolumn{3}{p{0.4\\textwidth}}{\\footnotesize{ Note: Partially or fully reproduced articles.
++                    Answers to questions Exit Q8 and Q9. These questions were skipped when
++                    reproduction was not successful.}}\\\\")
+> print(tab_code.summary,
++       file=file.path(Outputs,"table_code.tex"),
++       add.to.row = notes,
++       caption.placement = "top",
++       sanitize.rownames.function=function(x)gsub("\\."," ",x))
+> 
+> 
+> ### Old code Create table
+> tab_code.raw <- exit_all %>% filter(replicated %in% c("Yes")) %>%
++   group_by(year,change) %>% summarize(n=n()) %>% spread(change,n) %>%
++   mutate(Total = sum(`None`,`Complex Change`,`Directory Change`,na.rm = TRUE)) %>%
++   rename(Year = year)
+`summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
+> 
+> 
+> 
+> ## Add sum row
+> 
+> row_sum <- colSums(tab_code.raw[,2:5],na.rm=TRUE)
+> tab_code <- bind_rows(tab_code.raw,row_sum)
+> tab_code[nrow(tab_code),1] = c("Total")
+> 
+> ## Add col percent
+> col_pct <- round(tab_code[nrow(tab_code),2:5])*100/as.numeric(tab_code[nrow(tab_code),5],2)
+> tab_code <- bind_rows(tab_code,col_pct)
+> tab_code[nrow(tab_code),1]=c("Percent")
+> 
+> # Same for partial
+> 
+> tab_code_partial <- exit_all %>% filter(replicated %in% c("Partial")) %>%
++   group_by(year,change) %>% summarize(n=n()) %>% spread(change,n) %>%
++   mutate(Total = sum(`None`,`Complex Change`,`Directory Change`,na.rm = TRUE)) %>%
++   rename(Year = year)
+`summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
+> 
+> ## Add sum row
+> 
+> row_sum <- colSums(tab_code_partial[,2:5],na.rm=TRUE)
+> tab_code_partial <- bind_rows(tab_code_partial,row_sum)
+> tab_code_partial[nrow(tab_code_partial),1] = c("Total")
+> 
+> ## Add col percent
+> col_pct <- round(tab_code_partial[nrow(tab_code_partial),2:5])*100/
++                   as.numeric(tab_code_partial[nrow(tab_code_partial),5],
++                              2)
+> tab_code_partial <- bind_rows(tab_code_partial,col_pct)
+> tab_code_partial[nrow(tab_code_partial),1]=c("Percent")
+> 
+> # Number for tex
+> nochange        <-as.numeric(tab_code$`None`[tab_code$Year == "Total"])
+> directorychange <-as.numeric(tab_code$`Directory Change`[tab_code$Year == "Total"])
+> change          <-nochange+directorychange
+> cat(change, 					file=file.path(TexIncludes,"change.tex"))
+> complex         <-as.numeric(tab_code$`Complex Change`[tab_code$Year == "Total"])
+> cat(complex, 					file=file.path(TexIncludes,"complex.tex"))
+> ratiocomplex    <-100*round(complex/attempted.success,2)
+> cat(ratiocomplex, 					file=file.path(TexIncludes,"ratiocomplex.tex"))
+> 
+> ###################################################
+> ### code chunk number 9: results2.Rnw:255-259
+> ###################################################
+> # Print table
+> tab_code[is.na(tab_code)] <- 0
+> #tab_code[12,2]<- round(as.numeric(tab_code[12,2]))
+> #tab_code[12,3]<- round(as.numeric(tab_code[12,3]))
+> #tab_code[12,4]<- round(as.numeric(tab_code[12,4]))
+> #tab_code[12,1]=c("Percent")
+> 
+> stargazer(tab_code,
++           out=file.path(Outputs,"table_code_year.tex"),
++           type="latex",
++           title = "Manipulation of Code Required for Successful Reproductions",
++           label="tab:code",
++           style="aer",flip=F, summary=F, rownames = F,
++           font.size = fs,column.sep.width = cw,
++           notes=c("Note: Articles for which reproduction was attempted."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:12 PM
+\begin{table}[!htbp] \centering 
+  \caption{Manipulation of Code Required for Successful Reproductions} 
+  \label{tab:code} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} cccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Year & Complex Change & Directory Change & None & \textless NA\textgreater  & Total \\ 
+\hline \\[-1.8ex] 
+2009 & 1 & 1 & 2 & 0 & 4 \\ 
+2010 & 1 & 3 & 0 & 3 & 4 \\ 
+2011 & 4 & 2 & 2 & 2 & 8 \\ 
+2012 & 2 & 3 & 3 & 0 & 8 \\ 
+2013 & 0 & 1 & 2 & 1 & 3 \\ 
+2014 & 2 & 1 & 4 & 0 & 7 \\ 
+2015 & 0 & 3 & 1 & 0 & 4 \\ 
+2016 & 3 & 3 & 2 & 0 & 8 \\ 
+2017 & 9 & 2 & 2 & 0 & 13 \\ 
+2018 & 2 & 0 & 1 & 0 & 3 \\ 
+Total & 24 & 19 & 19 & 6 & 0 \\ 
+Percent & 400 & 316.666666666667 & 316.666666666667 & 100 & 0 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{6}{l}{Note: Articles for which reproduction was attempted.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> ###################################################
+> ### code chunk number 10: results2.Rnw:265-289
+> ###################################################
+> main <- exit_all %>% mutate(doc_qual = ifelse(clarity == "Complete",1,0),
++                               `Fully reproduced` = ifelse(replicated == "Yes",1,0))
+> 
+> 
+> # Run Regression: citations on h-indices and confidential data
+> ols.docqual <- lm(`Fully reproduced`~doc_qual,main)
+> 
+> # stargazer(ols.docqual,
+> #            title="OLS: Reproduction Success vs Documentation Quality",
+> #           align=TRUE,no.space=FALSE,label = "reg1",
+> #            dep.var.labels=c('Successful Reproduction'),
+> #           covariate.labels = c("Documentation Clarity = Complete","Constant"),
+> #           notes.align = "l", notes.append = FALSE,
+> #           style="qje", type="latex",notes = c("Dependent variable = 1 if fully replicated."),
+> #            keep.stat = c("n"))
+> 
+> resmatrix<-cor.test(main$`Fully reproduced`,main$doc_qual,method="pearson")
+> resmatrix2<-cor.test(main$`Fully reproduced`,main$doc_qual,method="kendall")
+> resmatrix3<-cbind(resmatrix$estimate,resmatrix$p.value)
+> resmatrix4<-cbind(resmatrix2$estimate,resmatrix2$p.value)
+> resmatrix3<-rbind(resmatrix3,resmatrix4)
+> rownames(resmatrix3) <- c("Pearson","Kendall")
+> colnames(resmatrix3) <- c("Estimate", "p-value")
+> stargazer(resmatrix3,
++           out=file.path(Outputs,"table_reg1.tex"),
++           column.labels = c("test","estimate", "p-value"),
++           title="Correlation of Reproduction Success vs Documentation Quality",
++           align=TRUE, no.space=FALSE, label = "reg1",
++           notes.align = "l", column.sep.width = cw,
++           type="latex",single.row = TRUE,digits = 5,
++           notes=c("Notes: Sample of reproduced and scored papers, i.e, assessed",
++ "papers for which we attempted reproduction."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:12 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Correlation of Reproduction Success vs Documentation Quality} 
+  \label{reg1} 
+\begin{tabular}{@{\extracolsep{0.4pt}} D{.}{.}{-5} D{.}{.}{-5} D{.}{.}{-5} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{Estimate} & \multicolumn{1}{c}{p-value} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{1}{c}{Pearson} & 0.25500 & 0.00057 \\ 
+\multicolumn{1}{c}{Kendall} & 0.25500 & 0.00066 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{3}{l}{Notes: Sample of reproduced and scored papers, i.e, assessed} \\ 
+\multicolumn{3}{l}{papers for which we attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> ###################################################
+> ### code chunk number 11: results2.Rnw:299-363
+> ###################################################
+> # TODO: correct the average citation - it is not corrected in the raw data
+> 
+> # Load h-index data and citation data
+> hindex <- read.csv(paste(Outputs,HindexClean,sep="/"), header=TRUE,stringsAsFactors = F)
+> 
+> # Use DOI to identify year
+> hindex$article <- sub(pattern = "10.1257/app.",replacement = "",hindex$DOI)
+> hindex$pubyear <- sapply(strsplit(hindex$article,'[.]'),function(x) x[1])
+> hindex$pubyear <- as.numeric(hindex$pubyear)+2008
+> 
+> # Fix the formatting on citations per year number
+> hindex$Average.per.Year <- as.numeric(as.character(sub(",",".", hindex$Average.per.Year, fixed = TRUE)))
+> 
+> # as downloaded, but  need to convert to numeric first
+> # 2010 have 6 possible publication years divided by 6 years : are correctly computed
+> # 2011 have 5 possible publication years divided by 6 years
+> # 2013 have 3 possible publication years divided by 4 years
+> hindex$Average.per.Year <- as.numeric(hindex$Average.per.Year)
+> hindex$Average.per.Year[hindex$pubyear==2009] <- hindex$Average.per.Year[hindex$pubyear==2009] * 8/7
+> hindex$Average.per.Year[hindex$pubyear==2011] <- hindex$Average.per.Year[hindex$pubyear==2011] * 6/5
+> hindex$Average.per.Year[hindex$pubyear==2012] <- hindex$Average.per.Year[hindex$pubyear==2012] * 5/4
+> hindex$Average.per.Year[hindex$pubyear==2013] <- hindex$Average.per.Year[hindex$pubyear==2013] * 4/3
+> 
+> # Summarise stats
+> hindex <- hindex %>% group_by(DOI) %>%
++   summarise(cite = mean(Total.Citations),
++             avgcite = mean(Average.per.Year),
++             avghindex = mean(h.index,na.rm=TRUE),
++             tophindex=max(h.index,na.rm=TRUE),
++             pubyear = mean(pubyear),
++             lowhindex = min(h.index,na.rm=TRUE),
++             authnum=max(Author.Order))
+> hindex$tophindex[!is.finite(hindex$tophindex)] <- NA
+> hindex$lowhindex[!is.finite(hindex$lowhindex)] <- NA
+> 
+> # save for future re-use
+> saveRDS(hindex,file=file.path(interwrk,"31_hindex_merged_wos.Rds"))
+> 
+> # This operation creates problem with  -Inf and Inf later, need to replace with Nan?
+> # Merge with exit Q
+> main <- exit_all %>% left_join(hindex,by="DOI")
+> 
+> # Summary Stats by Replication Success
+> authorstats.doi <- main %>% filter(!is.na(avghindex))
+> 
+> author <- authorstats.doi %>%
++   # coherence with later selection criteria
++   filter(!is.na(replicated)) %>%
++   filter(confdata!="Confidential")%>%
++   group_by(replicated) %>%
++   summarise(`Number of Articles` = n(),
++             `Avg h-index`=mean(avghindex,na.rm=TRUE),
++             `Lowest h-index`=mean(lowhindex,na.rm=TRUE),
++             `Number of Authors`=mean(authnum,na.rm=TRUE),
++             `Avg Annual Citations`=mean(avgcite,na.rm=TRUE)) %>%
++   mutate(replicated = ifelse(replicated == "No","Unsuccessful",replicated),
++          replicated = ifelse(replicated == "Yes","Successful",replicated)) %>%
++   rename(Outcome = replicated) %>%
++    mutate_if(is.numeric, round, digits=2)
+> 
+> saveRDS(authorstats.doi,file=file.path(interwrk,"31_authorstats_doi.Rds"))
+> 
+> # Run Regression: number of authors and replication success
+> nauthor <- main %>% filter(!is.na(avghindex)) %>%
++   group_by(replicated) %>%
++   summarise(`Number of Articles` = n(),
++             `Avg h-index`=mean(avghindex,na.rm=TRUE),
++             `Lowest h-index`=mean(lowhindex,na.rm=TRUE),
++             `Number of Authors`=mean(authnum,na.rm=TRUE),
++             `Avg Annual Citations`=mean(avgcite,na.rm=TRUE)) %>%
++   mutate(replicated = ifelse(replicated == "No","Unsuccessful",replicated),
++          replicated = ifelse(replicated == "Yes","Successful",replicated)) %>%
++   rename(Outcome = replicated) %>%
++    mutate_if(is.numeric, round, digits=2)
+> 
+> 
+> ###################################################
+> ### code chunk number 12: results2.Rnw:369-397
+> ###################################################
+> # Clarity and number of co-authors
+> cat1 <- c("no readme file was provided.")
+> cat2 <- c("complete. provided all information required to run the programs.")
+> cat3 <- c("incomplete. was ambiguous or left out crucial steps.")
+> 
+> main2 <- main %>%
++   mutate(clarity = ifelse(tolower(X18) %in% cat1,"No ReadMe Provided","No Info"),
++          clarity = ifelse(tolower(X18) %in% cat2,"Complete",clarity),
++          clarity = ifelse(tolower(X18) %in% cat3,"Incomplete",clarity))
+> 
+> #author2 <- main2 %>% filter(!is.na(avghindex)) %>% filter(replicated != "NA")
+> author2 <- main2 %>% filter((replicated != "NA"))   %>%
++   #filter((clarity != "No ReadMe Provided")) %>%
++   group_by(clarity) %>%
++   summarise(`Number of Articles` = n(),
++             `Number of Authors`=mean(authnum,na.rm=TRUE))%>%
++    mutate_if(is.numeric, round, digits=2)
+> 
+> # Metrics clarity and number of authors
+> stargazer(author2,
++           out=file.path(Outputs,"table_authormetrics.tex"),
++           type="latex",title = "Clarity and Author Metrics",
++           label="tab:authormetrics",
++           style="aer",flip=F, summary=F, rownames = F,
++           font.size = fs,column.sep.width = cw,
++           notes=c("Notes: Sample of reproduced and scored papers, i.e, assessed",
++                   "papers for which we attempted reproduction."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:12 PM
+\begin{table}[!htbp] \centering 
+  \caption{Clarity and Author Metrics} 
+  \label{tab:authormetrics} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+clarity & Number of Articles & Number of Authors \\ 
+\hline \\[-1.8ex] 
+Complete & 133 & 2.43 \\ 
+Incomplete & 45 & 2.27 \\ 
+No Info & 2 & 2 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{3}{l}{Notes: Sample of reproduced and scored papers, i.e, assessed} \\ 
+\multicolumn{3}{l}{papers for which we attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> # Print table
+> # Flip table
+> 
+> author %>%
++   select(Outcome,`Avg h-index`, `Lowest h-index`, `Number of Authors`  ,
++          Citations=`Avg Annual Citations`,N=`Number of Articles`  ) %>%
++   transpose(keep.names = "Name") -> tmp
+> names(tmp) <- as.character(unlist(tmp[1,]))
+> tmp[2:nrow(tmp),] %>%
++   select(Outcome,"Unsuccessful","Partial","Successful") %>%
++   rename(` ` = Outcome) -> author.t
+> rm(tmp)
+> 
+> stargazer(author.t,
++           out=file.path(Outputs,"table_metrics.tex"),
++           type="latex",title = "Publication and Author Metrics, WoS",
++           label="tab:metrics",
++           style="aer",flip=F, summary=F, rownames = F,
++           #font.size = fs,
++           column.sep.width = cw,
++           digits=2,
++           notes=c("Notes: Articles with attempted reproduction.",
++                   "Bibliometric data manually queried from WoS."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:13 PM
+\begin{table}[!htbp] \centering 
+  \caption{Publication and Author Metrics, WoS} 
+  \label{tab:metrics} 
+\begin{tabular}{@{\extracolsep{0.4pt}} cccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+  & Unsuccessful & Partial & Successful \\ 
+\hline \\[-1.8ex] 
+Avg h-index & 7.14 & 7.22 & 7.78 \\ 
+Lowest h-index & 5.07 & 4.25 & 4.51 \\ 
+Number of Authors & 2.14 & 2.4 & 2.58 \\ 
+Citations & 4.04 & 3.6 & 5.26 \\ 
+N & 14 & 52 & 45 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{4}{l}{Notes: Articles with attempted reproduction.} \\ 
+\multicolumn{4}{l}{Bibliometric data manually queried from WoS.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> ###################################################
+> ### code chunk number 13: results2.Rnw:403-446
+> ###################################################
+> 
+> # Merge with entry Q
+> # main_entry <- entry_merge %>% left_join(hindex,by="DOI")
+> #
+> # # Merge with exit Q
+> # main_exit <- exit_merge %>% left_join(hindex,by="DOI")
+> #
+> # # Create a binary confidential variable
+> # main_entry <- main_entry %>%   mutate(confidential_data = absence, confidential_data = ifelse(absence %in% c("Confidential Data"),1,confidential_data), confidential_data = ifelse(absence %in%
+> #  c("No Data or Reason","Data was Provided"),0,confidential_data), #
+> #  confidential_data = as.numeric(confidential_data))
+> #
+> #  main_exit <- main_exit %>% mutate(confidential_data = ifelse(confdata =="Confidential",1,0))
+> 
+> # Create dataset with total confidential data variable from entry and exit
+> main <- complete_sample %>% select(DOI,absence) %>% left_join(exit_all) %>%
++   left_join(hindex,by="DOI") %>%
++   mutate(confidential_data = absence,
++          confidential_data = ifelse(absence %in% c("Confidential Data"),1,confidential_data),
++          confidential_data = ifelse(absence %in% c("No Data or Reason","Data was Provided"),0,confidential_data),
++          confidential_data = as.numeric(confidential_data),
++          confidential_data = ifelse(confidential_data == 0 & confdata == "Confidential",1,confidential_data))
+Joining with `by = join_by(DOI, absence)`
+> main$confidential_data[grepl("No Data or Reason",main$absence)] <- 0
+> 
+> 
+> # Create numeric replication variable
+> main <- main %>% mutate(`Fully reproduced` = replicated,
++                         `Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,`Fully reproduced`),
++                         `Fully reproduced` = ifelse(replicated %in% c("Yes"),1,`Fully reproduced`),
++                         `Fully reproduced` = as.numeric(`Fully reproduced`))
+> 
+> # Run Regression: citations on h-indices and confidential data
+> ols.cite.avgh <- lm(cite~avghindex* confidential_data,main)
+> ols.cite.toph <- lm(cite~tophindex* confidential_data,main)
+> ols.cite.lowh <- lm(cite~lowhindex* confidential_data,main)
+> 
+> # Make table
+> stargazer(ols.cite.avgh,ols.cite.toph,ols.cite.lowh,
++           title="OLS: Citations vs Confidential Data",
++           align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="reg2",
++           dep.var.labels = "Total Citations",
++           style="qje", type="latex",
++           column.sep.width = "-15pt",
++           keep.stat = c("n"), out=file.path(Outputs,"table_reg2.tex"),
++           notes.label = "",
++           notes = c("Notes: *** Significant at the 1 percent level, ** Significant at the 5 percent level",
++                     "* Significant at the 10 percent level.","Avghindex is the average hindex about the article's authors,  tophindex the maximum",
++                     " hindex among them and lowhindex the lowest. Avghindex:confidential stands for","the interaction between a dummy taking value 1 if the article uses confidential  ","data, and the aforementioned average hindex of authors.")
++ )
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:13 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Citations vs Confidential Data} 
+  \label{reg2} 
+\begin{tabular}{@{\extracolsep{-15pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 2.490^{***} &  &  \\ 
+  & (0.477) &  &  \\ 
+  & & & \\ 
+ tophindex &  & 1.210^{***} &  \\ 
+  &  & (0.248) &  \\ 
+  & & & \\ 
+ lowhindex &  &  & 1.420^{*} \\ 
+  &  &  & (0.758) \\ 
+  & & & \\ 
+ confidential\_data & 12.500^{*} & 9.750^{*} & 3.080 \\ 
+  & (6.610) & (5.660) & (6.470) \\ 
+  & & & \\ 
+ avghindex:confidential\_data & -1.300 &  &  \\ 
+  & (0.795) &  &  \\ 
+  & & & \\ 
+ tophindex:confidential\_data &  & -0.590 &  \\ 
+  &  & (0.448) &  \\ 
+  & & & \\ 
+ lowhindex:confidential\_data &  &  & -0.117 \\ 
+  &  &  & (1.230) \\ 
+  & & & \\ 
+ Constant & 6.960^{*} & 12.100^{***} & 19.100^{***} \\ 
+  & (4.080) & (3.420) & (4.000) \\ 
+  & & & \\ 
+\textit{N} & \multicolumn{1}{c}{189} & \multicolumn{1}{c}{189} & \multicolumn{1}{c}{189} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\multicolumn{4}{l}{Notes: *** Significant at the 1 percent level, ** Significant at the 5 percent level} \\ 
+\multicolumn{4}{l}{* Significant at the 10 percent level.} \\ 
+\multicolumn{4}{l}{Avghindex is the average hindex about the article's authors,  tophindex the maximum} \\ 
+\multicolumn{4}{l}{ hindex among them and lowhindex the lowest. Avghindex:confidential stands for} \\ 
+\multicolumn{4}{l}{the interaction between a dummy taking value 1 if the article uses confidential  } \\ 
+\multicolumn{4}{l}{data, and the aforementioned average hindex of authors.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> 
+> 
+> 
+> ###################################################
+> ### code chunk number 14: results2.Rnw:450-468
+> ###################################################
+> # Run Regression: citations on h-indices and confidential data
+> ols.cite.avgh <- lm(cite~avghindex,main)
+> ols.cite.toph <- lm(cite~tophindex,main)
+> ols.cite.lowh <- lm(cite~lowhindex,main)
+> 
+> print(mean(main$cite,na.rm = T))
+[1] 26.5
+> print(mean(main$avghindex,na.rm = T))
+[1] 7.32
+> print(mean(main$tophindex,na.rm = T))
+[1] 10.6
+> print(mean(main$lowhindex,na.rm = T))
+[1] 4.44
+> 
+> # Make table
+> stargazer(ols.cite.avgh,ols.cite.toph,ols.cite.lowh,
++           out=file.path(Outputs,"table_reg2test.tex"),
++           title="OLS: Citations vs Confidential Data Testing",
++           align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,label="reg2test",
++           dep.var.labels = "Annual Citations",
++           style="qje", type="latex",
++           column.sep.width = "-15pt",
++           keep.stat = c("n"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:13 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Citations vs Confidential Data Testing} 
+  \label{reg2test} 
+\begin{tabular}{@{\extracolsep{-15pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Annual Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 2.010^{***} &  &  \\ 
+  & (0.383) &  &  \\ 
+  & & & \\ 
+ tophindex &  & 1.010^{***} &  \\ 
+  &  & (0.207) &  \\ 
+  & & & \\ 
+ lowhindex &  &  & 1.380^{**} \\ 
+  &  &  & (0.595) \\ 
+  & & & \\ 
+ Constant & 11.700^{***} & 15.700^{***} & 20.300^{***} \\ 
+  & (3.220) & (2.720) & (3.130) \\ 
+  & & & \\ 
+\textit{N} & \multicolumn{1}{c}{189} & \multicolumn{1}{c}{189} & \multicolumn{1}{c}{189} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{3}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> ###################################################
+> ### code chunk number 15: ols1
+> ###################################################
+> 
+> # Get exit data without confidential data
+> main <- exit_all %>% filter(confdata=="Other") %>%
++   mutate(`Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,1)) %>%
++   mutate(`Full or Partial`= ifelse(replicated %in% c("No"),0,1)) %>%
++   mutate(doc_qual = ifelse(clarity == "Complete",1,0),
++                               `Fully reproduced` = ifelse(replicated == "Yes",1,0)) %>%
++   left_join(hindex,by="DOI")
+> 
+> 
+> # Run Regression: citations on h-indices and replication success
+> avgh <- lm(cite~avghindex* `Fully reproduced`,main)
+> toph <- lm(cite~tophindex* `Fully reproduced`,main)
+> lowh <- lm(cite~lowhindex* `Fully reproduced`,main)
+> 
+> avghp <- lm(cite~avghindex* `Full or Partial`,main)
+> tophp <- lm(cite~tophindex* `Full or Partial`,main)
+> lowhp <- lm(cite~lowhindex* `Full or Partial`,main)
+> 
+> 
+> ###################################################
+> ### code chunk number 16: ols1table
+> ###################################################
+> 
+> # Make table
+> # stargazer(ols.cite.avgh,ols.cite.toph,
+> #           ols.cite.lowh,
+> #           title="OLS: Citations vs Reproduction Success (A)",
+> #           align=TRUE,
+> #           no.space=FALSE,
+> #           notes.align = "l", notes.append = FALSE,
+> #           label="reg3",
+> #           dep.var.labels = "Annual Citations",
+> #           style="aer", type="latex",
+> #            column.sep.width = "-20pt",
+> #            keep.stat = c("n"),
+> #           out=file.path(Outputs,"table_reg3a.tex")
+> # )
+> 
+> stargazer(avgh, toph, lowh, avghp, tophp,lowhp,
++           title="OLS: Citations vs Reproduction Success (B)",
++           align=TRUE,
++           no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="reg3",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           out=file.path(Outputs,"table_reg3b.tex")
++ )
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:13 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Citations vs Reproduction Success (B)} 
+  \label{reg3} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{6}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 2.230^{***} &  &  & 1.550 &  &  \\ 
+  & (0.580) &  &  & (1.990) &  &  \\ 
+  & & & & & & \\ 
+ tophindex &  & 1.010^{***} &  &  & 0.539 &  \\ 
+  &  & (0.285) &  &  & (1.220) &  \\ 
+  & & & & & & \\ 
+ lowhindex &  &  & 1.850 &  &  & 1.580 \\ 
+  &  &  & (1.140) &  &  & (2.810) \\ 
+  & & & & & & \\ 
+ `Fully reproduced` & 1.080 & 0.992 & 9.590 &  &  &  \\ 
+  & (7.730) & (6.680) & (8.050) &  &  &  \\ 
+  & & & & & & \\ 
+ avghindex:`Fully reproduced` & 0.866 &  &  &  &  &  \\ 
+  & (0.891) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Fully reproduced` &  & 0.618 &  &  &  &  \\ 
+  &  & (0.480) &  &  &  &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Fully reproduced` &  &  & -0.141 &  &  &  \\ 
+  &  &  & (1.530) &  &  &  \\ 
+  & & & & & & \\ 
+ `Full or Partial` &  &  &  & -7.750 & -7.810 & 1.480 \\ 
+  &  &  &  & (15.700) & (13.400) & (16.000) \\ 
+  & & & & & & \\ 
+ avghindex:`Full or Partial` &  &  &  & 1.170 &  &  \\ 
+  &  &  &  & (2.040) &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Full or Partial` &  &  &  &  & 0.744 &  \\ 
+  &  &  &  &  & (1.240) &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Full or Partial` &  &  &  &  &  & 0.270 \\ 
+  &  &  &  &  &  & (2.920) \\ 
+  & & & & & & \\ 
+ Constant & 5.210 & 10.500^{***} & 13.100^{**} & 12.600 & 18.500 & 15.600 \\ 
+  & (4.830) & (3.930) & (5.750) & (15.200) & (12.900) & (15.500) \\ 
+  & & & & & & \\ 
+Observations & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} \\ 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{6}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{6}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{6}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> # Merged
+> # DOES NOT WORK
+> # stargazer(ols.cite.avgh,ols.cite.toph,
+> #           ols.cite.lowh, ols.cite.avghp,
+> #           ols.cite.tophp,ols.cite.lowhp, out=file.path(Outputs,"table_reg3.tex"),
+> #           title="OLS: Citations vs Reproduction Success",
+> #           align=TRUE,
+> #           no.space=FALSE,
+> #           notes.align = "l", notes.append = FALSE,
+> #           label="reg3",
+> #           dep.var.labels = "Annual Citations",
+> #           style="aer", type="latex",
+> #           column.sep.width = "-20pt",
+> #           keep.stat = c("n"),
+> #           notes.label = "",
+> #           notes = c("Notes: *** Significant at the 1 percent level, ** Significant at the 5 percent level",
+> #                     "* Significant at the 10 percent level.","Avghindex, lowhindex and tophindex stand respectively for the average, minimum","and maximum hindex across the article's authors. Fully reproduced takes value 1 if there",
+> #                     "is full reproducibility. Full or partial is either full or partial reproducibility."
+> #           )
+> #)
+> 
+> 
+> ###################################################
+> ### code chunk number 17: logols1
+> ###################################################
+> 
+> # Get exit data without confidential data
+> logmain <- exit_all %>%
++   filter(confdata=="Other") %>%
++   mutate(`Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,1)) %>%
++   mutate(`Full or Partial`= ifelse(replicated %in% c("No"),0,1)) %>%
++   mutate(doc_qual = ifelse(clarity == "Complete",1,0),
++                               `Fully reproduced` = ifelse(replicated == "Yes",1,0)) %>%
++   left_join(hindex,by="DOI") %>%
++   mutate(logcite = log(cite))
+> 
+> 
+> # Run Regression: citations on h-indices and replication success
+> lavgh <- lm(logcite~avghindex* `Fully reproduced`,logmain)
+> ltoph <- lm(logcite~tophindex* `Fully reproduced`,logmain)
+> llowh <- lm(logcite~lowhindex* `Fully reproduced`,logmain)
+> 
+> lavghp <- lm(logcite~avghindex* `Full or Partial`,logmain)
+> ltophp <- lm(logcite~tophindex* `Full or Partial`,logmain)
+> llowhp <- lm(logcite~lowhindex* `Full or Partial`,logmain)
+> 
+> 
+> 
+> ###################################################
+> ### code chunk number 18: logols1table
+> ###################################################
+> 
+> # Make table
+> stargazer(lavgh,ltoph, llowh,lavghp, ltophp, llowhp,
++           out=file.path(Outputs,"table_logreg3b.tex"),
++           title="OLS: Log Citations vs Reproduction Success", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,label="logreg3b",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++            column.sep.width = "-20pt",
++            keep.stat = c("n"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:14 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Log Citations vs Reproduction Success} 
+  \label{logreg3b} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{6}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 0.108^{***} &  &  & 0.078 &  &  \\ 
+  & (0.025) &  &  & (0.086) &  &  \\ 
+  & & & & & & \\ 
+ tophindex &  & 0.049^{***} &  &  & 0.024 &  \\ 
+  &  & (0.012) &  &  & (0.052) &  \\ 
+  & & & & & & \\ 
+ lowhindex &  &  & 0.091^{*} &  &  & 0.073 \\ 
+  &  &  & (0.048) &  &  & (0.119) \\ 
+  & & & & & & \\ 
+ `Fully reproduced` & 0.484 & 0.427 & 0.551 &  &  &  \\ 
+  & (0.332) & (0.288) & (0.337) &  &  &  \\ 
+  & & & & & & \\ 
+ avghindex:`Fully reproduced` & -0.015 &  &  &  &  &  \\ 
+  & (0.038) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Fully reproduced` &  & -0.004 &  &  &  &  \\ 
+  &  & (0.021) &  &  &  &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Fully reproduced` &  &  & -0.028 &  &  &  \\ 
+  &  &  & (0.064) &  &  &  \\ 
+  & & & & & & \\ 
+ `Full or Partial` &  &  &  & -0.292 & -0.392 & -0.020 \\ 
+  &  &  &  & (0.677) & (0.574) & (0.677) \\ 
+  & & & & & & \\ 
+ avghindex:`Full or Partial` &  &  &  & 0.028 &  &  \\ 
+  &  &  &  & (0.088) &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Full or Partial` &  &  &  &  & 0.026 &  \\ 
+  &  &  &  &  & (0.053) &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Full or Partial` &  &  &  &  &  & 0.003 \\ 
+  &  &  &  &  &  & (0.123) \\ 
+  & & & & & & \\ 
+ Constant & 1.860^{***} & 2.110^{***} & 2.230^{***} & 2.300^{***} & 2.620^{***} & 2.490^{***} \\ 
+  & (0.208) & (0.169) & (0.241) & (0.655) & (0.554) & (0.653) \\ 
+  & & & & & & \\ 
+Observations & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} \\ 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{6}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{6}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{6}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> # stargazer(ols.lcite.avghp,
+> #           ols.lcite.tophp,ols.lcite.lowhp,
+> #           out=file.path(Outputs,"table_logreg3b.tex"),
+> #           title="OLS: Log Citations vs Reproduction Success", align=TRUE,no.space=FALSE,
+> #           notes.align = "l", notes.append = FALSE,label="logreg3b",
+> #           dep.var.labels = "Annual Citations",
+> #           style="aer", type="latex",
+> #           column.sep.width = "-20pt",
+> #           keep.stat = c("n"))
+> # Merged table
+> # stargazer(ols.lcite.avgh,ols.lcite.toph,
+> #           ols.lcite.lowh, ols.lcite.avghp,
+> #           ols.lcite.tophp,ols.lcite.lowhp,
+> #           out=file.path(Outputs,"table_logreg3.tex"),
+> #           title="OLS: Log Citations vs Reproduction Success", align=TRUE,no.space=FALSE,
+> #           notes.align = "l", notes.append = FALSE,label="logreg3b",
+> #           dep.var.labels = "Annual Citations",
+> #           style="aer", type="latex",
+> #           column.sep.width = "-20pt",
+> #           keep.stat = c("n"))
+> 
+> ###################################################
+> ###################################################
+> ### code chunk number 18: arcsins1table
+> ###################################################
+> arcsinmain <- exit_all %>%
++   filter(confdata=="Other") %>%
++   mutate(`Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,1)) %>%
++   mutate(`Full or Partial`= ifelse(replicated %in% c("No"),0,1)) %>%
++   mutate(doc_qual = ifelse(clarity == "Complete",1,0),
++          `Fully reproduced` = ifelse(replicated == "Yes",1,0)) %>%
++   left_join(hindex,by="DOI") %>%
++   mutate(ascite = asinh(cite))
+> 
+> 
+> # Run Regression: citations on h-indices and replication success
+> asavgh <- lm(ascite~avghindex* `Fully reproduced`,arcsinmain)
+> astoph <- lm(ascite~tophindex* `Fully reproduced`,arcsinmain)
+> aslowh <- lm(ascite~lowhindex* `Fully reproduced`,arcsinmain)
+> 
+> asavghp <- lm(ascite~avghindex* `Full or Partial`,arcsinmain)
+> astophp <- lm(ascite~tophindex* `Full or Partial`,arcsinmain)
+> aslowhp <- lm(ascite~lowhindex* `Full or Partial`,arcsinmain)
+> 
+> # Make table
+> stargazer(asavgh,astoph, aslowh,asavghp, astophp, aslowhp,
++           out=file.path(Outputs,"table_asreg3b.tex"),
++           title="OLS: Log Citations vs Reproduction Success", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,label="asreg3b",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:15 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Log Citations vs Reproduction Success} 
+  \label{asreg3b} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{6}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 0.107^{***} &  &  & 0.078 &  &  \\ 
+  & (0.025) &  &  & (0.085) &  &  \\ 
+  & & & & & & \\ 
+ tophindex &  & 0.049^{***} &  &  & 0.024 &  \\ 
+  &  & (0.012) &  &  & (0.052) &  \\ 
+  & & & & & & \\ 
+ lowhindex &  &  & 0.089^{*} &  &  & 0.073 \\ 
+  &  &  & (0.047) &  &  & (0.117) \\ 
+  & & & & & & \\ 
+ `Fully reproduced` & 0.477 & 0.422 & 0.540 &  &  &  \\ 
+  & (0.328) & (0.284) & (0.333) &  &  &  \\ 
+  & & & & & & \\ 
+ avghindex:`Fully reproduced` & -0.015 &  &  &  &  &  \\ 
+  & (0.038) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Fully reproduced` &  & -0.004 &  &  &  &  \\ 
+  &  & (0.020) &  &  &  &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Fully reproduced` &  &  & -0.027 &  &  &  \\ 
+  &  &  & (0.063) &  &  &  \\ 
+  & & & & & & \\ 
+ `Full or Partial` &  &  &  & -0.283 & -0.384 & -0.012 \\ 
+  &  &  &  & (0.668) & (0.566) & (0.669) \\ 
+  & & & & & & \\ 
+ avghindex:`Full or Partial` &  &  &  & 0.027 &  &  \\ 
+  &  &  &  & (0.087) &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Full or Partial` &  &  &  &  & 0.025 &  \\ 
+  &  &  &  &  & (0.053) &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Full or Partial` &  &  &  &  &  & 0.002 \\ 
+  &  &  &  &  &  & (0.122) \\ 
+  & & & & & & \\ 
+ Constant & 2.560^{***} & 2.810^{***} & 2.940^{***} & 3.000^{***} & 3.320^{***} & 3.190^{***} \\ 
+  & (0.205) & (0.167) & (0.238) & (0.646) & (0.547) & (0.645) \\ 
+  & & & & & & \\ 
+Observations & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} \\ 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{6}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{6}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{6}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> ###################################################
+> ### Explanation of sample
+> ###################################################
+> uniquedoi <- readRDS(file=file.path(dataloc,"00_uniquedoi.Rds"))
+> 
+> count <- c(uniquedoi,total.assessed,total.attempted[1],total.attempted.nonconf[1])
+> sample <-matrix(c("Assessed articles","Assessed with complete records", "Eligible articles with non confidential data, complete and unique records","Amenable for replication, after removing confidential data articles identified during replication"))
+> sample_doc <- data.frame(sample, count)
+> 
+> 
+> ###################################################
+> ### code chunk number 3: tabappeendix
+> ###################################################
+> # Print table
+> stargazer(sample_doc,
++           type="latex",title = "Summary of data",
++           label="tab:appendix",
++           out=file.path(Outputs,"table_appendix.tex"),
++           style="aer",align = TRUE,
++           flip=FALSE,summary=FALSE,
++           rownames = TRUE,
++           font.size = fs,column.sep.width = cw)
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 11:34:15 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Summary of data} 
+  \label{tab:appendix} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{sample} & \multicolumn{1}{c}{count} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{1}{c}{1} & \multicolumn{1}{c}{Assessed articles} & 303 \\ 
+\multicolumn{1}{c}{2} & \multicolumn{1}{c}{Assessed with complete records} & 274 \\ 
+\multicolumn{1}{c}{3} & \multicolumn{1}{c}{Eligible articles with non confidential data, complete and unique records} & 180 \\ 
+\multicolumn{1}{c}{4} & \multicolumn{1}{c}{Amenable for replication, after removing confidential data articles identified during replication} & 152 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+> 
+> #### Some extra numbers
+> nauthors<-round(mean(author$`Number of Authors`),2)
+> cat(nauthors, 					file=file.path(TexIncludes,"nauthors.tex"))
+> ncite<-round(mean(author$`Avg Annual Citations`),2)
+> cat(ncite, 					file=file.path(TexIncludes,"ncite.tex"))
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  17.72    1.94   18.46 

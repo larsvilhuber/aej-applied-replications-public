@@ -1,0 +1,760 @@
+\documentclass{beamer}[10pt, aspectratio=169]
+%\usetheme{JuanLesPins}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amsthm, amssymb} %mathematical packages for propositions, proofs and so on 
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{graphicx}
+ \usepackage{setspace}
+ \usepackage{tabulary}
+ \usepackage{tabularx}
+ \usepackage{longtable}
+\usepackage{bm}
+\usepackage{pgffor}
+\usepackage{subscript}
+\usepackage{blkarray}
+\usepackage{mathrsfs}
+\usetikzlibrary{positioning}
+\usepackage{changepage}
+\usepackage{placeins}
+\usepackage{bbm}
+\usepackage{dcolumn}
+\usepackage{pgfplots}
+\usepackage{subcaption}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{frametitle}[default][center]
+\addtobeamertemplate{frametitle}{\vskip+2.5ex}{}
+\newtheorem{proposition}[theorem]{Proposition}
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate {footline}{\quad\hfill\insertframenumber\strut\quad}
+%\renewcommand{\baselinestretch}{0.8}
+\setbeamertemplate{footline}[frame number]{}
+
+%--------------------------------------------------------------------------------
+
+\begin{document}
+\title[]{The Reproducibility of Economics Research: A Case Study}
+\author{S.Herbert H.Kingi F.Stanchi and L.Vilhuber }
+\date{\today}
+%--------------------------------------------------------------------------------
+
+{
+\setbeamertemplate{footline}{}
+ \begin{frame}
+ \titlepage
+ \small
+
+ \end{frame}}
+ %--------------------------------------------------------------------------------
+% Define some colors
+  \definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
+  \definecolor{beaublue}{rgb}{0.74, 0.83, 0.9}
+	
+%--------------------------------------------------------------------------------
+
+\renewenvironment{quote}[1][1em]
+  {\begin{adjustwidth}{#1}{#1}}
+  {\end{adjustwidth}}
+  
+\section{Introduction}
+\begin{frame}
+ \addtocounter{framenumber}{-1}
+\frametitle{}
+\frametitle{Credibility of research in economics}
+ \begin{itemize}
+\item Transparency and openness are essential to the credibility of economics research
+\break
+
+\item Even more important for policy making because research provides informs economic policies
+\break
+
+\item Evidence-based policy making  with reliance on academic research
+\break
+
+\item  Research needs to be trustworthy, hence reliable
+\end{itemize}
+\end{frame}
+%--------------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Peer review and reproducibility}
+\begin{itemize}
+\item Peer review ensures high quality and original research
+\break
+
+\item But zero obligation to reproduce results from the codes and data
+\break
+
+\item Data availability policies to promote transparency 
+
+\end{itemize}
+
+\begin{figure}
+ \resizebox{\textwidth}{!}{%
+ \begin{tikzpicture}[x=3.5cm,nodes={text width=2.5cm,align=center}] 
+\draw[black,->,thick,>=latex,line cap=rect] (0,0) -- (5,0);
+\fill (0,0) circle[radius=1.5pt]  node[above=0.2ex] {{\visible<1->{1933}}} ;
+\fill (0,0) circle[radius=1.5pt]  node[below=0.2ex] {{\visible<1->{{{\textit{Econometrica} \\ raw data}}}}} ;
+\fill (1,0) circle[radius=1.5pt] node[above=0.2ex] {{\visible<2->{1976-1999}}};
+\fill (1,0) circle[radius=1.5pt]  node[below=0.2ex] {{\visible<2->{{{\textit{JPE} \\ confirmation and contradictions}}}}} ;
+\fill (2,0) circle[radius=1.5pt] node[above=0.2ex] {{\visible<3->{1982}}};
+\fill (2,0) circle[radius=1.5pt]  node[below=0.2ex] {{\visible<3->{{\textit{JMCB} \\ data and code at submission}}}} ;
+\fill (3,0) circle[radius=1.5pt] node[above=0.2ex] {{\visible<4->{2004}}};
+\fill (3,0) circle[radius=1.5pt]  node[below=0.2ex] {{\visible<4->{{\textit{AEA} \\ data and code availability policies}}}} ;
+\fill (4,0) circle[radius=1.5pt] node[above=0.2ex] {{\visible<5->{2016}}};
+\fill (4,0) circle[radius=1.5pt]  node[below=0.2ex] {{\visible<5->{{\textit{QJE} \\ data and code availability policies}}}} ;
+\end{tikzpicture}
+
+%\begin{tikzpicture}[x=3.5cm,nodes={text width=2.5cm,align=center}]
+%\draw[black,->,thick,>=latex,line cap=rect]
+%  (0,0) -- (5,0);
+%  \small
+%\foreach \Text [count=\Xc starting from 0] in 
+%{{\textit{Econometrica} \\ raw data}, %
+% {\textit{JPE} \\ confirmation and contradictions},%
+% {\textit{JMCB} \\ data and code at submission},%
+% {\textit{AEA} \\  data and code availability policies},
+% {\textit{QJE} \\ data and code availability policies}}
+%{\fill (\Xc,0) circle[radius=1.5pt];
+%\node[below=0.2ex] at (\Xc,0) {\Text}; }
+%\foreach \Text [count=\Xc starting from 0] in 
+%{{1933},%
+% {1976-1999},%
+% {1982},%
+% {2004},
+% {2016}}
+%{\fill (\Xc,0) circle[radius=1.5pt];
+%\node[above=0.2ex] at (\Xc,0) {\Text}; \pause}
+%\end{tikzpicture}
+}
+\end{figure}
+\begin{itemize}
+\item<6-> Between 8.1 $\%$ and $54\%$ of economics journal have it, depending on sample (Duvendack et al., 2015; Vlaeminck and Herrmann, 2015; Hoffler 2017)
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------------------------------
+\section{Introduction}
+\begin{frame}
+\frametitle{What we do}
+ \begin{itemize}
+\item<1-> AEA data policy enforced in 2005
+
+\begin{adjustwidth}{1em}{1em}
+\textit{\footnotesize{``Authors of accepted papers ... must provide to the Review, prior to publication, the data, programs, and other details of the computations sufficient to permit replication. ... The Editor should be notified at the time of submission if the data used in a paper are proprietary or if, for some other reason, the requirements above cannot be met.''}}
+\end{adjustwidth}
+\vspace{0.1in}
+\item 
+
+\item<2-> \textbf{Can data availability policies with light enforcement yield reproducible research?}
+\end{itemize}
+\end{frame}
+%--------------------------------------------------------------------------------
+\section{Introduction}
+\begin{frame}
+\frametitle{Variety of replication concepts}
+\begin{figure}
+ \resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[x=4.5cm,nodes={text width=3.5cm,align=center}]
+\draw[black,<->,thick,>=latex,line cap=rect]
+  (0,0) -- (2,0);
+  \footnotesize
+\foreach \Text [count=\Xc starting from 0] in 
+{
+ {\textbf{Reproducibility}},%
+ {\textbf{Replicability}},%
+ {\textbf{Generalizabilty}}}
+{\fill (,0) circle[radius=1.5pt];
+\node[above=0.2ex] at (\Xc,0) {\Text};}
+\foreach \Text [count=\Xc starting from 0] in 
+{{ \begin{itemize}
+\item \tiny Narrow Replication (Pesaran 2003) 
+\item Pure Replication (Hamermesh 2007) 
+\item Verification (Clemens 2015)
+\end{itemize}
+},%
+ {\begin{itemize}
+ \item  \tiny Wide Replication (Pesaran 2003) 
+\item Statistical Replication (Hamermesh 2007) 
+\item  Reproduction Reanalysis (Clemens 2015) 
+\end{itemize}},%
+ {\begin{itemize}
+ \item  \tiny  Wider Replication (Pesaran 2003) 
+\item Scientific Replication (Hamermesh 2007) 
+\item Reanalysis Robustness (Clemens 2015)
+\end{itemize}}}
+{
+\node[below=0.2ex] at (\Xc,0) {\Text};}
+\end{tikzpicture}
+}
+\end{figure}
+
+\begin{itemize}
+\item Reproducible research: same materials + same procedure as original investigator = duplicate results
+\break
+
+\item Can undergraduates, \textbf{armed only with the information provided by authors on the journal website, successfully reproduce the tables and figures} presented by the author in the article?
+\end{itemize}
+\end{frame}
+  %--------------------------------------------------------------------------------
+\section{Introduction}
+\begin{frame}
+\frametitle{Preview of results}
+Data availability policies (unverified reproducibility) yields reproducible research:
+\break
+
+\begin{enumerate}
+\item \textbf{Moderate replication success:} 28$\%$ (total articles), 37$\%$ (total assessed), 42$\%$ (non-confidential data)
+\break
+
+\item \textbf{Main reason is confidential data, with the supplementary material complying with the policy overall}
+\begin{itemize}
+\item Documentation complete (73$\%$ provided complete readme)
+\item A proportion successful replications still required some code changes
+\end{itemize}
+\break
+
+\item \textbf{No citation bonus} for clean and ready to use research
+\end{enumerate}
+\begin{itemize}
+\item Results emphasize the need for a systematic check of reproducibility by journals (AEA policy post 2018), or third-party (Cascad)
+\end{itemize}
+\end{frame}
+  %--------------------------------------------------------------------------------
+\begin{frame}[plain]
+\addtocounter{framenumber}{-1}
+\definecolor{foo}{rgb}{0.2,0.2,0.7}
+\LARGE
+\begin{tikzpicture}[overlay, remember picture]
+\node[anchor=center] at (current page.center) {
+\begin{beamercolorbox}[center]{title}
+ \color{foo} \centering{Reproduction procedure}
+  \end{beamercolorbox}};
+\end{tikzpicture}
+\end{frame}
+
+
+  %--------------------------------------------------------------------------------
+\section{Data}
+\begin{frame}
+\frametitle{Reproduction procedure}
+\vspace{0.1in}
+\begin{footnotesize}
+\textbf{Replication lab}: undergraduates over 5 summers (2014-2018)
+\begin{itemize}
+\item Minimum knowledge: economics, computer sciences or Operations Research
+\item Training: version control systems, cloud computing, reproduction procedure
+\end{itemize}
+\vspace{0.1in}
+
+\textbf{3-step process}:
+\begin{enumerate}
+\item<1-> Entry questionnaire
+
+\begin{itemize}
+\item<1-> \footnotesize{Descriptive information: online appendix, data sets presence and availability, programs, documentation and its clarity}
+\item<1-> \footnotesize{Expected level of replication difficulty}
+\end{itemize}
+\break
+\item<2-> Reproduction exercise: record any change in VCS, replication summary in a txt
+\item<3-> Exit questionnaire
+\begin{itemize}
+\item<3-> \footnotesize{Reproduction success, reasons for failure}
+\end{itemize}
+
+\end{enumerate}
+\end{footnotesize}
+\end{frame}
+
+  %--------------------------------------------------------------------------------
+  \section{Data}
+\begin{frame}
+\frametitle{Reproducing the AEA:applied journal}
+\begin{itemize}
+\item 303 papers of the journal \textit{AEJ:applied economics} examined
+\item Covering years well after introduction of the data availability policy: 2009-2018
+\end{itemize}
+\begin{table}[!htbp] \centering 
+ % \caption{Articles by Year} 
+  \label{tab:EntryJournalSum} 
+    \resizebox{\textwidth}{!}{%
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccccccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+2009 & 2010 & 2011 & 2012 & 2013 & 2014 & 2015 & 2016 & 2017 & 2018 & Total \\ 
+\hline \\[-1.8ex] 
+23 & 32 & 36 & 40 & 10 & 40 & 24 & 36 & 42 & 20 & 303 \\ 
+\hline \\[-1.8ex] 
+\end{tabular}
+}
+\end{table}
+\end{frame}
+    %--------------------------------------------------------------------------------
+    \begin{frame}[plain]
+\addtocounter{framenumber}{-1}
+\definecolor{foo}{rgb}{0.2,0.2,0.7}
+\LARGE
+\begin{tikzpicture}[overlay, remember picture]
+\node[anchor=center] at (current page.center) {
+\begin{beamercolorbox}[center]{title}
+ \color{foo} \centering{Compliance with data availability policy}
+  \end{beamercolorbox}};
+\end{tikzpicture}
+\end{frame}
+    %--------------------------------------------------------------------------------
+
+ \section{Data}
+\begin{frame}
+\frametitle{Compliance with AEA data provision requirements}
+\begin{itemize}
+\item Not all articles were accompanied by the necessary data set 
+\end{itemize}
+
+\begin{table}[!htbp] \centering 
+\label{tab:absence} 
+  \resizebox{\textwidth}{!}{%
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}}ccccccccccccc}
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Reason & 2009 & 2010 & 2011 & 2012 & 2013 & 2014 & 2015 & 2016 & 2017 & 2018 & Total & Percent \\ 
+\hline \\[-1.8ex] 
+Confidential Data & 5 & 10 & 8 & 10 & 1 & 15 & 2 & 11 & 11 & 7 & 80 & 26.4 \\ 
+Data was Provided & 16 & 22 & 28 & 27 & 9 & 23 & 21 & 23 & 29 & 11 & 209 & 68.98 \\ 
+No Data or Reason & 2 &  &  & 3 &  & 2 & 1 & 2 & 2 & 2 & 14 & 4.62 \\ 
+Total & 23 & 32 & 36 & 40 & 10 & 40 & 24 & 36 & 42 & 20 & 303 & 100 \\ 
+\hline \\[-1.8ex] 
+\end{tabular}
+}
+\end{table} 
+
+\begin{itemize}
+\item Mainly due to confidential data
+\item Imperfect provision of data, with  missing data: ``No data or reason'' %(ex-ante assessment, mainly due to non-identified confidential data)
+\end{itemize}
+\end{frame}
+
+  %--------------------------------------------------------------------------------
+  \section{Data}
+\begin{frame}
+\frametitle{Dominance of stata}
+\centering
+\begin{figure}
+\centering
+  \resizebox{0.9\textwidth}{!}{%
+\begin{tikzpicture}
+\begin{axis}[
+    every axis plot post/.style={/pgf/number format/fixed},
+    ybar=5pt,
+    bar width=12pt,
+    x=2.5cm,
+    ymin=0,
+    ymax=300,
+    xtick=data,
+    enlarge x limits=25,
+    symbolic x coords={Stata, Matlab, Sas, R, SPSS, Excel, Not reported },
+    point meta={y}, %y-Werte mal 100 für Prozent 
+%    yticklabel={\pgfmathparse{\tick*100}\pgfmathprintnumber{\pgfmathresult}\%},
+    axis lines*=left,
+    axis x line*=bottom, axis y line=left,
+enlarge x limits=auto,
+    clip=false
+    ]
+\addplot [draw=ballblue, fill=ballblue, error bars/.cd, y dir=both, y explicit] coordinates{(Stata, 281) (Matlab,11) (Sas,9) (R,6) (SPSS,2) (Not reported, 14)};
+
+
+
+%\node (a) [above] at (axis cs:  Incomplete,0.25) {25\%};
+%\node [above] at (axis cs:  Complete,0.7389) {73.89\%};
+\end{axis}
+\end{tikzpicture}
+}
+\end{figure}
+ \end{frame}
+
+    %--------------------------------------------------------------------------------
+
+\section{Data}
+\begin{frame}
+\frametitle{Compliance with AEA data availability policy}
+\begin{itemize}
+\item Documentation quite complete: majority of articles is well-documented
+\end{itemize}
+\centering
+  \resizebox{0.5\textwidth}{!}{%
+\begin{tikzpicture}
+\begin{axis}[
+    every axis plot post/.style={/pgf/number format/fixed},
+    ybar=5pt,
+    bar width=12pt,
+    x=2.5cm,
+    ymin=0,
+    ymax=0.8,
+    xtick=data,
+    enlarge x limits=25,
+    symbolic x coords={NoInfo, Incomplete, Complete},
+    point meta={y*100}, %y-Werte mal 100 für Prozent 
+    yticklabel={\pgfmathparse{\tick*100}\pgfmathprintnumber{\pgfmathresult}\%},
+    axis lines*=left,
+    axis x line*=bottom, axis y line=left,
+enlarge x limits=auto,
+    clip=false
+    ]
+\addplot [draw=ballblue, fill=ballblue, error bars/.cd, y dir=both, y explicit] coordinates{(NoInfo,0.011) (Incomplete,0.25)  (Complete,0.7389)};
+\node [above] at (axis cs:  NoInfo,0.011) {1.11\%};
+\node (a) [above] at (axis cs:  Incomplete,0.25) {25\%};
+\node [above] at (axis cs:  Complete,0.7389) {73.89\%};
+\end{axis}
+\end{tikzpicture}
+}
+\begin{itemize}
+\item<1-> {Complete: instructions about how to replicate}
+\item<2->Incomplete: ambiguous ReadMe file
+\item<3->No Info: missing ReadMe file
+\end{itemize}
+\end{frame}
+  %--------------------------------------------------------------------------------
+  \section{Data}
+\begin{frame}
+\frametitle{Subjective measure of replication difficulty}
+\begin{table}[!htbp] \centering 
+  \label{tab:difficult} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Difficulty Rating & Number of Articles & Percent \\ 
+\hline \\[-1.8ex] 
+1 & 64 & 21.12 \\ 
+2 & 64 & 21.12 \\ 
+3 & 66 & 21.78 \\ 
+4 & 37 & 12.21 \\ 
+5 & 72 & 23.76 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+\begin{itemize}
+\item Difficulty level 1
+\begin{itemize}
+\item Data provided $\&$ public
+\item  Documentation clear $\&$ complete
+\item Code ready to run
+\end{itemize}
+\vspace{0.1in}
+\item Difficulty level 3
+\begin{itemize}
+\item Documentation unclear
+\item Code order ambiguous
+\end{itemize}
+\vspace{0.1in}
+\item Difficulty level 5
+\begin{itemize}
+\item Missing Data/Code/Documentation
+\end{itemize}
+\end{itemize}
+\end{frame}
+    %--------------------------------------------------------------------------------
+    \begin{frame}[plain]
+\addtocounter{framenumber}{-1}
+\definecolor{foo}{rgb}{0.2,0.2,0.7}
+\LARGE
+\begin{tikzpicture}[overlay, remember picture]
+\node[anchor=center] at (current page.center) {
+\begin{beamercolorbox}[center]{title}
+ \color{foo} \centering{Can data availability policies ensure reproducibility?}
+  \end{beamercolorbox}};
+\end{tikzpicture}
+\end{frame}
+
+  %--------------------------------------------------------------------------------
+ \section{Results}
+\begin{frame}
+\frametitle{Moderate replication success}
+\begin{figure}
+ \resizebox{.4\textwidth}{!}{
+\includegraphics{../summarysuccess.jpeg}
+}
+\end{figure}
+\begin{footnotesize}
+\begin{itemize}
+\item \textbf{Full replication success} goes from
+\begin{itemize}
+\item 25$\%$ (missing, confidential and data eligible for reproduction)
+\item to 38$\%$ (180 assessed including confidential data identified during the reproduction)
+\item to \textbf{42$\%$} conditional on non-confidential data
+\end{itemize}
+\item \textbf{Partial success}: another \textbf{42$\%$}
+\end{itemize}
+\end{footnotesize}
+\end{frame}
+   
+     %--------------------------------------------------------------------------------
+\section{Results}
+\begin{frame}
+\frametitle{Replication success}
+Comparable with other exercises using different journals and methodologies:
+\begin{itemize}
+\item 13$\%$ Dewald et  al. (1986)
+\item 6$\%$ McCullough et al. (2006)
+\item 43$\%$ Chang and Li (2015)
+\item 61$\%$  Camerer et al. (2016)
+\end{itemize}
+\end{frame}
+   %--------------------------------------------------------------------------------
+ \section{Results}
+\begin{frame}
+\frametitle{Main reasons for unsuccessful replication}
+\begin{table}[!htbp] \centering 
+  \label{tab:reason} 
+  \resizebox{0.7\textwidth}{!}{%
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Year & Missing Data & Corrupted Data & Code Error & Software Unavailable & Other  \\ 
+\hline \\[-1.8ex] 
+2009 &  & 1 &  &  &   \\ 
+2010 &  &  &  &  & 3  \\ 
+2011 &  &  &  &  & 12  \\ 
+2012 & 1 & 1 & 1 &  &   \\ 
+2014 & 1 &  &  & 1 &   \\ 
+2016 & 1 &  &  &  &   \\ 
+2017 & 1 &  &  &  & 1  \\ 
+2018 &  & 1 &  &  &   \\ 
+Total & 4 (16$\%$) & 3 (16$\%$) & 1 (4$\%$) & 1 (4$\%$)  & 16 (64$\%$) \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+}
+\end{table} 
+\begin{enumerate}
+\item<1-> Confidential and proprietary data:  80 identified during the initial assessment and 18 during reproduction
+\break
+
+\item<2-> Inconsistent values
+\break
+
+\item<3-> Missing or corrupted data 
+\end{enumerate}
+\end{frame}
+ %--------------------------------------------------------------------------------
+ \section{Data}
+\begin{frame}
+\frametitle{Successful replications codes}
+\begin{itemize}
+\item Majority required at least a directory change
+\item $1/3$ of successful papers required complex code modifications
+\end{itemize}
+\centering
+  \resizebox{0.6\textwidth}{!}{%
+\begin{tikzpicture}
+\begin{axis}[
+    every axis plot post/.style={/pgf/number format/fixed},
+    ybar=5pt,
+    bar width=12pt,
+    x=2.5cm,
+    ymin=0,
+    ymax=0.8,
+    xtick=data,
+    xticklabel style={font=\tiny, text width=0.6cm},
+    enlarge x limits=25,
+    symbolic x coords={Complex change, Directory change, No change},
+    point meta={y*100}, %y-Werte mal 100 für Prozent 
+    yticklabel={\pgfmathparse{\tick*100}\pgfmathprintnumber{\pgfmathresult}\%},
+    axis lines*=left,
+    axis x line*=bottom, axis y line=left,
+enlarge x limits=auto,
+    clip=false
+    ]
+\addplot [draw=ballblue, fill=ballblue, error bars/.cd, y dir=both, y explicit] coordinates{(Complex change,0.35) (Directory change,0.28)  (No change,0.37)};
+%\node [above] at (axis cs:  NoInfo,0.011) {1.11\%};
+%\node (a) [above] at (axis cs:  Incomplete,0.25) {25\%};
+%\node [above] at (axis cs:  Complete,0.7389) {73.89\%};
+\end{axis}
+\end{tikzpicture}
+}
+
+\end{frame}
+ %--------------------------------------------------------------------------------
+
+
+\section{Results}
+\begin{frame}
+\frametitle{Good documentation is positively associated with reproductive success}
+
+\begin{table}[!htbp] \centering 
+  \label{reg1} 
+   \resizebox{0.8\textwidth}{!}{%
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{1}{c}{Successful Reproduction} \\ 
+\hline \\[-1.8ex] 
+ Documentation Clarity = Complete & 0.300^{***} \\ 
+  & (0.080) \\ 
+  & \\ 
+ Constant & 0.200^{**} \\ 
+  & (0.070) \\ 
+  & \\ 
+\textit{N} & \multicolumn{1}{c}{180} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{1}{l}{Dependent variable = 1 if fully replicated.} \\ 
+\end{tabular} 
+}
+\end{table}
+\begin{itemize}
+\item Confirming Findings/Suspicions of Chang and Li (2015), McCullough et al. (2006) and Stark (2018)
+\end{itemize}
+\end{frame}
+ %--------------------------------------------------------------------------------
+     \begin{frame}[plain]
+\addtocounter{framenumber}{-1}
+\definecolor{foo}{rgb}{0.2,0.2,0.7}
+\LARGE
+\begin{tikzpicture}[overlay, remember picture]
+\node[anchor=center] at (current page.center) {
+\begin{beamercolorbox}[center]{title}
+ \color{foo} \centering{Is there a citation bonus for reproducible papers?}
+  \end{beamercolorbox}};
+\end{tikzpicture}
+\end{frame}
+ %--------------------------------------------------------------------------------
+
+\section{Results}
+\begin{frame}
+\frametitle{Incentives to provide reproducible material?}
+\begin{table}[!htbp] \centering 
+ \resizebox{0.6\textwidth}{!}{%
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{6}{c}{Annual Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 0.200^{***} &  &  & 0.200^{***} &  &  \\ 
+  & (0.030) &  &  & (0.060) &  &  \\ 
+  & & & & & & \\ 
+ tophindex &  & 0.070^{***} &  &  & 0.070^{**} &  \\ 
+  &  & (0.020) &  &  & (0.030) &  \\ 
+  & & & & & & \\ 
+ lowhindex &  &  & 0.100^{**} &  &  & 0.090 \\ 
+  &  &  & (0.050) &  &  & (0.080) \\ 
+  & & & & & & \\ 
+ `Fully reproduced` & 0.600^{*} & 0.500 & 0.500 &  &  &  \\ 
+  & (0.400) & (0.300) & (0.400) &  &  &  \\ 
+  & & & & & & \\ 
+ avghindex:`Fully reproduced` & -0.070 &  &  &  &  &  \\ 
+  & (0.050) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Fully reproduced` &  & -0.040 &  &  &  &  \\ 
+  &  & (0.030) &  &  &  &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Fully reproduced` &  &  & -0.070 &  &  &  \\ 
+  &  &  & (0.080) &  &  &  \\ 
+  & & & & & & \\ 
+ `Full or Partial` &  &  &  & 0.400 & 0.100 & -0.100 \\ 
+  &  &  &  & (0.500) & (0.400) & (0.500) \\ 
+  & & & & & & \\ 
+ avghindex:`Full or Partial` &  &  &  & -0.060 &  &  \\ 
+  &  &  &  & (0.070) &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Full or Partial` &  &  &  &  & -0.020 &  \\ 
+  &  &  &  &  & (0.030) &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Full or Partial` &  &  &  &  &  & 0.000 \\ 
+  &  &  &  &  &  & (0.090) \\ 
+  & & & & & & \\ 
+ Constant & 2.000^{***} & 2.000^{***} & 2.000^{***} & 2.000^{***} & 2.000^{***} & 3.000^{***} \\ 
+  & (0.200) & (0.200) & (0.300) & (0.500) & (0.400) & (0.400) \\ 
+  & & & & & & \\ 
+Observations & \multicolumn{1}{c}{78} & \multicolumn{1}{c}{78} & \multicolumn{1}{c}{78} & \multicolumn{1}{c}{78} & \multicolumn{1}{c}{78} & \multicolumn{1}{c}{78} \\ 
+\hline \\[-1.8ex] 
+%\textit{Notes:} & \multicolumn{6}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+% & \multicolumn{6}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+% & \multicolumn{6}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+}
+\end{table} 
+
+\end{frame}
+ %--------------------------------------------------------------------------------
+\section{Results}
+\begin{frame}
+\frametitle{Positive but noisy citation bonus for confidential data}
+\begin{table}[!htbp] \centering 
+  \label{reg2} 
+   \resizebox{0.5\textwidth}{!}{%
+\begin{tabular}{@{\extracolsep{-15pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Annual Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 3.000^{***} &  &  \\ 
+  & (0.700) &  &  \\ 
+  & & & \\ 
+ tophindex &  & 1.000^{***} &  \\ 
+  &  & (0.400) &  \\ 
+  & & & \\ 
+ lowhindex &  &  & 2.000 \\ 
+  &  &  & (1.000) \\ 
+  & & & \\ 
+ confidential\_data & 17.000^{*} & 13.000^{*} & 8.000 \\ 
+  & (9.000) & (8.000) & (9.000) \\ 
+  & & & \\ 
+ avghindex:confidential\_data & -1.000 &  &  \\ 
+  & (1.000) &  &  \\ 
+  & & & \\ 
+ tophindex:confidential\_data &  & -0.500 &  \\ 
+  &  & (0.700) &  \\ 
+  & & & \\ 
+ lowhindex:confidential\_data &  &  & -0.200 \\ 
+  &  &  & (2.000) \\ 
+  & & & \\ 
+ Constant & 5.000 & 13.000^{***} & 20.000^{***} \\ 
+  & (6.000) & (5.000) & (5.000) \\ 
+  & & & \\ 
+\textit{N} & \multicolumn{1}{c}{119} & \multicolumn{1}{c}{119} & \multicolumn{1}{c}{119} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular}
+}
+\end{table} 
+\end{frame}
+
+ %--------------------------------------------------------------------------------
+\section{Conclusion}
+\begin{frame}
+\frametitle{Conclusion}
+\begin{itemize}
+\item Moderate replication success even with data availability policies (DAP)
+\break
+
+\item Main culprit is confidential data, so good compliance overall with the DAP
+\begin{itemize}
+\item online material quality is not yet perfect to reach reproducibility (some changes in the code were still required for successful reproductions)
+\item non-zero proportion of average quality documentation
+\end{itemize}
+\break
+
+\item Incentives to provide reproducible research not in the citation bonus
+\end{itemize}
+\end{frame}
+ %--------------------------------------------------------------------------------
+\section{Conclusion}
+\begin{frame}
+\frametitle{How do we reach the ``good'' equilibrium?}
+\begin{itemize}
+\item Systematic verification  (AEA data editor 2018) leads to higher re-execution (Trisovic, 2021)
+\break
+
+\item Third-party services such as cascad
+\end{itemize}
+\end{frame}
+\end{document}
+
+
+

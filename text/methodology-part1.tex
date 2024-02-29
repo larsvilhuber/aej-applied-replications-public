@@ -1,0 +1,175 @@
+
+%% \section{Description of Reproduction Procedure}\label{sec:methodology}
+
+
+We start by defining  terms and concepts, describing the setup for the reproducibility exercise, followed by the bibliometric analysis.
+%
+As in any modern study on ``reproducibility'' and ``replicability,'' we need to define those terms, since historically, multiple, often conflicting or confusing definitions have been used \parencite{Pesaran2003,Hamermesh2007,Bollen2015-vb,Clemens2015,nasem2019}
+%
+Throughout the text, we use (computational) \textit{reproducibility} to refer to ``the ability [$\dots$] to duplicate the results of a prior study using the same materials and procedures as were used by the original investigator'' (\citet{Bollen2015-vb}, see also \citet{nasem2019}). \textcite[p. 942]{Christensen2018} argue that is the ``basic standard [that] should be expected of all published economics research, and hope this expectation is universal among researchers.'' In contrast, \textit{replicability} refers to ``the ability of a researcher to duplicate the results of a prior study if the same procedures are followed but new data are collected.''%
+%
+\footnote{\label{fn:confusion}We note that we have ourselves not always been consistent in the use of these terms. For instance, our instructions to our ``replicators'' ask whether the article has been ``replicated'', not ``reproduced,'' see Appendix~\ref{app:assessment_form} and~\ref{app:exit_form}. While \citet{Bollen2015-vb} certainly first defined the concepts as we use them here, they only became (relatively well) accepted with the publication of \citet{nasem2019}, after the conclusion of our experiment. We reproduce our replicator instructions material verbatim in the appendix, and do not modify the terminology.}
+%sec:
+%and \textit{generalizability} refers to the extension of the scientific findings to other populations, contexts, and time frames, perhaps using different methods. Because there is a grey zone between these last two definitions, we will generally refer to either context as ``replicability'', which \textcite{Hamermesh2017} calls ``scientific replication.''} %Robustness tests performed by researchers have aspects of self-replication, by identifying conditions under which the findings continue to hold when software or data are varied.
+
+%We will use these terms as defined, even when authors use different terms.
+%In this text, we will use the terms as defined above when the distinction is material. However, we may refer to the overall concept of redoing the analysis as ``replicability''.}. In simple words, the same code and data should produce similar results. 
+We refer to the collection of instructions, code, and data as ``replication packages,'' because they enable not just the exact computational reproduction of an article, but also more generally replication.%
+%
+\footnote{Journals sometimes do refer to these as ``supplemental data,'' but in economics, they almost always contains code, if not data.}
+%
+In our context, we will refer to the (junior) researchers re-executing the code in a replication package as ``replicators,'' primarily for linguistic convenience (see also footnote~\ref{fn:confusion}).
+
+%
+% Exercise setup
+%
+ 
+Our reproducibility exercise was conducted over the course of five summers, from 2014 to 2018 as well as the fall semester of 2018. The exercise was split into three steps.  
+%
+First, an ``assessor'' evaluated an article and its replication package as to the availability of the required components and its difficulty, and recorded a selection of article characteristics. A ``replicator'' then conducted the actual reproducibility check. Often but not always, the same person would be assessor and replicator. Finally, upon completion of the attempt at reproduction, replicators filled out a guided report with questions about the reproduction, such as whether or not the main results of the article could be reproduced and, if not, the main barriers impeding a successful reproduction. 
+
+To complement the information collected during the reproducibility exercise, we also obtained descriptive article and author information, such as citations and h-indexes, from 
+%Web of Science \parencite{WebofScience} and 
+the OpenAlex (OA) \ac{API} \parencite{openalex2022,ourresearch2023}.
+
+\subsection{Article selection}
+
+The \ac{AEJ:AE} published \input{./includes/aejdoistotal.tex} articles between the first issue in 2009 (volume 1 issue 1) and the April issue in 2018 (volume 10 issue 2). Replicators worked on this project from the summer of 2014 until Fall of 2018. Articles were added to the assignment set in groups by year, though somewhat haphazardly. The pilot project in the summer of 2014 worked on articles from 2013, and completed many of them. Subsequently, the collection of information was systematized, but the articles already completed from 2013 were not transferred to the new collection instrument, and are thus missing from our analysis in this paper. In 2015, using the systematized collection instrument,  years 2010 and 2011 were added. Years 2009 and 2012 were added in the summer of 2016, and publication year 2014 was added in 2017. Finally, in 2018, the years 2015 through 2017 as well as the first two issues in 2018 were added (see Appendix Table \ref{tab:assignments}). Articles were added in batches to separate online spreadsheets, based on a pull from the CrossRef API, which yielded articles in somewhat random order, augmented by a manual culling of unprocessed articles from the previous summer's list.%
+%
+\footnote{Ex-post inspection of our assignment lists shows no particular pattern, though articles with lower issue and page numbers seem to appear higher in the original lists.}
+% 
+Once a particular cohort of replicators had completed a batch, a new batch was pulled. 
+%
+Replicators were assigned an initial article by the supervising team, but could subsequently self-select (first come, first serve) from the list of unprocessed articles. They were instructed to finish the initial assessment regardless of the outcome. We do not believe that there was intentional systematic assignment based on data availability, software usage, or topic.
+
+
+Table~\ref{tab:Selection} shows the number of eligible articles (i.e., published articles) per year, and the number of articles each year that were assessed and scored, as described in the next few sections. 
+
+\input{./includes/table_article_selection}
+
+\subsection{Initial Assessment}\label{sec:entry}
+
+Before attempting a reproduction, each article was assessed.
+%The replication process began with an ``Entry Questionnaire," which was filled out by an assessor before the replication
+An assessor filled out the entry questionnaire, gathering descriptive information,  and providing an initial assessment of the expected level of reproducibility of an article.%
+%
+\footnote{See Appendix~\ref{app:assessment_form}. We will refer to questions on the entry questionnaire by ``Entry Q1'', ``Entry Q2'', etc.}
+%
+Each assessor was provided the  \ac{DOI} of the article,%
+%
+\footnote{\acp{DOI} are a managed identifier space built on top of the Handle System \parencite{Handle}, a technology for distributed, persistent, and unique naming for digital objects. Virtually all academic publishers assign \acp{DOI} at the article level in all of their publications. In addition, \acp{DOI} are increasingly used to identify data \parencite{PollardWilkinson2010}. In particular, each \ac{DOI} provides a persistent identifier \parencite{DOI2012} for a digital object: an article or data artifact.}
+%
+and then verified the following elements:
+\begin{itemize}
+\item
+The presence of one or more downloadable datasets (including \ac{DOI} or URL, if any), an online appendix, the programs used by the authors and documentation on how to run them (the ``Readme");%
+%
+ \footnote{In theory, the author might have provided a \ac{DOI} to a third-party data archive for some or all of the content. 
+ 	%Ideally, each component -- the article, the online appendix, the data and the programs -- would have a separate \ac{DOI}. 
+ 	In the case of the \ac{AEJ:AE}, at the time this exercise was conducted, only the article itself was assigned a \ac{DOI}. Supplemental data, programs, and online appendices are linked from the landing page associated with the article's \ac{DOI}. This has changed since completion of the exercise, see \textcite{VilhuberAEAPap.Proc.2020}.}
+ %
+ \item
+ The clarity and completeness of the documentation and of the program metadata;
+ \item
+ The presence of clear references to the original data provenance and a description of how to construct the initial datasets;
+ %\mc{HK}{It doesn't look like we actually report anything about this information, and it was left blank for the majority of articles. Shall we just say that most articles didn't provide data provenance?}
+ \item
+ Data availability, and some basic categories if not available as part of the replication package (e.g., restricted access data, private data, public use data, etc.)
+ \end{itemize}
+
+%Although some of the responses to the questionnaire could have been captured via web-scraping tools, it is not possible to assess the completeness of the replication package without inspection by the assessor. 
+While many supplemental data packages contained some content, they often did not contain all the data or programs. Sometimes, the data provenance might be described in an online appendix, while the instructions for the programs might be enclosed in the supplemental ``data'' package. Thus, a ``clerical'' review of each article's webpage, and some careful reading of the actual article and online appendix were the only way to collect all the information requested. 
+%We will return to the aspect of machine-readability (machine-reproducibility) in the concluding discussion.
+
+Based on the initial objective enumeration of the characteristics of the article and a subjective evaluation by the assessor of the complexity of the task described in the ``Readme" document, the assessor was asked to provide a subjective rating of the replication difficulty, from 1 (easiest) to 5 (most difficult), based on a set of heuristics (see Table~\ref{tab:criteria_difficulty}, Entry Q60).%
+\footnote{A score of 1 assigned to an article does not imply that its replication package cannot be improved. For example, the programs provided by authors might lack documentation, or the provenance of the included datasets might be obfuscated, despite  the article being easily reproducible.}
+Assessors also recorded the programming languages (Entry Q8) and separately the data storage formats (Entry Q21, Q28, Q36, Q44) contained within each archive. Archives can and do contain programs and data in multiple formats.
+While all articles had some supplementary data, not all articles were accompanied by the datasets necessary for replication. Assessors recorded  whether the articles were accompanied by any data (Entry Q14), and if not, the (apparent) reason why data were not provided (Entry Q15). This included an assessment of whether the data were confidential or proprietary, for which we provided some guidance.
+
+
+\begin{table}[!htbp] \centering
+  \caption{Criteria for Assessment of Difficulty of Replication}
+  \label{tab:criteria_difficulty}
+\footnotesize
+\begin{tabular}{@{\extracolsep{3pt}} cc}
+\\[-1.8ex]\hline
+\hline \\[-1.8ex]
+Rating & Description   \\
+\hline \\[-1.8ex]
+\thead[bc]{~\\1\\~} & \thead{The article possesses all desired features that ensure replicability. Datasets are provided\\
+and their use is public. The documentation and program metadata are clear and complete.\\ Negligible changes might be required to run the programs (e.g. path redirection).}\\
+\thead[bc]{~\\2\\~} &  \thead{The article possesses most desired features that ensure replicability. Datasets are \\ provided and their use is public. The documentation and program metadata are present\\ but the programs might need some changes to run cleanly.} \\
+\thead[bc]{~\\3\\~}  & \thead{The article replication may present some difficulties. Datasets are provided and their use\\ is public, but the documentation is incomplete or unclear. Substantial changes might be\\ needed to run the programs.}  \\
+\thead[bc]{~\\4\\~} & \thead{The article replication may present substantial difficulties and/or additional steps are\\ required to recover the datasets used by the authors. Datasets may not be provided but\\ their use is public or available on request.}\\
+\thead[bc]{5\\~} & \thead{The article is not replicable. The dataset are not provided and their access is private or\\ restricted. The programs are not provided. Documentation is absent or incomprehensible.}   \\
+\hline \\[-1.8ex]
+\end{tabular}
+\begin{minipage}{0.8\textwidth}
+NOTE: The description is reproduced verbatim. The language used in the instructions used ``replication'' instead of ``reproduction'', as we generally use it in this article.
+
+\end{minipage}
+\end{table}
+
+
+\FloatBarrier
+
+
+
+\subsection{Reproducing the Empirical Analyses}
+
+Once the article was assessed and determined to be amenable for replication, a replicator was assigned based on characteristics of the article, and in particular the type of software required and the assessed difficulty of the replication task. Most often, the initial assessor self-assigned themselves as the replicator although some replications were conducted by the supervising team or distributed to a replicator based on their familiarity with a particular programming language.
+%\footnote{The team used a restricted-access Subversion repository. }
+The materials for each article were downloaded, and used to populate an article-specific repository. 
+%
+% Moved here
+%
+Unlike  \textcite{Dewald1986,McCullough03,Stodden2018}, who requested data and programs from the original authors when no materials were published by the journal, but similar to \textcite{Glandon2010}, we only tried to obtain data that was available on the journal's archive, and replicators were explicitly instructed not to contact the authors. This is very much in the spirit of \textcite{King95,McCullough2006,Glandon2010} and others, who emphasize the importance of being able to reproduce the results without assistance from the authors. Thus, we did not follow-up on  missing datasets, private data, protected data, or data available upon request. All attempts at reproducing the analysis were done based exclusively on the materials provided by the authors at the time of publication of the articles, or references therein leading to external data archives.
+%If multiple replicators worked on the same article, they would work in separate subdirectories of the same repository.
+%
+
+The replicator was instructed to document any changes made to the author-provided programs using a \ac{VCS}. They also recorded information in two additional files: Any URLs that were used to download materials were recorded in \textit{`SRC.txt'}, and a high-level summary of steps undertaken for the replication and results obtained in a short report (called \textit{`REPLICATION.txt'}).
+
+Once the \ac{VCS}  was populated and all data files  downloaded, each replicator was instructed to  read the author-provided ``Readme'', and attempt to run the programs in the author-provided archive. Replicators were told to keep modifications to the absolute minimum, starting with the adjustment of path structures to the replication system (for an example, see Appendix Figure~\ref{fig:svndiff}). Whenever a program required more extensive changes to run, the replicator would do so to the best of their ability. 
+The entire team discussed problems encountered in regular meetings, and sought to find solutions. However, we also limited the time to find a solution for problems encountered to about a week. If unsuccessful in finding a solution, the reproduction attempt was marked as ``not reproducible.'' There was no time limit for running programs.
+
+Replicators were free to use any computer they had access to for the replication, unless the author materials specifically mandated a particular operating system. This was quite rare, but did happen a few times. We note that the journal does not require authors to specify the required software, \ac{OS}, and versions thereof, and most articles were silent on the topic. In addition to replicators' laptops, our team had access to university-provided Windows remote desktops and a Linux cluster, and were unlikely to be constrained by computing resources. Both Windows and Linux systems had access to the latest version of the computing software, typically updated yearly.
+% (%
+% per correspondence with Janet Heslop, Director of IT, CISER, 2016-01-27
+% at the time of the reproducibility exercise, Stata 13 and 14, the most current version of MATLAB, SAS 9.4, SPSS 23, and a recent version of Excel). 
+%
+In general, we assume that versions of \ac{OS} and software are different from the version originally used by the authors, given the considerable time lag between submission, publication, and the time of the reproducibility exercise. In some cases, programs needed small modifications to run cleanly due to software version discrepancies. If successful, these modifications were treated as `negligible' and did not affect the score of the article. If unsuccessful, however, the article was classified as non- or partially reproducible. We discuss the necessary code changes required for successful reproduction along with our results in Section~\ref{sec:results}.
+%\footnote{We captured the modified programs created by the replicators in the \ac{VCS}. We could, therefore,  capture objective measures of code changes using, for instance, the number of code lines changed. However, this turned out to be more complex than expected, and was skipped for the analysis reported here.}
+
+
+% MOVED TO CONCLUSION
+
+%One way to address the issue of software versioning and other issues such as ambiguity in the documentation of programs would be to reach out to authors directly for confirmation. 
+
+
+
+\subsection{Report on Reproducibility}
+
+Once the reproduction attempt was completed, replicators described outcomes via the exit questionnaire, recording information about the success or failure of the reproduction attempt and other descriptive information.\footnote{The print version of the online questionnaire is provided in Appendix~\ref{app:exit_form}. We refer to questions on the exit questionnaire as ``Exit Q1'', ``Exit Q2'', etc.} We asked replicators to classify the attempt as fully, partially, or not reproducible (Exit Q3), and elicited perceived causes (Exit Q4-Q12). 
+%When confidential data was the impediment, we also asked them to classify the confidential data into a few categories (Exit Q5): private or administrative, and within each category, several subcategories, as well as the type of access (formal, informal, or unknown).\footnote{We did not allow multiple types of confidential data type or access to be selected, which may be constraining.} 
+For partial or full reproducibility, we asked them to further describe some of the possible issues: whether modifications to the programs were needed, and if yes, what those changes were, and whether all output was accurately reproduced (Exit Q7-Q12). We also collected additional information on the packages: Software and data formats they encountered, including versions, and whether any extra packages or libraries were required (Exit Q13-Q17). Finally, we asked them to describe the completeness (ex-post) of the description of the reproduction in the authors' README (Exit Q22), and how difficult they found the reproduction attempt (Exit Q26).%
+%
+\footnote{
+We note that information on completeness and difficulty are also queried in the entry questionnaire, but the analysis in this article will rely on the ex-post description recorded in the exit questionnaire. }
+
+
+
+%%%%%%%%%%%%%%%%%
+\subsection{Bibliometric data}
+
+In addition to the data collected through the replication process, we also obtained complementary descriptive data for each article and the (academic) characteristics of the authors and their institutions. We queried OpenAlex \parencite[OA,][]{openalex2022,ourresearch2023} for  data on each article in the sample. We then queried OA for all works published by authors in our sample, using the per-year citation data to recompute authors' h-index \parencite{Hirsch2005}. We also computed author experience (years since the first publication). OA also identifies authors' institutions at the time of publication, and provides information on each institution (as of 2023), such as the total number of works published by all authors at the  institution.%
+%
+\footnote{Note that this number is an attribute of the institution in 2023, not at the time of publication of the article. For reference, OA reported \input{./includes/cornell.works} works published cumulatively in their corpus by authors affiliated with Cornell University, as of October 2023.}
+%
+We use this number as a proxy for the research intensity of the authors' institutions, though we cannot be sure that the institution at the time of publication is the affiliation at the time of preparation of the manuscript. We also identify the location (country or region) of the institution.  More details can be found in the Online Appendix.
+
+\subsection{Recruitment of Replication Lab Members}
+
+Over the course of five summers, we recruited undergraduate students (typically but not always rising seniors) for the reproducibility exercise as part of summer research, to serve as assessors and replicators. The team members needed to meet some minimal technical qualifications, such as experience working with the relevant programming languages, and acceptable performance in economics or technically equivalent courses (it turned out that many of our students had never taken an economics class). Team members attended a one-day training course covering the background and purpose of the reproducibility exercise and our approach. They were also given guidance about the subjective aspects of the exercise such as difficulty rating and classifying documentation clarity, and were instructed on some technical matters such as version control with Subversion and the use of remote computing clusters using materials from a Cornell High Performance Computing course designed for social science researchers. The team members were supervised by economics Ph.D. candidates from Cornell University (Kingi, Stanchi, Herbert) and a faculty-level researcher (Vilhuber). As this was not part of any coursework, the replicators were not graded. They were paid an hourly wage commensurate with Cornell University pay scales for student employees.\footnote{The selection, training, and supervision are precursors to the training and supervision described in \textcite{vilhuber2022b}, but are not identical.}
+
+%The information gathered by the students in the entry and exit questionnaires allow us to grasp how documented the data and code is, and how easy the reproduction can potentially be.
+\FloatBarrier

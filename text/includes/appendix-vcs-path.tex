@@ -1,0 +1,30 @@
+
+%svn diff --summarize -rbeginRev:endRev <URLtoBranch>
+%svn diff -rbeginRev:endRev <URLtoBranch> | diffstat
+
+%The typical changes should be limited to file location and such:
+\begin{figure}
+\caption{Example of change to author-provided file\label{fig:svndiff}}
+\begin{verbatim}
+> svn diff -r961:HEAD $SVNURL/10.1257/app.5.4.92/replication-xxx/Data/
+ do_files/main_analysis.do
+Index: main_analysis.do
+===================================================================
+--- main_analysis.do	(revision 961)
++++ main_analysis.do	(revision 3425)
+@@ -6,7 +6,7 @@
+     version 11.2
+
+ *place path here:
+-global path "C:\"
++global path "\\rschfs1x\usercl\spring\xxx\Data"
+ cd            "$path\output"
+ use "$path\data\thefts_sales.dta",clear
+ cap log close
+
+\end{verbatim}
+\end{figure}
+
+
+\FloatBarrier
+

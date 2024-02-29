@@ -1,0 +1,86 @@
+"","DOI","Title","Pages","Entry Questionnaire","AEJ Edition","Year","Expected Difficulty","Replicator","Completed","Replicated","Main Issue","Type of Missing Data","2nd Replicator","Completed_1","Replicated_1","Data Type","Data Access Type","Data Comments","Data URL","Data Contact","worksheet"
+"1","10.1257/app.3.1.1","Do Teenagers Respond to HIV Risk Information? Evidence from a Field Experiment in Kenya","1-34","Sarah","2011 vol. 1",2011,1,"Sarah","Y","No","Missing Code",NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"2","10.1257/app.3.1.35","Transactional Sex as a Response to Risk in Western Kenya","35-64","Sarah","2011 vol. 1",2011,1,"Sarah","Y","No","Code Error",NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"3","10.1257/app.3.1.65","Traffic Congestion and Infant Health: Evidence from E-ZPass","65-90","Sarah","2011 vol. 1",2011,5,"Sarah","Y","No","Confidential Data","Confidential Data",NA,NA,NA,"administrative, regional","no information","Vital Statistics Natality records from Pennsylvania for 1997 to 2002 and for New Jersey for the years 1994 to 2003. We make use of a confidential version of the data with the mother’s address. The birth certificate data was obtained from the New Jersey and Pennsylvania Department of Health and New Jersey Tax Assessors Office","N","N","Second2015"
+"4","10.1257/app.3.1.91","Menstruation, Sanitary Products, and School Attendance: Evidence from a Randomized Evaluation","91-100","Sarah","2011 vol. 1",2011,1,"Sarah","Y","Yes",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"5","10.1257/app.3.1.101","The Labor Market Returns to Cognitive and Noncognitive Ability: Evidence from the Swedish Enlistment","101-28","Nathan","2011 vol. 1",2011,5,"Nathan","Y","No","Confidential Data","Confidential Data",NA,NA,NA,"administrative, national","formal access","As our data contains sensitive information on individual outcomes (such as health status), Swedish law requires users of the data to hold a permission from an Ethical Review Board (“Centrala Etikprövningsnämnden”). This implies that it is not possible for us to make our data directly available online. However, researchers interested in obtaining our data could themselves apply for permission from the Ethical Review Board. The website of the Ethical Review Board (http://www.epn.se/start/startsida.aspx) contains information on how to apply. The cost of applying for permission from an ethics board is 5000 SEK (about 700 dollars). The Ethical Review Board does currently only allow applications in Swedish. Having obtained permission to use the data, the actual matching is done by Statistics Sweden","Y","N","Second2015"
+"6","10.1257/app.3.1.129","Minimum Wages and Firm Profitability","129-51","Nathan","2011 vol. 1",2011,3,"Nathan","Y","Yes",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"7","10.1257/app.3.1.152","Are Restaurants Really Supersizing America?","152-88","Nathan","2011 vol. 1",2011,5,"Nathan","Y","No","Confidential Data","Confidential Data",NA,NA,NA,"administrative, regional","informal access, no commitment","Confidential Extract of the Behavioral Risk Factor Surveillance System requested from various state departments of health. Data to ask for: ""obtain BRFSS data with telephone exchange and/or ZIP code information from the
+Departments of Health for the following states over the following years:
+AR: 1996-2005, CO: 2003-2005, IA: 2002-2004, KS: 1996-2004, ME: 1994-2004, MO: 2000-2005,
+ND: 1996-2003, NE: 1990-2005, OK: 1995-2005, UT: 1995-2004, VT: 1996-2003""","N","N","Second2015"
+"8","10.1257/app.3.1.189","Aftershocks: The Impact of Clinic Violence on Abortion Services","189-223","Kelly","2011 vol. 1",2011,5,"Kelly","Y","No","Confidential Data","Confidential Data",NA,NA,NA,"administrative, national","no information","Confidential county-level abortion provider data from The Alan Guttmacher Institute: ""We acquired confidential county-level AGI data on the number of abortion facilities (providers)
+and the number of abortions performed in each survey year."" Not stated by the authors, but probable personal connection: ""This information also comes from personal communication with Henshaw on October 28, 2008.""","N","N","Second2015"
+"9","10.1257/app.3.1.224","Was There Really a Hawthorne Effect at the Hawthorne Plant? An Analysis of the Original Illumination Experiments","224-38","Kelly","2011 vol. 1",2011,3,"Kelly","Y","Yes",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"10","10.1257/app.3.1.239","Caste as an Impediment to Trade","239-63","Kelly","2011 vol. 1",2011,4,"Kelly","Y","No","Missing Code",NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"11","10.1257/app.3.2.1","Mechanisms and Impacts of Gender Peer Effects at School","1-33","Kelly","2011 vol. 2",2011,3,"Kelly","Y","No","Confidential Data","Confidential Data",NA,NA,NA,"administrative, national","no information","Administrative records collected by the Israel Ministry of Education. 1The GEMS are not administered for school accountability purposes, and only aggregated results at the district
+level are published. For more information on the GEMS see the Division of Evaluation and Measurement
+website (in Hebrew) http://cms.education.gov.il/educationcms/units/rama/odotrama/odot.htm (accessed November
+14, 2010). No further information on how to request the data. Website in Hebrew","Y","N","Second2015"
+"12","10.1257/app.3.2.34","The Wrong Side(s) of the Tracks: The Causal Effects of Racial Segregation on Urban Poverty and Inequality","34-66","Nathan","2011 vol. 2",2011,2,"Nathan","Y","Yes",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"13","10.1257/app.3.2.67","Peers, Neighborhoods, and Immigrant Student Achievement: Evidence from a Placement Policy","67-95","Nathan","2011 vol. 2",2011,2,"Nathan","Y","Yes",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"14","10.1257/app.3.2.96","Schooling and the Vietnam-Era GI Bill: Evidence from the Draft Lottery","96-118","Nathan","2011 vol. 2",2011,5,"Nathan","Y","No","Confidential Data","Confidential Data",NA,NA,NA,"administrative, national","formal access","These programs are meant to be run on non-public-use les archived at the Boston Census Data Center (BRDC). Researchers interested in working with les at the BRDC must be approved for access. See http://www.ces.census.gov/index.php/ces/contact_us_ces for details.","Y","N","Second2015"
+"15","10.1257/app.3.2.119","Conscription and Crime: Evidence from the Argentine Draft Lottery","119-36","Alice","2011 vol. 2",2011,1,"Alice","Y","Mostly",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"16","10.1257/app.3.2.137","Purchasing Power Parity Exchange Rates for the Global Poor","137-66","Sarah","2011 vol. 2",2011,5,"Sarah","Y","No","Confidential Data","Confidential Data",NA,NA,NA,"administrative, national","informal access, no commitment","Multiple country national statistical agencies data accessed through a World Bank project: ""Most of these survey datasets are the property of national statistical agencies and are not publicly available. They were made available to the authors under a World Bank research project.""","N","N","Second2015"
+"17","10.1257/app.3.2.167","Improving the Design of Conditional Transfer Programs: Evidence from a Randomized Education Experiment in Colombia","167-95","Sarah","2011 vol. 2",2011,3,"Sarah","Y","Yes",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"18","10.1257/app.3.2.196","The Price of Political Opposition: Evidence from Venezuela's Maisanta","196-214","Sarah","2011 vol. 2",2011,1,"Sarah","Y","Mostly",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"19","10.1257/app.3.3.1","Government Transfers and Political Support","1-28","Sarah","2011 vol. 3",2011,5,"Sarah","Y","No","Confidential Data","Proprietary Data",NA,NA,NA,"administrative, national","informal access, no commitment","Specifies to contact Juan Pablo Labat, Director de la División de Evaluación y Monitoreo Ministerio de Desarrollo Social (Uruguay), email: jplabat@mides.gub.uy","N","Y","Second2015"
+"20","10.1257/app.3.3.29","Do Value-Added Estimates Add Value? Accounting for Learning Dynamics","29-54","Nathan","2011 vol. 3",2011,2,"Nathan","Y","Yes",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"21","10.1257/app.3.3.55","Financial Constraints and Inflated Home Prices during the Real Estate Boom","55-87","Kelly","2011 vol. 3",2011,3,"Kelly","Y","No","Missing Code",NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"22","10.1257/app.3.3.88","Low-Skilled Immigration and the Labor Supply of Highly Skilled Women","88-123","Nathan","2011 vol. 3",2011,3,"Nathan","Y","Partial",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"23","10.1257/app.3.3.124","Marrying Up: The Role of Sex Ratio in Assortative Matching","124-57","Alice","2011 vol. 3",2011,1,"Alice","Y","Yes",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"24","10.1257/app.3.3.158","Are High-Quality Schools Enough to Increase Achievement among the Poor? Evidence from the Harlem Children's Zone","158-87","Nathan","2011 vol. 3",2011,5,"Nathan","Y","No","Confidential Data","Confidential Data",NA,NA,NA,"administrative, local","informal access, no commitment","researchers interested in obtaining our data could apply to the Harlem Children’s Zone and the New York City Department of Education (NYCDOE)","N","N","Second2015"
+"25","10.1257/app.3.3.188","Subsidizing Vocational Training for Disadvantaged Youth in Colombia: Evidence from a Randomized Trial","188-220","Nathan","2011 vol. 3",2011,3,"Nathan","Y","Mostly",NA,NA,NA,NA,NA,NA,NA,"
+",NA,NA,"Second2015"
+"26","10.1257/app.3.3.221","Returns to Local-Area Health Care Spending: Evidence from Health Shocks to Patients Far from Home","221-43","Kelly","2011 vol. 3",2011,4,"Kelly","Y","No","Confidential Data","Proprietary Data",NA,NA,NA,"administrative, regional","informal access, no commitment","data are available for purchase from the Florida Center for Health Information
+and Policy Analysis, part of the Florida Agency for Health Care Administration
+(AHCA).
+A research proposal and a Limited Data Use agreement will be required","N","N","Second2015"
+"27","10.1257/app.3.3.244","Do Social Connections Reduce Moral Hazard? Evidence from the New York City Taxi Industry","244-67","Alice","2011 vol. 3",2011,4,"Alice","Y","No","Confidential Data","Proprietary Data",NA,NA,NA,"administrative, local","informal access, no commitment","""To obtain these data, I contacted Andrew Salkin, First Deputy Commission at the TLC, and requested data on driver characteristics, owner characteristics, medallion characteristics, and driving outcomes. I then signed a proprietary data sharing agreement with the TLC regarding maintaining data confidentiality. The TLC then ran queries on the main TLC internal databases to generate the data files above, which I picked up in person at the TLC office at 40 Rector Street,
+New York, NY.""","N","Y","Second2015"
+"28","10.1257/app.3.4.1","Informal Taxation","1-28","Sarah","2011 vol. 4",2011,5,"Sarah","Y","No","Confidential Data",NA,NA,NA,NA,"administrative, national","informal access, no commitment","Admin data from multiple countries: Proprietary World Bank datasets (obtained with direct permission):
+Philippines
+Vietnam
+Zambia","N","N","Second2015"
+"29","10.1257/app.3.4.29","Public Provision and Protection of Natural Resources: Groundwater Irrigation in Rural India","29-55","Sarah","2011 vol. 4",2011,5,"Sarah","Y","No","Confidential Data","Proprietary Data",NA,NA,NA,"private, commercial entity","informal access, no commitment","A nuumber of sources, including the Minor Irrigation Division
+Ministry of Water Resources, Census of India, ML Infomap. ""The Minor Irrigation Data Wave (2nd and 3rd Census) can be obtained by writing to:
+ Director (Stat)
+ Minor Irrigation Division
+ Ministry of Water Resources
+ 6, B-Wing, Ground Floor
+ Shastri Bhawan
+ New Delhi- 110001, India
+ Telephone No: 011-23389496
+ E-mail: dirmi-mowr@nic.in. The Census of India Primary Census Abstract (PCA) for 1991 and 2001 and Village
+Directory for 1991 (VD) were purchased from the Census of India :
+ Office of The Registrar General and Census Commissioner, India
+ 2/A, Man Singh Road, New Delhi -110011 (INDIA)
+ Tel. Nos: +91-11-23070629 , +91-11-23070629 , 23381623, 23384816
+ Fax No : +91-11-23383145, Email : rgoffice.rgi@nic.in
+3. The digital data was purchased from ML Infomap (www.mlinfomap.com)""","N","Y","Second2015"
+"30","10.1257/app.3.4.56","Health Capital and the Prenatal Environment: The Effect of Ramadan Observance during Pregnancy","56-85","Sarah","2011 vol. 4",2011,2,"Sarah","Y","No","Confidential Data","Proprietary Data",NA,NA,NA,"administrative, regional","informal access, no commitment","Both international IPUMS and Michigan Department of Community Health. We thus purchased Michigan’s births data for 1989-2005 in 2007.1
+ Michigan referred to these
+records as: “Live birth files, Michigan residents 1989-2005.” At the time, we were charged
+$2,550 ($150 per birth year). The mailing address for obtaining these data is:
+Michigan Department of Community Health
+Vital Records and Health Data Development Section
+201 Townsend St., 2nd floor
+PO Box 30691
+Lansing, MI 48909
+In practice, the most useful contact for obtaining these data is for Michael Beebe
+(BeebeM@michigan.gov). To him we provided three completed application documents:
+1. A$“data$files$request$form”.$$A""blank""copy""of""this""form""follow""immediately""follows""this""
+summary;
+2. A$“Michigan$IRB$Review$Application”.$A""blank""copy""of""this""form""follow""immediately""
+follows""this""summary;
+3. A$freeBstanding$study$protocol.
+In the IRB application, we requested exception from IRB review under section 46.101 b(4)","N","Y","Second2015"
+"31","10.1257/app.3.4.86","The Consumption Response to Seasonal Income: Evidence from Japanese Public Pension Benefits","86-118","Alice","2011 vol. 4",2011,4,"Alice","Y","No","Confidential Data","Proprietary Data",NA,NA,NA,"administrative, national","informal access, no commitment","Japan Statistical Bureau: ""The survey datasets are the property of Japan Statistical Bureau and are
+ not publicly available. They were made available to the authors with the permission based
+ on Article 33 of Statistical Law of Japan. It would be basically available for academic
+researchers, while application and other documentation should be written in Japanese""","N","N","Second2015"
+"32","10.1257/app.3.4.119","Government Advertising and Media Coverage of Corruption Scandals","119-51","Kelly","2011 vol. 4",2011,3,"Kelly","Y","Yes",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"33","10.1257/app.3.4.152","Climate Change, Mortality, and Adaptation: Evidence from Annual Fluctuations in Weather in the US","152-85","Alice","2011 vol. 4",2011,4,"Alice","Y","No","Confidential Data","Confidential Data",NA,NA,NA,"administrative, national","formal access","Hadley Climate Model 3 (Hadley 3) data from the British Atmospheric Data Centre (http://badc.nerc.ac.uk/home/) and NCAR Community Climate System Model (CCSM) 3 data from the World Climate Research Programme’s Coupled Model Intercomparison Project’s data portal (https://esg.llnl.gov:8443/index.jsp),","Y","N","Second2015"
+"34","10.1257/app.3.4.186","Subsidized Farm Input Programs and Agricultural Performance: A Farm-Level Analysis of West Bengal's Green Revolution, 1982-1995","186-214","Alice","2011 vol. 4",2011,5,"Alice","Y","No","Corrupted Data",NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"35","10.1257/app.3.4.215","Economic Shocks and Civil Conflict: A Comment","215-27","Alice","2011 vol. 4",2011,1,"Alice","Y","Partial","Code Error",NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"
+"36","10.1257/app.3.4.228","Re-examining Economic Shocks and Civil Conflict","228-32","Alice","2011 vol. 4",2011,1,"Alice","Y","Partial",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"Second2015"

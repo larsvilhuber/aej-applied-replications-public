@@ -1,0 +1,58 @@
+% Bibliometric analysis
+
+\subsection{Reproducibility and Impact on Citations}
+
+%%%%%%% h-index now %%%%%%%%%%%%%%
+
+
+%If clear documentation allows for better reproducibility, we then wonder if such ``easiness'' of use of reproducible papers' material make these papers more  widely used and cited.
+
+Journal editors have noted that any credible research paper must be reproducible, in order to serve as a starting point for future research.\footnote{
+	``[Reproducibility] is essential if empirical findings are to be credible and usable as a starting point for other researchers.'' \citep{bernanke2004}
+%
+	``[Reproducible papers]  should be the starting point for related future work. [...] Reproductions are the most essential type of reanalysis. They are the foundation of science.'' \citep{welch2019c}}
+%
+Given citation practices in the social sciences, this should lead to a positive correlation between reproducibility and future citations. We would expect \textit{a priori} that reproducible papers provide research which can be easily built upon and that other researchers are thus more likely to use.  \citet{Hamermesh2007} observes that heavily cited articles are also replicated (not reproduced) in the literature, while poorly cited articles are not. While this is also a positive correlation ex-post, it does not answer the question of whether (unobserved) underlying reproducibility was possibly a condition for future replication, in the sense of \citet{bernanke2004}.%
+%
+\footnote{Hamermesh actually uses the positive correlation between presence of replications and citations to argue that (enforced) reproducibility is unnecessary: 
+	%
+	``Sparsely-cited articles in major journals
+	are not killed by replications that cast doubt on
+	their results; rather, they ``die'' from neglect.'' \citep{Hamermesh2017}}
+%
+
+
+
+%\mc{HK}{The article count has the total number of articles for which we have citation/h index data. It isn't equal to the breakdown above of 180 articles. Is this what we want here? Also note that it is actually different for each of the columns, so I have just put it for !is.na(avg hindex)}
+
+We collected the annual citations of each article from OA, and computed cumulative citations and per-year h-indexes up to year 5 post-publication.\footnote{OA does provide a measure of total citations for each paper at the data availability boundary in 2012, making the use of cumulative citations feasible. Tables~\ref{tab:statdesc:assessed} and~\ref{tab:statdesc:attemped} in Appendix~\ref{app:sumstat} provide summary statistics.} 
+%
+In the following Tables~\ref{reg2:OA} to~\ref{arcregdum:OA}, we investigate the relationship between cumulative citations measured four years after publication and reproducibility measures, as well as some of the same bibliometric measures and author characteristics identified earlier. Ideally, we would measure the bibliometric measures in the year of publication. We do so for the sample of articles published in 2012 and later, in the appendix. Here, we measure the bibliometric measures with a one-year lag, but for the whole sample.
+
+% . We first model the relationship between the reproduction outcome of the  paper, different h-index measures of authors (average, minimum and maximum), the type of data used, and the count of citations of the paper. We subsequently investigate the contribution of other covariates capturing productivity of the authors' institutions, a measure of authors' seniority, and the geographic locations of authors.
+
+We start by exploring the role of the type of data used in explaining citation outcomes, using the full sample. We regress cumulative total citations for an article on an indicator of whether the article used confidential data (Table~\ref{reg2:OA}). Results indicate a positive but non-significant citation bonus for papers with confidential data. The prime determinants of future citations are the number of authors, and the h-indexes of the various authors of an article, though that pattern appears to differ somewhat for articles using confidential data. 
+
+\input{./analysis/table_reg2OA}
+
+Conditional on not using confidential data, how does the reproducibility of an article affect its future citation count? We regress  the inverse hyperbolic sine (arcsinh) transform of year-to-date citations on an indicator of whether our team was able to partially or fully reproduce the article, along with the other potential determinants of citations, in addition to controls for author characteristics. Table~\ref{arcreg3alt:OA} shows that there appears to be only a weak (non-significant) positive effect of reproducibility on citations, with author characteristics (h-index and the number of authors) playing a significant role.%
+%
+\footnote{Tables~\ref{reg3:OA}, \ref{logreg3alt:OA},  and~\ref{poisson:OA} in Appendix ~\ref{app:altspec}  show the same pattern using alternate specifications in levels and logs as well as a Poisson regression, respectively.}
+%
+
+
+\input{./analysis/table_arcreg3OA}
+
+
+The bibliometric measures in Table~\ref{arcreg3alt:OA} are  measured with only a one-year lag to the measured citations, and may be inappropriately capturing some of the already-occurred citations. Table~\ref{arcregp2012:OA} uses the same specification on the sample of articles published in 2012 and later, but with bibliometric measures now collected in the year of the article's publication. The effect of the various h-index variables is no longer significant, but institutional productivity now has a slightly positive effect instead. However, generally, there is no impact of reproducibility on future citations. Using both partial and full reproduced results as the outcome is qualitatively similar (Appendix Table~\ref{arcregp2012:OA:partial}).
+
+\input{./analysis/table_arcregpost12OA.tex}
+
+Finally, we consider the dynamic effect over time. Instead of restricting the sample to the fourth year after publication, we look at the effect on yearly citations over the  five years following publication. Since 2018/2019 was a period in which multiple data editors were appointed (AEA, this journal, ReStud, EJ), we add a dummy variable for years 2019 and later. Indeed, the introduction of data editors could have changed economists' perceptions about papers in the AEJ:AE, even though all articles in this study were published prior to the data editor's appointment, and not subject to his scrutiny.
+Table~\ref{arcregdum:OA} shows the usual (concave) evolution of citations over time (with a maximum in yearly citations around 7 years after publication). There is no significant effect of reproducibility, other than a small second-order effect through the h-index interaction. The hypothesized data editor effect is not significant.
+
+\input{./analysis/table_arcreg3OA4.tex}
+
+
+
+%test for a citation bonus of papers successfully reproduced, we captured bibliometric measures for articles published through 2018, leaving 4 post-publication years available to measure these metrics.\footnote{Many data editors were appointed in 2018, and started to enforce data and code availability, in particular for the journal studied here. We wanted to avoid conflating a possibly different interest in reproducibility related to those appointments.} 

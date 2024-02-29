@@ -1,0 +1,478 @@
+
+R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> # Get author and institution information
+> # Output files:
+> #  - openalex.hindex - per-author-year hindex
+> # Intermediate files:
+> # - file.path(interwrk,"citations.df.Rds"))
+> # Inputs:
+> # - file.path(crossrefloc,"audit-exp.xlsx")
+> # - file.path(interwrk,"authors.df.Rds")) (from 42)
+> # Requires 16GB of memory at least.
+> 
+> source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+> source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: devtools
+Loading required package: usethis
+Loading required package: rprojroot
+Loading required package: tictoc
+Loading required package: ggplot2
+Loading required package: bindrcpp
+Loading required package: Rcpp
+> source(file.path(programs,"libraries.R"), echo=FALSE)
+Loading required package: rcrossref
+Loading required package: readr
+Loading required package: tidyr
+Loading required package: data.table
+
+Attaching package: ‘data.table’
+
+The following object is masked from ‘package:tictoc’:
+
+    shift
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: xtable
+Loading required package: rjson
+Loading required package: stargazer
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+Loading required package: knitr
+Loading required package: stringr
+Loading required package: readxl
+Loading required package: fastDummies
+Loading required package: skimr
+Loading required package: sandwich
+Loading required package: pastecs
+
+Attaching package: ‘pastecs’
+
+The following objects are masked from ‘package:data.table’:
+
+    first, last
+
+The following object is masked from ‘package:tidyr’:
+
+    extract
+
+The following objects are masked from ‘package:dplyr’:
+
+    first, last
+
+Loading required package: formattable
+
+Attaching package: ‘formattable’
+
+The following object is masked from ‘package:xtable’:
+
+    digits
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
+  Use `force = TRUE` to force installation
+> source(file.path(programs,"config.R"), echo=FALSE)
+> 
+> 
+> if ( file.exists(openalex.authors.Rds) ) {
++   message(paste0("File already exists: ",openalex.authors.Rds))
++   message("Loading file from previous version.")
++ } else {
++ 
++   stop(paste0("File missing: ",openalex.authors.Rds))
++ }
+File already exists: /home/rstudio/data/openalex/openalex-aejae-authors.Rds
+Loading file from previous version.
+> 
+> # We now have authors data, with all citations
+> 
+> works_list <- readRDS(file=openalex.authors.Rds)
+> nrow(works_list)
+[1] 166051
+> names(works_list)
+ [1] "id"               "doi.url"          "display_name"     "author"           "so"               "so_id"           
+ [7] "cited_by_count"   "counts_by_year"   "publication_date" "publication_year" "type"            
+> table(works_list$type)
+
+        article            book    book-chapter     book-series         dataset    dissertation       editorial 
+         140698            2794            7328               1            5309             583              54 
+        erratum          letter           other        paratext     peer-review reference-entry          report 
+             78              10             261             433             135             162            8205 
+> 
+> 
+> # Read audits back in.
+> 
+> exp_audit <- read_excel(file.path(crossrefloc,"audit-exp.xlsx")) %>%
++   select(au_id,verified_first) %>%
++   filter(!is.na(verified_first)) %>%
++   group_by(au_id) %>%
++   mutate(verified_first=min(verified_first,na.rm=TRUE)) %>%
++   distinct()
+> 
+> nrow(exp_audit)
+[1] 112
+> # merge the audited data back on. Also apply conditions.
+> 
+> # we have a blacklist of known bad matches
+> blacklist.au_id <- read_excel(file.path(openalexloc,"blacklist.xlsx")) %>%
++   select(au_id)
+> nrow(blacklist.au_id %>% distinct(au_id))
+[1] 1
+> 
+> # expanded list of authors in the AEJ:AE
+> 
+> authors.in.sample <- readRDS(file.path(interwrk,"authors.df.Rds")) %>%
++   distinct(au_id)
+> nrow(authors.in.sample)
+[1] 1114
+> # [1] 1114
+> 
+> # Now let's look at citations for these folks
+> 
+> # we start again with works_list, because we need to expand it to full years.
+> 
+> works_list %>%
++   select(article_id=id,counts_by_year) %>%
++   tidyr::unnest(counts_by_year) %>%
++   select(article_id,year) %>%
++   expand(article_id,year) %>%
++   filter(!is.na(year)) -> expanded
+> 
+> min.year <- min(expanded$year)
+> 
+> # we now have all years, all articles
+> 
+> # We correct for some obvious issues:
+> # - incorrectly attributed articles are removed, when publication_year < 1950
+> 
+> nrow(works_list)
+[1] 166051
+> # 166051
+> works_list %>%
++   ############ article level #################################################
++   #filter(id=="https://openalex.org/W2114926243") %>%
++   select(article_id=id,max_citations = cited_by_count,publication_year,
++          counts_by_year,author,type) %>%
++   # remove a few types we don't want to use here
++   # This leaves 165060
++   filter(! type %in% c("other","paratext","peer-review","reference-entry")) %>%
++   tidyr::unnest(counts_by_year) %>%
++   ########### article - year level, sparse ###################################
++   # some articles have no citations at all
++   mutate(year = replace_na(year,min.year)) %>%
++   # we now have all articles, all authors, select years
++   right_join(expanded,by=c("article_id","year")) %>%
++   ########### article - year level, full, missing ############################
++   # fill in values
++   group_by(article_id) %>%
++   fill(author,.direction = "updown") %>%
++   fill(max_citations,.direction = "updown") %>%
++   fill(publication_year,.direction = "updown") %>%
++   mutate(cited_by_count = replace_na(cited_by_count,0)) %>%
++   ########### article - year level, full, filled #############################
++   filter(year >= publication_year) %>%
++   ########### article - year level, reduced to post-publication ##############
++   # now expand the authors again
++   tidyr::unnest(author) -> TMP
+>   ########### article - year - author level  #################################
+> message(paste0("Author-article-year: ",nrow(TMP)))
+Author-article-year: 5236235
+> gc()
+            used (Mb) gc trigger (Mb)  max used (Mb)
+Ncells   7350893  393   17968987  960  17968987  960
+Vcells 145382055 1109  240944578 1838 200611102 1531
+> TMP %>%
++   # We only want the data for the authors in our sample.
++   right_join(authors.in.sample %>% select(au_id),
++              by="au_id") -> TMP
+> ########### article - year - author, limited  #################################
+> message(paste0(" - limited to AEJ:AE: ",nrow(TMP)))
+ - limited to AEJ:AE: 1342878
+> message(paste0("   Authors: ",nrow(TMP %>% distinct(au_id))))
+   Authors: 158525
+> 
+> gc()
+           used (Mb) gc trigger (Mb)  max used (Mb)
+Ncells  7322129  391   17968987  960  17968987  960
+Vcells 84908403  648  240944578 1838 230281358 1757
+> TMP %>%
++   # But this gets us all the data for ALL the co-authors on papers that are out of scope.
++   # Kenneth J Arrow rule...
++   filter(publication_year > 1950) %>%
++   group_by(au_id) %>%
++   mutate(earliest_pub = min(publication_year)) %>%
++   ungroup() %>%
++   # bring in audited file
++   left_join(exp_audit,by=c("au_id")) %>%
++   mutate(earliest_pub = max(earliest_pub,verified_first,na.rm=TRUE)) %>%
++   filter(publication_year <= earliest_pub) -> TMP
+> ########### article - year - author, cleaned  #################################
+> message(paste0(" - removing implausible records: ",nrow(TMP)))
+ - removing implausible records: 1316453
+> message(paste0("   Authors: ",nrow(TMP %>% distinct(au_id))))
+   Authors: 1114
+> 
+> TMP %>%
++   # remove blacklist authors
++   # note that this COMPLETE removes them, because of full bad match
++   anti_join(blacklist.au_id) -> TMP
+Joining with `by = join_by(au_id)`
+> message(paste0(" - after blacklist removal: ",nrow(TMP)))
+ - after blacklist removal: 1316453
+> message(paste0("   Authors: ",nrow(TMP %>% distinct(au_id))))
+   Authors: 1114
+> 
+> # we now have all articles, all authors, all years
+> TMP %>%
++   select(au_id,au_display_name,year,article_id,publication_year,
++          max_citations,cited_by_count,type) %>%
++   ungroup() -> citations.df
+> rm(TMP)
+> gc()
+           used (Mb) gc trigger (Mb)  max used (Mb)
+Ncells  7213095  385   17968987  960  17968987  960
+Vcells 63648965  486  192755663 1471 230281358 1757
+> 
+> 
+> nrow(citations.df)
+[1] 1316453
+> # [1] 1343406
+> nrow(citations.df %>% distinct(au_id))
+[1] 1114
+> # [1] 1137
+> names(citations.df)
+[1] "au_id"            "au_display_name"  "year"             "article_id"       "publication_year" "max_citations"   
+[7] "cited_by_count"   "type"            
+> # [1] "au_id"            "au_display_name"
+> # [3] "year"             "article_id"
+> # [5] "publication_year" "max_citations"
+> # [7] "cited_by_count"   "type"
+> 
+> ## quality control
+> citations.df %>% select(au_id) %>% skim() %>% filter(n_missing>0)
+# A tibble: 0 × 9
+# … with 9 variables: skim_type <chr>, skim_variable <chr>, n_missing <int>, complete_rate <dbl>, character.min <int>,
+#   character.max <int>, character.empty <int>, character.n_unique <int>, character.whitespace <int>
+> # A tibble: 0 × 9
+> citations.df %>% select(publication_year,max_citations,cited_by_count,year) %>% skim()
+── Data Summary ────────────────────────
+                           Values    
+Name                       Piped data
+Number of rows             1316453   
+Number of columns          4         
+_______________________              
+Column type frequency:               
+  numeric                  4         
+________________________             
+Group variables            None      
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable    n_missing complete_rate    mean     sd   p0  p25  p50  p75  p100 hist 
+1 publication_year         0             1 2009.     9.29 1951 2005 2011 2015  2021 ▁▁▁▃▇
+2 max_citations            0             1   35.5  209.      0    0    2   18 32309 ▇▁▁▁▁
+3 cited_by_count           0             1    2.40  15.1     0    0    0    1  5359 ▇▁▁▁▁
+4 year                     0             1 2018.     3.32 2012 2016 2019 2021  2023 ▅▃▅▅▇
+> # ── Variable type: numeric ────────────────────────
+> # skim_variable    n_missing complete_rate    mean
+> # 1 publication_year         0             1 2009.
+> # 2 max_citations            0             1   35.5
+> # 3 cited_by_count           0             1    2.40
+> # 4 year                     0             1 2018.
+> 
+> saveRDS(citations.df,file=file.path(interwrk,"citations.df.Rds"))
+> 
+> # We first tried out straighforward by-year
+> # result:
+> # - cumulative does not seem to correspond to reported cited_by_count
+> # - cumulative h-index is different than computed off the article-level cited_by_count.
+> # - this is likely due to the fact that we are using the API, which is limited to 10 years.
+> #
+> # So let's try another thing
+> # use the reported total and compute the cumulative-by-year as the remainder going backward
+> 
+> message("Preparing H-index file")
+Preparing H-index file
+> citations.df %>%
++   #filter(au_id=="https://openalex.org/A5027614993") %>%
++   arrange(au_id,article_id,desc(year)) %>%
++   group_by(au_id,article_id) %>%
++   mutate(max_citations = max(max_citations,na.rm = TRUE),
++          neg_cum_citations = cumsum(replace_na(cited_by_count,0)),
++          ytd_citations = max_citations - neg_cum_citations + cited_by_count) %>%
++   arrange(au_id,year,desc(ytd_citations)) %>%
++   group_by(au_id,year) %>%
++   mutate(position=row_number(),
++          flag = position<=ytd_citations,
++          n_pubs=n())  %>%
++   ungroup() -> hindex.tmp
+>   # we still have 1114 here
+> nrow(hindex.tmp %>% distinct(au_id))
+[1] 1114
+> # [1] 1114
+> message(paste0("   Authors: ",nrow(hindex.tmp %>% distinct(au_id))))
+   Authors: 1114
+> 
+> # this drops folks with no citations = h-index =0
+> hindex.tmp2 <- hindex.tmp %>%
++   filter(flag) %>%
++   group_by(au_id,au_display_name,year) %>%
++   summarize(hindex=max(position),.groups="keep") %>%
++   ungroup()
+> 
+> message(paste0("   - after filter(flag): ",nrow(hindex.tmp2 %>% distinct(au_id))))
+   - after filter(flag): 1113
+> 
+> # lets get the others, who never have citations.
+> hindex.tmp3 <- hindex.tmp %>%
++   filter(!flag) %>%
++   distinct(au_id,au_display_name,year) %>%
++   mutate(hindex=0)
+> 
+> message(paste0("   - never/not yet cited (no flag): ",nrow(hindex.tmp3 %>% distinct(au_id))))
+   - never/not yet cited (no flag): 1113
+> 
+> 
+> hindex.by.year.tmp <-
++   full_join(hindex.tmp2,hindex.tmp3,by=c("au_id","au_display_name","year")) %>%
++   left_join(hindex.tmp %>% distinct(au_id,year,n_pubs)) %>%
++   mutate(hindex = coalesce(hindex.x,hindex.y)) %>%
++   select(-hindex.x,-hindex.y)
+Joining with `by = join_by(au_id, year)`
+> 
+> message(paste0("   - after joining back: ",nrow(hindex.by.year.tmp %>% distinct(au_id))))
+   - after joining back: 1114
+> skim(hindex.by.year.tmp)
+── Data Summary ────────────────────────
+                           Values            
+Name                       hindex.by.year.tmp
+Number of rows             13036             
+Number of columns          5                 
+_______________________                      
+Column type frequency:                       
+  character                2                 
+  numeric                  3                 
+________________________                     
+Group variables            None              
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable   n_missing complete_rate min max empty n_unique whitespace
+1 au_id                   0             1  32  32     0     1114          0
+2 au_display_name         0             1   5  29     0     1110          0
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable n_missing complete_rate   mean     sd   p0  p25  p50  p75  p100 hist 
+1 year                  0             1 2018.    3.43 2012 2015 2018 2021  2023 ▇▅▅▅▇
+2 n_pubs                0             1  101.  343.      1   21   52  117 15513 ▇▁▁▁▁
+3 hindex                0             1   14.5  15.9     0    4   10   19   199 ▇▁▁▁▁
+> 
+> # Removing outliers
+> message(paste0(".   Outliers: ",max(hindex.by.year.tmp$n_pubs)))
+.   Outliers: 15513
+> 
+> # we filter all individuals who ever have too many pubs, indicative of a bad match
+> hindex.by.year.tmp %>%
++   # Richard Freeman Rule: Cumulative publication less than Freeman or Acemoglu.
++   # Acemoglu is not in this sample
++   filter(n_pubs > 1500) %>% distinct(au_id,au_display_name) -> outliers
+> 
+> print(outliers)
+# A tibble: 2 × 2
+  au_id                            au_display_name
+  <chr>                            <chr>          
+1 https://openalex.org/A5006822602 Xin Wang       
+2 https://openalex.org/A5031212154 James Lee      
+> 
+> hindex.by.year <-
++   hindex.by.year.tmp %>%
++   anti_join(outliers %>% select(au_id))
+Joining with `by = join_by(au_id)`
+> 
+> # who is now max
+> hindex.by.year %>% filter(n_pubs == max(n_pubs)) %>% select(au_id,au_display_name,year,n_pubs)
+# A tibble: 3 × 4
+  au_id                            au_display_name     year n_pubs
+  <chr>                            <chr>              <int>  <int>
+1 https://openalex.org/A5051656604 Richard B. Freeman  2021   1487
+2 https://openalex.org/A5051656604 Richard B. Freeman  2022   1487
+3 https://openalex.org/A5051656604 Richard B. Freeman  2023   1487
+> message(paste0("   - after filtering outliers: ",nrow(hindex.by.year %>% distinct(au_id))))
+   - after filtering outliers: 1112
+> skim(hindex.by.year)
+── Data Summary ────────────────────────
+                           Values        
+Name                       hindex.by.year
+Number of rows             13012         
+Number of columns          5             
+_______________________                  
+Column type frequency:                   
+  character                2             
+  numeric                  3             
+________________________                 
+Group variables            None          
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable   n_missing complete_rate min max empty n_unique whitespace
+1 au_id                   0             1  32  32     0     1112          0
+2 au_display_name         0             1   5  29     0     1108          0
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable n_missing complete_rate   mean     sd   p0  p25  p50  p75 p100 hist 
+1 year                  0             1 2018.    3.43 2012 2015 2018 2021 2023 ▇▅▅▅▇
+2 n_pubs                0             1   91.0 116.      1   21   52  116 1487 ▇▁▁▁▁
+3 hindex                0             1   14.3  15.3     0    4   10   19  154 ▇▁▁▁▁
+> 
+> 
+> nrow(hindex.by.year)
+[1] 13012
+> nrow(hindex.by.year %>% distinct(au_id))
+[1] 1112
+> # Should be: 1112
+> names(hindex.by.year)
+[1] "au_id"           "au_display_name" "year"            "n_pubs"          "hindex"         
+> # > names(hindex.by.year)
+> # [1] "au_id"           "au_display_name" "year"            "hindex"
+> 
+> 
+> saveRDS(hindex.by.year,openalex.hindex)
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  56.59    2.33   57.64 

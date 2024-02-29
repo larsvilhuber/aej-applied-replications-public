@@ -1,0 +1,46 @@
+
+\subsection{Analysis of replication packages}
+
+
+%\subsection{Results from the Initial Assessment}\label{sec:results:entry}
+Out of  \input{./includes/aejdoistotal} eligible articles in AEJ:AE, \input{./includes/total.assessed} were assigned and assessed. Table~\ref{tab:data_availability} shows the classification of the \input{./includes/total.assessed} assessed articles into three categories (Appendix Table~\ref{tab:absence} breaks these numbers down by year of publication). The assessors identified \input{./includes/articles_confdata} articles that relied on confidential data, proprietary data, or data that would require payment, application, or registration. Another \input{./includes/articles_nodata} provided neither data nor explanation for the absence of data. These were likely articles that obtained exemptions from the data availability policy, the standard policy at the time for articles with confidential data. Finally, \input{./includes/total.attempted} articles (\input{./includes/attemptrate}\%) appeared to contain sufficient information, data, and code to attempt a reproduction.%
+%
+\footnote{To be precise, we have complete entry and exit questionnaires for \input{./includes/total.attempted} articles. We exclude articles which were assigned for reproduction, but for which the reproduction attempt or the exit questionnaire are incomplete. These are mostly articles which were assigned towards the end of the summer, and which were aborted as the student left the summer job.%}%
+%$^{,}$%
+%\footnote{%
+ For some  articles, a second reproduction attempt was made,  for a number of reasons, including explicit double-coding, ``onboarding'' of new replicators, and operator error. Duplicates are removed in the analysis to keep the most successful outcomes when several outcomes were available for a given article. This creates an intentional upward bias in terms of reproducibility, given the skill distribution of our replicators. Results do not materially change when switching to the first recorded outcome.}
+
+\input{./includes/table_data_availability.tex}
+
+
+
+We note that when authors requested an exemption due to data confidentiality, they may have understood that they were also exempted from the policy to ``precisely document[]'' the data. Thus, provision of no information, as in the case of the \input{./includes/articles_nodata} articles in Table~\ref{tab:data_availablity}, may be consistent with the implementation of the policy at the time. In what follows, we therefore concentrate on articles that did, in fact, provide some information that could be assessed. We first document the types of software required and data formats, a subjective measure of difficulty of reproduction, as well as ex-post documentation clarity. We then turn to the reproduction results themselves.
+
+
+\subsubsection{Software and data formats} 
+
+
+Most replication packages relied on proprietary, non-open source software for statistical programs, and stored data in proprietary formats. The vast majority of code in replication packages used the Stata programming language for at least some portion of analysis (Table~\ref{tab:prog}). This dominance of a single language is reflective of broader usage in economics, though the particular dominance of Stata might be specific to the \ac{AEJ:AE}. From a reproducibility perspective, Stata has both advantages and disadvantages. While it is proprietary software, it is relatively cheap and accessible. Many packages to extend its usability are available, many of which are accessible from within the software from both peer-reviewed (Stata Journal) and crowd-sourced (RePEc/SSC) repositories. Unfortunately, in contrast to CRAN, the SSC does not currently support versioning of packages, making it sometimes difficult to find the original version of a package used by authors. 
+
+
+\input{./includes/table_data_prog}
+
+Table~\ref{tab:prog} also indicates that economists tend to provide data in the native format of the programming language used, instead of open formats (CSV and others). The Stata file format has proven to be quite robust, as newly released versions of Stata maintain backward compatibility to all previous versions of the data format. Furthermore,  the data format is well understood (albeit not open-source), and can be read by many open-source software packages (R, python). The Stata file format allows the embedding of richer metadata, which is not feasible for (basic) CSV formats. We did not verify that metadata (variable labels, same variable names, etc.) complied with modern data curation standards.
+
+\FloatBarrier
+
+
+
+\subsubsection{Subjective difficulty}
+
+Replicators were asked to provide a subjective measure of the difficulty of ``reproducibility,'' based on the criteria described in Table~\ref{tab:criteria_difficulty}. Outcomes both for the full sample of assessed articles, as well as for the subset of articles for which reproducibility was attempted, are presented in Table~\ref{tab:difficult:joint}. Note that the assessment was made before a decision was made whether or not to reproduce the article, though it was known that articles with confidential data would not be reproduced. Because data availability entered into the assessment, it is not surprising that replicators found articles that we ultimately attempted to reproduce to be easier (median rating of \input{./includes/median.difficulty.attempted} for attempted articles vs. a median rating of \input{./includes/median.difficulty.all} for all assessed articles). These ratings should be interpreted with respect to the skill level of the replicators, as well as the time and effort that could be devoted to these attempts.
+
+\input{./includes/table_difficult}
+
+
+\subsubsection{Documentation of replication packages}
+
+Previous authors have argued for improved documentation of submitted data and programs \parencite{McCullough2006, ChangLi2015}. Reproduction and in particular replication attempts are made significantly easier when replicators are not required to resolve ambiguity,  and the source of each table and figure is well documented. In contrast to previous assessments, Table~\ref{tab:doc} presents a summary of the ex-post documentation quality, after a reproduction was attempted,  by  year of publication. As evaluated by the replicators, the quality of documentation seems fairly good, with a majority of articles being perceived as well documented. \input{./includes/tdcomplete}  articles out of \input{./includes/tdtotal} (\input{./includes/tdcompletepct}\%) provided complete documentation, defined as a README file with step by step instructions on how to execute every provided program. However, \input{./includes/tdincomplete} articles (\input{./includes/tdincompletepct}\%)  provided incomplete ReadMe files that either skipped some of the important steps required to run the programs or contained some ambiguous instructions.  No documentation was provided in \input{./includes/tdnoinfo} articles.
+
+
+\input{./includes/table_doc}
