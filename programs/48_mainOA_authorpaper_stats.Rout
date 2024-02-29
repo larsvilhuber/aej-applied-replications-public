@@ -1,0 +1,854 @@
+
+R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> ## OLS REGRESSIONS:
+> #### Create variables for similar OLS regressions as the ones before
+> ### Reproduce the regressions with web of Sciences
+> ### Add author information such as institution and region
+> 
+> 
+> source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+> source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: devtools
+Loading required package: usethis
+Loading required package: rprojroot
+Loading required package: tictoc
+Loading required package: ggplot2
+Loading required package: bindrcpp
+Loading required package: Rcpp
+Loading required package: markdown
+> source(file.path(programs,"libraries.R"), echo=FALSE)
+Loading required package: rcrossref
+Loading required package: readr
+Loading required package: tidyr
+Loading required package: data.table
+
+Attaching package: ‘data.table’
+
+The following object is masked from ‘package:tictoc’:
+
+    shift
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: xtable
+Loading required package: rjson
+Loading required package: stargazer
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+Loading required package: knitr
+Loading required package: stringr
+Loading required package: readxl
+Loading required package: fastDummies
+Loading required package: skimr
+Loading required package: sandwich
+Loading required package: pastecs
+
+Attaching package: ‘pastecs’
+
+The following objects are masked from ‘package:data.table’:
+
+    first, last
+
+The following object is masked from ‘package:tidyr’:
+
+    extract
+
+The following objects are masked from ‘package:dplyr’:
+
+    first, last
+
+Loading required package: formattable
+
+Attaching package: ‘formattable’
+
+The following object is masked from ‘package:xtable’:
+
+    digits
+
+Loading required package: reshape2
+
+Attaching package: ‘reshape2’
+
+The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+  Use `force = TRUE` to force installation
+> source(file.path(programs,"config.R"), echo=FALSE)
+> 
+> 
+> # footnote text
+> source(file.path(programs,"_footnotes.R"))
+> 
+> ##========================== Pub and author stats ============================
+> 
+> 
+> ### Clean readback
+> 
+> mainOA           <- readRDS(file=file.path(interwrk,"47_mainOA_complete.Rds"))
+> biblio.derived   <- readRDS(file=file.path(interwrk,"47_hindex_allyears.Rds"))
+> hindex.allyears  <- readRDS(file=file.path(interwrk,"47_hindex_allyears.Rds"))
+> institutions.quantiles <- readRDS(file.path(interwrk,"43_institution_quantiles.Rds"))
+> 
+> works.q33 <- institutions.quantiles %>% filter(quantile =="33%") %>% pull(value)
+> works.q67 <- institutions.quantiles %>% filter(quantile =="67%") %>% pull(value)
+> 
+> 
+> 
+> # pretty names
+> name.mapping     <- read_excel(file.path(auxilloc,"mainOA-mapping.xlsx")) %>%
++   # one fix
++   mutate(model.varnames = case_when(
++     model.varnames == "Data absent: confidential"~ "Confidential data",
++     .default = model.varnames
++   ))
+> 
+> ## Compute paper and author stats
+> 
+> 
+> pub_author_stats.doi <- mainOA %>%
++   left_join(biblio.derived %>% filter(!is.na(avghindex)) %>%
++               filter(years_since_publication <=5)) %>% #filter(!is.na(replicated)) %>%
++   # build composite variable
++   mutate(Outcome = case_when(
++     flag_main_issue_confdata ~  "Confidential data",
++     replicated == "No" ~ "Unsuccessful",
++     replicated == "Yes" ~ "Successful",
++     replicated == "Partial" ~ "Partial",
++     flag_entry_confdata ==1 ~ "Confidential data",
++     .default = NA))
+Joining with `by = join_by(DOI)`
+Warning message:
+In left_join(., biblio.derived %>% filter(!is.na(avghindex)) %>%  :
+  Each row in `x` is expected to match at most 1 row in `y`.
+ℹ Row 1 of `x` matches multiple rows.
+ℹ If multiple matches are expected, set `multiple = "all"` to silence this warning.
+> 
+> pub_author_stats <- pub_author_stats.doi %>%
++   group_by(Outcome,years_since_publication) %>%
++   summarise(`Avg h-index`=mean(avghindex,na.rm=TRUE),
++             `Lowest h-index`=mean(lowhindex,na.rm=TRUE),
++             `Number of Authors`=mean(nauthors,na.rm=TRUE),
++             `Citations`=mean(new_cites,na.rm=TRUE),
++             `Highest experience`  =mean(max_experience,na.rm = TRUE),
++             `Institutional productivity`=mean(max_institution_works/10000,na.rm = TRUE),
++             `Percent of authors in US` =mean(100*metaregion_US,na.rm=TRUE),
++             `N` = n())%>%
++   ungroup() %>%
++   mutate_if(is.numeric, round, digits=2)
+`summarise()` has grouped output by 'Outcome'. You can override using the `.groups` argument.
+> 
+> pub_author_stats %>% group_by(years_since_publication) %>%
++   summarise(n=sum(N))
+# A tibble: 6 × 2
+  years_since_publication     n
+                    <dbl> <dbl>
+1                       0   197
+2                       1   229
+3                       2   252
+4                       3   273
+5                       4   273
+6                       5   273
+> 
+> pub_author_stats %>% filter(years_since_publication ==4) %>%
++   select(-years_since_publication) -> pub_author_stats4
+> 
+> pub_author_stats4 %>%
++   transpose(keep.names = "Name") -> tmp
+> names(tmp) <- as.character(unlist(tmp[1,]))
+> tmp[2:nrow(tmp),] %>%
++   select(Outcome,"Confidential data","Unsuccessful","Partial","Successful") %>%
++   rename(` ` = Outcome) -> pub_author_stats4.t
+> rm(tmp)
+> 
+> pub_author_stats %>% filter(years_since_publication ==0) %>%
++   select(-years_since_publication)  -> pub_author_stats0
+> 
+> pub_author_stats0 %>%
++   transpose(keep.names = "Name") -> tmp
+> names(tmp) <- as.character(unlist(tmp[1,]))
+> tmp[2:nrow(tmp),] %>%
++   select(Outcome,"Confidential data","Unsuccessful","Partial","Successful") %>%
++   rename(` ` = Outcome) ->pub_author_stats0.t
+> rm(tmp)
+> 
+> footnote.m1  <- ", except for 1 author dropped for inconsistent OA data."
+> 
+> # Print table
+> stargazer(pub_author_stats4.t,
++           out=file.path(Outputs,"table_metrics_OA.tex"),
++           type="latex",title = "Publication and Author Metrics",
++           label="tab:metrics:OA",
++           style="aer",flip=F, summary=F, rownames = F,
++           #font.size = fs,
++           column.sep.width = cw,
++           digits = 2,
++           notes=c(paste0("Notes: All assessed articles",footnote.m1),
++                   "Author and institutional characteristics are measured 4 years after publication, ",
++                   "due to limitations in the OA data availability.",
++                   footnote.prod1k))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:13:00 AM
+\begin{table}[!htbp] \centering 
+  \caption{Publication and Author Metrics} 
+  \label{tab:metrics:OA} 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+  & Confidential data & Unsuccessful & Partial & Successful \\ 
+\hline \\[-1.8ex] 
+Avg h-index & 16.41 & 21.57 & 17.22 & 18.5 \\ 
+Lowest h-index & 9.43 & 14.17 & 10.18 & 10.41 \\ 
+Number of Authors & 2.21 & 2.17 & 2.32 & 2.56 \\ 
+Citations & 9.24 & 6.61 & 8.23 & 11.26 \\ 
+Highest experience & 24.31 & 27.11 & 23.45 & 24.84 \\ 
+Institutional productivity & 20.07 & 26.25 & 18.5 & 23.1 \\ 
+Percent of authors in US & 85.12 & 72.22 & 74.24 & 83.82 \\ 
+N & 121 & 18 & 66 & 68 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{Notes: All assessed articles, except for 1 author dropped for inconsistent OA data.} \\ 
+\multicolumn{5}{l}{Author and institutional characteristics are measured 4 years after publication, } \\ 
+\multicolumn{5}{l}{due to limitations in the OA data availability.} \\ 
+\multicolumn{5}{l}{Institutional (cumulative) productivity measured in 10,000 publications.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> stargazer(pub_author_stats0.t,
++           out=file.path(Outputs,"table_metrics_OA_app0.tex"),
++           type="latex",title = "Publication and Author Metrics (2012+)",
++           label="tab:metrics:OA:zero",
++           style="aer",flip=F, summary=F, rownames = F,
++           #font.size = fs,
++           column.sep.width = cw,
++           notes=c("Notes: All assessed articles published after 2011, except for 1 author dropped ",
++                   "for inconsistent OA data.with . Author and institutional characteristics are measured ",
++                   "in the year of publication. ",
++                   footnote.prod1k))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:13:00 AM
+\begin{table}[!htbp] \centering 
+  \caption{Publication and Author Metrics (2012+)} 
+  \label{tab:metrics:OA:zero} 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+  & Confidential data & Unsuccessful & Partial & Successful \\ 
+\hline \\[-1.8ex] 
+Avg h-index & 12.06 & 14.67 & 11.68 & 14.04 \\ 
+Lowest h-index & 6.21 & 7.33 & 6.14 & 7.4 \\ 
+Number of Authors & 2.27 & 2.44 & 2.32 & 2.6 \\ 
+Citations & 2.87 & 2.11 & 3.58 & 5.47 \\ 
+Highest experience & 20.57 & 24.89 & 19.28 & 21.53 \\ 
+Institutional productivity & 19.63 & 27.85 & 18.48 & 21.47 \\ 
+Percent of authors in US & 82.14 & 77.78 & 71.93 & 82.98 \\ 
+N & 84 & 9 & 57 & 47 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{Notes: All assessed articles published after 2011, except for 1 author dropped } \\ 
+\multicolumn{5}{l}{for inconsistent OA data.with . Author and institutional characteristics are measured } \\ 
+\multicolumn{5}{l}{in the year of publication. } \\ 
+\multicolumn{5}{l}{Institutional (cumulative) productivity measured in 10,000 publications.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> # stargazer(pub_author_stats4.t %>% select(-),
+> #           out=file.path(Outputs,"table_metrics_OA_app.tex"),
+> #           type="latex",title = "Publication and Author Metrics (no confidential data)",
+> #           label="tab:metrics:OA:noconf",
+> #           style="aer",flip=T, summary=F, rownames = F,
+> #           #font.size = fs,
+> #           column.sep.width = cw,
+> #           notes=c("Notes: All articles for which reproduction was attempted.",
+> #                   footnote.prod1k))
+> 
+> #### Some extra numbers
+> nauthors   <-round(weighted.mean(pub_author_stats4$`Number of Authors`,pub_author_stats4$N),2)
+> ncite      <-round(weighted.mean(pub_author_stats4$`Citations`,pub_author_stats4$N),2)
+> navghindex <-round(weighted.mean(pub_author_stats4$`Avg h-index`,pub_author_stats4$N),2)
+> nexperience<-round(weighted.mean(pub_author_stats4$`Highest experience`,pub_author_stats4$N),2)
+> nproductvt <-round(weighted.mean(pub_author_stats4$`Institutional productivity`,pub_author_stats4$N),0)*10000
+> 
+> 
+> cat(nauthors, 			file=file.path(TexIncludes,"nauthorsOA.tex"))
+> cat(ncite, 					file=file.path(TexIncludes,"nciteOA.tex"))
+> cat(navghindex, 		file=file.path(TexIncludes,"navghindexOA.tex"))
+> cat(nexperience, 		file=file.path(TexIncludes,"nexperienceOA.tex"))
+> cat(nproductvt, 		file=file.path(TexIncludes,"nproductvtOA.tex"))
+> 
+> 
+> 
+> #############################################################################
+> # Compute stats for articles that were in the WoS data.
+> 
+> pub_author_stats.doi.wos <- readRDS(file=file.path(interwrk,"31_authorstats_doi.Rds"))
+> 
+> # merge the two
+> 
+> combined_wos_oa <- left_join(pub_author_stats.doi.wos %>%distinct(DOI) %>%
++                                mutate(src="wos"),
++                              pub_author_stats.doi)
+Joining with `by = join_by(DOI)`
+Warning message:
+In left_join(pub_author_stats.doi.wos %>% distinct(DOI) %>% mutate(src = "wos"),  :
+  Each row in `x` is expected to match at most 1 row in `y`.
+ℹ Row 1 of `x` matches multiple rows.
+ℹ If multiple matches are expected, set `multiple = "all"` to silence this warning.
+> 
+> pub_author_stats.wos <- combined_wos_oa %>%
++   group_by(Outcome,years_since_publication) %>%
++   summarise(`Avg h-index`=mean(avghindex,na.rm=TRUE),
++             `Lowest h-index`=mean(lowhindex,na.rm=TRUE),
++             `Number of Authors`=mean(nauthors,na.rm=TRUE),
++             `Citations`=mean(new_cites,na.rm=TRUE),
++             `Highest experience`  =mean(max_experience,na.rm = TRUE),
++             `Institutional productivity`=mean(max_institution_works/10000,na.rm = TRUE),
++             `Percent of authors in US` =mean(100*metaregion_US,na.rm=TRUE),
++             `N` = n())%>%
++   ungroup() %>%
++   mutate_if(is.numeric, round, digits=2)
+`summarise()` has grouped output by 'Outcome'. You can override using the `.groups` argument.
+> 
+> pub_author_stats.wos %>% filter(years_since_publication ==4) %>%
++   select(-years_since_publication) -> pub_author_stats4.wos
+> 
+> pub_author_stats4.wos %>%
++   transpose(keep.names = "Name") -> tmp
+> names(tmp) <- as.character(unlist(tmp[1,]))
+> tmp[2:nrow(tmp),] %>%
++   select(Outcome,"Unsuccessful","Partial","Successful") %>%
++   rename(` ` = Outcome) -> pub_author_stats4.wos.t
+> rm(tmp)
+> 
+> stargazer(pub_author_stats4.wos.t,
++           out=file.path(Outputs,"table_metrics_OA_wos.tex"),
++           type="latex",title = "Publication and Author Metrics for WoS sample",
++           label="tab:metrics:OA:WoS",
++           style="aer",flip=F, summary=F, rownames = F,
++           #font.size = fs,
++           column.sep.width = cw,
++           digits = 2,
++           notes=c("Notes: Assessed articles matched to Web of Science database extract. Author ",
++                   "and institutional characteristics are measured 4 years after publication.",
++                   footnote.prod1k))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:13:01 AM
+\begin{table}[!htbp] \centering 
+  \caption{Publication and Author Metrics for WoS sample} 
+  \label{tab:metrics:OA:WoS} 
+\begin{tabular}{@{\extracolsep{0.4pt}} cccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+  & Unsuccessful & Partial & Successful \\ 
+\hline \\[-1.8ex] 
+Avg h-index & 20.76 & 17.84 & 19.65 \\ 
+Lowest h-index & 14.57 & 10.38 & 10.73 \\ 
+Number of Authors & 2.14 & 2.42 & 2.58 \\ 
+Citations & 7.07 & 8.56 & 12.04 \\ 
+Highest experience & 25.79 & 23.4 & 25.27 \\ 
+Institutional productivity & 26.57 & 18.12 & 23.2 \\ 
+Percent of authors in US & 71.43 & 73.08 & 82.22 \\ 
+N & 14 & 52 & 45 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{4}{l}{Notes: Assessed articles matched to Web of Science database extract. Author } \\ 
+\multicolumn{4}{l}{and institutional characteristics are measured 4 years after publication.} \\ 
+\multicolumn{4}{l}{Institutional (cumulative) productivity measured in 10,000 publications.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> #############################################################################
+> # table of ratios
+> t1 <- mainOA %>% select('Fully reproduced','Full or Partial') %>%
++   summarise(`Number of Articles` = n(),
++             `n_full`=
++               percent(sum(`Fully reproduced`,
++                                                      na.rm=TRUE)/ n(),
++                                                  digits=2),
++             `n_partial`=
++               percent(sum(`Full or Partial`,na.rm=TRUE)/ n(),
++                           digits=2)) %>%
++   mutate(Denominator = "$d_assessed$") %>%
++   select(Denominator,everything())
+> t1
+   Denominator Number of Articles n_full n_partial
+1 $d_assessed$                273 24.91%    50.18%
+> 
+> t2 <- mainOA %>% filter(!is.na(replicated)) %>%
++   summarise(`Number of Articles` = n(),
++             `n_full`=
++               percent(sum(`Fully reproduced`,
++                           na.rm=TRUE)/ n(),
++                       digits=2),
++             `n_partial`=
++               percent(sum(`Full or Partial`,na.rm=TRUE)/ n(),
++                       digits=2)) %>%
++   mutate(Denominator = "$d_attempted$") %>%
++   select(Denominator,everything())
+> t2
+    Denominator Number of Articles n_full n_partial
+1 $d_attempted$                180 37.78%    76.11%
+> 
+> t3 <- mainOA %>% filter(!is.na(replicated)) %>%
++   filter(!flag_main_issue_confdata) %>%
++   summarise(`Number of Articles` = n(),
++             `n_full`=
++               percent(sum(`Fully reproduced`,
++                           na.rm=TRUE)/ n(),
++                       digits=2),
++             `n_partial`=
++               percent(sum(`Full or Partial`,na.rm=TRUE)/ n(),
++                       digits=2)) %>%
++   mutate(Denominator = "$d_nonconfidential$") %>%
++   select(Denominator,everything())
+> t3
+          Denominator Number of Articles n_full n_partial
+1 $d_nonconfidential$                152 44.74%    88.16%
+> 
+> t_ratiosum <- rbind(t1,t2,t3) %>%
++   select(Denominator,`Number of Articles`,`n_full (%)`=n_full,`n_partial (%)`=n_partial)
+> 
+> 
+> 
+> stargazer(t_ratiosum,
++           title="Reproduction Rates", align=TRUE,no.space=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="tab:ratios",
++           style="aer",
++           flip=FALSE,summary=FALSE, rownames = FALSE,
++           #font.size = fs,
++           column.sep.width = cw,
++           notes = c("\\footnotesize Notes: ", footnote.full.partial),
++           out=file.path(Outputs,"table_ratios.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:13:01 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Reproduction Rates} 
+  \label{tab:ratios} 
+\begin{tabular}{@{\extracolsep{0.4pt}} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\multicolumn{1}{c}{Denominator} & \multicolumn{1}{c}{Number of Articles} & \multicolumn{1}{c}{n\_full (\%)} & \multicolumn{1}{c}{n\_partial (\%)} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{1}{c}{\$d\_assessed\$} & 273 & 24.90% & 50.20% \\ 
+\multicolumn{1}{c}{\$d\_attempted\$} & 180 & 37.80% & 76.10% \\ 
+\multicolumn{1}{c}{\$d\_nonconfidential\$} & 152 & 44.70% & 88.20% \\ 
+\hline \\[-1.8ex] 
+\multicolumn{4}{l}{\footnotesize Notes: } \\ 
+\multicolumn{4}{l}{Full or partial reproduction are defined in the text.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> ##### Run probits on Full or (Full + partial) reproducibility
+> 
+> 
+> 
+> # Run Regression: total citations on h-indices and confidential data
+> # We're going to start by running the analysis on the sub-sample
+> # with data in year0.
+> 
+> 
+> mainOA.0yr <- mainOA %>%
++   # first, get the citations in Year 4
++   left_join(hindex.allyears %>%
++               filter(years_since_publication == 0 ) ) %>%
++   filter(year>2011) %>%
++   mutate(log_ytd_cites = log(ytd_cites+1),
++          asin_ytd_cites = asinh(ytd_cites))
+Joining with `by = join_by(DOI)`
+> nrow(mainOA.0yr)
+[1] 197
+> 
+> ## Same for year 4
+> 
+> mainOA.4yr <- mainOA %>%
++   # first, get the citations in Year 4
++   left_join(hindex.allyears %>%
++               filter(years_since_publication == 4 ) ) %>%
++   mutate(log_ytd_cites = log(ytd_cites+1),
++          asin_ytd_cites = asinh(ytd_cites))
+Joining with `by = join_by(DOI)`
+> nrow(mainOA.4yr)
+[1] 273
+> 
+> run_probits <- function(data,number,.footnotes=c(footnote.base)) {
++ 
++   # pretty names
++ 
++ 
++   # pretty names
++   names.main <- names(data) %>%
++     as_tibble() %>%
++     rename(names=value)
++   left_join(names.main,name.mapping) %>%
++     mutate(model.varnames = if_else(is.na(model.varnames),names,model.varnames)) ->
++     mainOA.mapping
++   mainOA.mapping %>% filter(is.na(model.varnames)) -> test.na
++   if ( nrow(test.na) > 0 ) {
++     print(test.na)
++     stop("Error in variable name mapping")
++   }
++ 
++   # assign varnames by renaming
++   names(data) <- mainOA.mapping$model.varnames
++   names(data)
++ 
++ 
++   # probit data
++ 
++   probit.data <- data %>%
++     filter(`Reproduction failed: confidential data`==0 &
++              `Confidential data`==0) %>%
++     mutate(`Solo-authored` = (`Number of authors`==1),
++            `Institution Publications (bottom)`= (`Highest Institution Publications` < works.q33),
++            `Institution Publications (top)`= (`Highest Institution Publications` > works.q67),
++            `Highest Institution Publications` = `Highest Institution Publications`/10000)
++   message(paste0("Number of obs in regression data: ",nrow(probit.data)))
++ 
++   probit.full.avgh <- glm(`Fully reproduced`~`Avg. H-index` +
++                             `Highest Institution Publications` +
++                             `Highest Co-author Experience` +
++                             `Number of authors` +
++                             `Author at US university`,
++                           data = probit.data,
++                           family = binomial(link = "probit"))
++   probit.full.maxh <- glm(`Fully reproduced`~`Max H-index` +
++                             `Highest Institution Publications` +
++                             `Highest Co-author Experience` +
++                             `Number of authors` +
++                             `Author at US university`,
++                           data = probit.data,
++                           family = binomial(link = "probit"))
++   probit.full.minh <- glm(`Fully reproduced`~`Min H-index` +
++                             `Highest Institution Publications` +
++                             `Highest Co-author Experience` +
++                             `Number of authors` +
++                             `Author at US university`,
++                           data = probit.data,
++                           family = binomial(link = "probit"))
++   probit.full.avgh.solo <- glm(`Fully reproduced`~`Avg. H-index` +
++                                  `Institution Publications (top)` +
++                                  `Institution Publications (bottom)` +
++                                  `Highest Co-author Experience` +
++                                  `Number of authors` +
++                                  `Author at US university` +
++                                  `Solo-authored`,
++                                data = probit.data,
++                                family = binomial(link = "probit"))
++   probit.full.kitchen.sink <- glm(`Fully reproduced`~`Avg. H-index` +
++                                     `Max H-index` +
++                                     `Min H-index` +
++                                     `Institution Publications (top)` +
++                                     `Institution Publications (bottom)` +
++                                     `Highest Co-author Experience` +
++                                     `Number of authors` +
++                                     `Author at US university` +
++                                     `Solo-authored`,
++                                   data = probit.data,
++                                   family = binomial(link = "probit"))
++ 
++ 
++   probit.fullpartial.avgh <- glm(`Full or Partial`~`Avg. H-index` +
++                                    `Highest Institution Publications` +
++                                    `Highest Co-author Experience` +
++                                    `Number of authors` +
++                                    `Author at US university`,
++                                  data = probit.data,
++                                  family = binomial(link = "probit"))
++   probit.fullpartial.maxh <- glm(`Full or Partial`~`Max H-index` +
++                                    `Highest Institution Publications` +
++                                    `Highest Co-author Experience` +
++                                    `Number of authors` +
++                                    `Author at US university`,
++                                  data = probit.data,
++                                  family = binomial(link = "probit"))
++   probit.fullpartial.minh <- glm(`Full or Partial`~`Min H-index` +
++                                    `Highest Institution Publications` +
++                                    `Highest Co-author Experience` +
++                                    `Number of authors` +
++                                    `Author at US university`,
++                                  data = probit.data,
++                                  family = binomial(link = "probit"))
++   probit.fullpartial.avgh.solo <- glm(`Full or Partial`~`Avg. H-index` +
++                                         `Institution Publications (top)` +
++                                         `Institution Publications (bottom)` +
++                                         `Highest Co-author Experience` +
++                                         `Number of authors` +
++                                         `Author at US university` +
++                                         `Solo-authored`,
++                                       data = probit.data,
++                                       family = binomial(link = "probit"))
++   probit.fullpartial.kitchen.sink <- glm(`Full or Partial`~`Avg. H-index` +
++                                            `Max H-index` +
++                                            `Min H-index` +
++                                            `Institution Publications (top)` +
++                                            `Institution Publications (bottom)` +
++                                            `Highest Co-author Experience` +
++                                            `Number of authors` +
++                                            `Author at US university` +
++                                            `Solo-authored`,
++                                          data = probit.data,
++                                          family = binomial(link = "probit"))
++ 
++ 
++   #Full reproducibility
++   stargazer(probit.full.avgh,probit.full.maxh,probit.full.minh,
++             probit.full.kitchen.sink,
++             title=paste0("Probit: Determinants of Reproducibility, Year ",number),
++             align=TRUE,no.space=TRUE,
++             notes.append = FALSE,
++             label=paste0("reg:probit:reproducibility:full:",number),
++             dep.var.labels = "Outcome: Full Reproduction",
++             style="qje", type="latex",
++             column.sep.width = "-15pt",
++             keep.stat = c("n"),
++             out=file.path(Outputs,
++                           paste0("table_reg_probit_",number,"_full.tex")),
++             notes.label = "",
++             notes.align="l",
++             notes = .footnotes
++   )
++ 
++   stargazer(probit.fullpartial.avgh,probit.fullpartial.maxh,#probit.fullpartial.minh,
++             probit.fullpartial.kitchen.sink,
++             title=paste0("Probit: Determinants of Reproducibility, Year ",number),
++             align=TRUE,no.space=TRUE,
++             notes.append = FALSE,
++             label=paste0("reg:probit:reproducibility:fullpartial:",number),
++             dep.var.labels = "Outcome: Full or Partial Reproduction",
++             style="qje", type="latex",
++             column.sep.width = "-15pt",
++             keep.stat = c("n"),
++             out=file.path(Outputs,
++                          paste0("table_reg_probit_",number,"_fullpartial.tex")),
++             notes.label = "",
++             notes.align="l",
++             notes = .footnotes
++ )
++ 
++ }
+> 
+> # run probits for year 0
+> 
+> run_probits(mainOA.0yr,0,.footnotes = c(footnote.base,footnote.post2012))
+Joining with `by = join_by(names)`
+Number of obs in regression data: 113
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:13:01 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Probit: Determinants of Reproducibility, Year 0} 
+  \label{reg:probit:reproducibility:full:0} 
+\begin{tabular}{@{\extracolsep{-15pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{4}{c}{Outcome: Full Reproduction} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.010 &  &  & 0.102 \\ 
+  & (0.015) &  &  & (0.066) \\ 
+  `Max H-index` &  & -0.002 &  & -0.052^{*} \\ 
+  &  & (0.008) &  & (0.029) \\ 
+  `Min H-index` &  &  & 0.025 & -0.018 \\ 
+  &  &  & (0.023) & (0.043) \\ 
+  `Highest Institution Publications` & -0.001 & -0.001 & -0.001 &  \\ 
+  & (0.007) & (0.007) & (0.007) &  \\ 
+  `Institution Publications (top)` &  &  &  & 0.706^{*} \\ 
+  &  &  &  & (0.398) \\ 
+  `Institution Publications (bottom)` &  &  &  & 1.360^{**} \\ 
+  &  &  &  & (0.638) \\ 
+  `Highest Co-author Experience` & -0.004 & 0.002 & -0.005 & -0.016 \\ 
+  & (0.014) & (0.013) & (0.013) & (0.015) \\ 
+  `Number of authors` & 0.084 & 0.098 & 0.121 & 0.161 \\ 
+  & (0.112) & (0.116) & (0.116) & (0.158) \\ 
+  `Author at US university` & 0.345 & 0.368 & 0.347 & 0.039 \\ 
+  & (0.318) & (0.318) & (0.318) & (0.339) \\ 
+  `Solo-authored` &  &  &  & -0.467 \\ 
+  &  &  &  & (0.439) \\ 
+  Constant & -0.712^{**} & -0.707^{**} & -0.838^{**} & -0.955 \\ 
+  & (0.345) & (0.347) & (0.368) & (0.596) \\ 
+ \textit{N} & \multicolumn{1}{c}{113} & \multicolumn{1}{c}{113} & \multicolumn{1}{c}{113} & \multicolumn{1}{c}{113} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{5}{l}{Sample restricted to articles published in 2012 and later, with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:13:02 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Probit: Determinants of Reproducibility, Year 0} 
+  \label{reg:probit:reproducibility:fullpartial:0} 
+\begin{tabular}{@{\extracolsep{-15pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Outcome: Full or Partial Reproduction} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.0004 &  & 0.081 \\ 
+  & (0.021) &  & (0.099) \\ 
+  `Max H-index` &  & -0.002 & -0.032 \\ 
+  &  & (0.011) & (0.039) \\ 
+  `Highest Institution Publications` & -0.011 & -0.012 &  \\ 
+  & (0.009) & (0.009) &  \\ 
+  `Min H-index` &  &  & -0.021 \\ 
+  &  &  & (0.067) \\ 
+  `Institution Publications (top)` &  &  & -0.382 \\ 
+  &  &  & (0.596) \\ 
+  `Institution Publications (bottom)` &  &  & 4.240 \\ 
+  &  &  & (349.000) \\ 
+  `Highest Co-author Experience` & -0.024 & -0.023 & -0.026 \\ 
+  & (0.019) & (0.018) & (0.023) \\ 
+  `Number of authors` & 0.136 & 0.147 & 0.395 \\ 
+  & (0.177) & (0.188) & (0.279) \\ 
+  `Author at US university` & 0.273 & 0.278 & 0.057 \\ 
+  & (0.476) & (0.477) & (0.479) \\ 
+  `Solo-authored` &  &  & 0.856 \\ 
+  &  &  & (0.715) \\ 
+  Constant & 1.680^{***} & 1.670^{***} & 0.823 \\ 
+  & (0.529) & (0.535) & (0.946) \\ 
+ \textit{N} & \multicolumn{1}{c}{113} & \multicolumn{1}{c}{113} & \multicolumn{1}{c}{113} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\multicolumn{4}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{4}{l}{Sample restricted to articles published in 2012 and later, with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> run_probits(mainOA.4yr,4)
+Joining with `by = join_by(names)`
+Number of obs in regression data: 152
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:13:02 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Probit: Determinants of Reproducibility, Year 4} 
+  \label{reg:probit:reproducibility:full:4} 
+\begin{tabular}{@{\extracolsep{-15pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{4}{c}{Outcome: Full Reproduction} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & -0.002 &  &  & 0.137^{***} \\ 
+  & (0.010) &  &  & (0.053) \\ 
+  `Max H-index` &  & -0.006 &  & -0.064^{***} \\ 
+  &  & (0.006) &  & (0.023) \\ 
+  `Min H-index` &  &  & -0.003 & -0.069^{**} \\ 
+  &  &  & (0.014) & (0.032) \\ 
+  `Highest Institution Publications` & 0.001 & 0.001 & 0.001 &  \\ 
+  & (0.006) & (0.006) & (0.006) &  \\ 
+  `Institution Publications (top)` &  &  &  & 0.309 \\ 
+  &  &  &  & (0.318) \\ 
+  `Institution Publications (bottom)` &  &  &  & 0.525 \\ 
+  &  &  &  & (0.546) \\ 
+  `Highest Co-author Experience` & -0.003 & 0.0004 & -0.003 & -0.010 \\ 
+  & (0.011) & (0.011) & (0.011) & (0.012) \\ 
+  `Number of authors` & 0.123 & 0.149 & 0.117 & 0.188 \\ 
+  & (0.101) & (0.105) & (0.103) & (0.142) \\ 
+  `Author at US university` & 0.337 & 0.354 & 0.336 & 0.212 \\ 
+  & (0.276) & (0.276) & (0.275) & (0.282) \\ 
+  `Solo-authored` &  &  &  & -0.169 \\ 
+  &  &  &  & (0.370) \\ 
+  Constant & -0.598^{*} & -0.639^{**} & -0.577^{*} & -0.733 \\ 
+  & (0.322) & (0.324) & (0.343) & (0.541) \\ 
+ \textit{N} & \multicolumn{1}{c}{152} & \multicolumn{1}{c}{152} & \multicolumn{1}{c}{152} & \multicolumn{1}{c}{152} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\end{tabular} 
+\end{table} 
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:13:02 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Probit: Determinants of Reproducibility, Year 4} 
+  \label{reg:probit:reproducibility:fullpartial:4} 
+\begin{tabular}{@{\extracolsep{-15pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Outcome: Full or Partial Reproduction} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & -0.014 &  & 0.133 \\ 
+  & (0.013) &  & (0.086) \\ 
+  `Max H-index` &  & -0.007 & -0.055^{*} \\ 
+  &  & (0.007) & (0.033) \\ 
+  `Highest Institution Publications` & -0.015^{*} & -0.014^{*} &  \\ 
+  & (0.008) & (0.008) &  \\ 
+  `Min H-index` &  &  & -0.085 \\ 
+  &  &  & (0.053) \\ 
+  `Institution Publications (top)` &  &  & -0.927^{*} \\ 
+  &  &  & (0.557) \\ 
+  `Institution Publications (bottom)` &  &  & -0.815 \\ 
+  &  &  & (0.801) \\ 
+  `Highest Co-author Experience` & -0.020 & -0.022 & -0.013 \\ 
+  & (0.014) & (0.014) & (0.016) \\ 
+  `Number of authors` & 0.319^{*} & 0.351^{**} & 0.549^{**} \\ 
+  & (0.167) & (0.178) & (0.272) \\ 
+  `Author at US university` & 0.489 & 0.486 & 0.443 \\ 
+  & (0.361) & (0.360) & (0.359) \\ 
+  `Solo-authored` &  &  & 0.941^{*} \\ 
+  &  &  & (0.544) \\ 
+  Constant & 1.200^{***} & 1.110^{***} & 0.542 \\ 
+  & (0.422) & (0.428) & (0.891) \\ 
+ \textit{N} & \multicolumn{1}{c}{152} & \multicolumn{1}{c}{152} & \multicolumn{1}{c}{152} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\multicolumn{4}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> proc.time()
+   user  system elapsed 
+   15.9     1.9    16.4 

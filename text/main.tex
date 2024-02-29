@@ -1,0 +1,352 @@
+% !TeX TXS-program:bibliography = txs:///biber
+% $Id$
+% Authors: Flavio Stancchi, Hautahi Kingi, Lars Vilhuber, Sylverie Herbert
+% Results from the Cornell Replication Lab
+
+%!Rnw weave = knitr
+\documentclass[utf8]{article}
+\usepackage{inputenc}
+
+\usepackage[]{graphicx}\usepackage[]{xcolor}
+
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+
+\usepackage{alltt}
+
+% setting article items used multiple times
+\newcommand{\mytitle}{Reproduce to Validate: a Comprehensive Study on the Reproducibility of Economics Research}
+\newcommand{\myauthorA}{Hautahi Kingi}
+\newcommand{\myauthorB}{Flavio Stanchi}
+\newcommand{\myauthorC}{Lars Vilhuber}
+\newcommand{\myauthorD}{Sylv\'erie Herbert}
+
+% loading packages
+\usepackage{lscape}
+\usepackage{dcolumn}
+\usepackage[printonlyused]{acronym}
+\usepackage{pdfpages}
+\usepackage{placeins}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage[nohead]{geometry}
+\usepackage[singlespacing]{setspace}
+%\usepackage[bottom]{footmisc}
+%\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{rotating}
+%\usepackage[capposition=top]{floatrow}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+%\usepackage{qtree}
+\usepackage{makecell}
+\renewcommand\theadalign{bl}
+\usepackage{comment}
+\usepackage{etoolbox}
+\usepackage{csquotes}
+%\usepackage{footnote}
+%\makesavenoteenv{tabular}
+%\makesavenoteenv{table}
+%\usepackage{footmisc}
+
+
+\usepackage{hyperref}
+%\usepackage{biblatex}
+\hypersetup{%
+naturalnames=true,%
+bookmarksnumbered=true,%
+bookmarksopen=false,%
+plainpages=false,%
+colorlinks=true,%
+linkcolor=black,%
+citecolor=blue,%
+urlcolor = black,
+pdftitle={\mytitle},%
+pdfpagemode=UseOutlines,%
+pdfauthor={\myauthorD, \myauthorA, \myauthorB, \myauthorC},%
+pdfsubject={Replication}
+}
+\usepackage{csvsimple}
+\usepackage{xspace}
+%==================== final toggle ====================%
+%%%%%%% The "final" flag toggles the final version of the proposal. When set
+%%%%%%% to true, all comments are hidden, the page is set to the correct size,
+%%%%%%% and any `fix' information is drawn normally.
+\newtoggle{final}
+\toggletrue{final}
+%\togglefalse{final}
+
+%% Set margins for toggle
+\iftoggle{final}{
+    \geometry{letterpaper,left=1.0in,right=1.0in,top=1.0in,bottom=1.0in} %rgb
+}{
+    \geometry{letterpaper,ignoreheadfoot,left=1.0in,right=2.0in,top=1.0in,bottom=1.0in,footskip=0.25in,headsep=0.125in,marginparwidth=1.75in,paperwidth=9.5in} %rgb
+}
+
+%% enable todo package for margin notes, missing figs, and such
+\iftoggle{final}{
+        \usepackage[disable]{todonotes}
+    }{
+    \usepackage[textsize=scriptsize]{todonotes}
+    }
+
+% todo-enabled version: \margincomment{}{} command to put comments about text into the margin.
+\newcommand{\mc}[2]{% % 1=initials, 2=comment
+\todo[size=\scriptsize,linecolor=blue!90]{\textbf{\uppercase{#1}:}~#2}
+}
+
+%==================== bibliography tools
+
+%\usepackage[backend=biber,sortlocale=nb_NO,sortcites,style=authoryear-icomp,doi=true,isbn=false,url=false,uniquename=false]{biblatex}
+%\usepackage[backend=bibtex,style=authoryear,natbib,sortcites,doi=true,isbn=false,maxcitenames=2,date=year,url=false,eprint=false]{biblatex}
+\usepackage[backend=biber,natbib,
+%sortcites,
+doi=true,isbn=false,maxcitenames=2,date=year,url=false,eprint=false,
+authordate,ibidtracker=false]{biblatex-chicago}
+%
+\AtBeginRefsection{\GenRefcontextData{sorting=nyt}}
+\AtEveryCite{\localrefcontext[sorting=ynt]}
+
+\usepackage[american]{babel}
+%\addbibresource{./includes/replication_papers.bib}
+\addbibresource{./includes/paper.bib}
+\addbibresource{./includes/aej-paper.bib}
+
+%%%%%%%
+\setcounter{MaxMatrixCols}{30}
+
+%\makeatletter
+%\def\@biblabel#1{\hspace*{-\labelsep}}
+%\makeatother
+%\geometry{left=1in,right=1in,top=1.00in,bottom=1.0in}
+%\setlength{\parindent}{4em}
+%\setlength{\parskip}{1em}
+%%%%%%%%%%%
+\setstretch{1.5}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+
+\begin{document}
+
+
+
+
+
+% NOTE: All R processing is done from the programs/ directory (README.Rmd) prior to running this file!
+% The file config.tex contains the relevant paths
+
+\input{./includes/config.tex}
+
+% possible overrides : relative paths
+\renewcommand{\ROutputs}{analysis}
+
+\title{\mytitle}
+\author{\myauthorD\thanks{Banque de France: sylverie.herbert@banque-france.fr} \and \myauthorA\thanks{Google: hautahikingi@gmail.com} \and \myauthorB\thanks{Airbnb: fs379@cornell.edu} \and \myauthorC \thanks{Labor Dynamics Institute, Cornell University: lars.vilhuber@cornell.edu. This work has benefited from insightful comments by Christophe P\'erignon, Ben Greiner, Jan H\"offler, and participants of the Banque de France DGSEI seminar and the 2018 BITSS annual meeting at UC Berkeley. The paper has been previously circulated as \citet{kingi2018} and \citet{herbert2021}.  The opinions expressed in this article are solely the authors', and do not represent the views of the American Economic Association, the US Census Bureau, Banque de France, Google, or Airbnb. }}
+
+\maketitle
+% \begin{center}
+% Preliminary - do not cite or quote without contacting authors.
+% \end{center}
+\sloppy
+
+\begin{abstract}
+
+\input{abstract}
+
+
+\end{abstract}
+
+\textit{JEL} codes: B41; C80; C81; C87; C88
+
+\setstretch{1.5}
+
+\textbf{Keywords:} Replication, reproducibility, transparency, replicability, journal policies\\
+
+%\singlespacing
+
+\thispagestyle{empty}
+
+\onehalfspacing
+\clearpage
+
+%%%%%%%%%%%%%%%%
+
+\clearpage
+
+% Note:
+% Child documents:
+%   if pure LaTeX,, use \include{document.tex}
+%   if knitr document, use <<mypart, child='mypart.Rnw'>>==
+%%
+%%===================== Intro ======================
+%%
+\section{Introduction}\label{sec:intro}
+\input{intro.tex}
+%
+
+%%
+%%===================== Background ===================
+
+\section{Background}\label{sec:background}
+\input{background.tex}
+
+%%===================== Methods ======================
+%%
+\section{Methodology}\label{sec:methodology}
+\input{methodology-part1.tex}
+%%
+%%===================== Results ======================
+%%
+\section{Results}\label{sec:results}
+%%
+%%
+%%
+%%
+%%  THIS IS RESULTS1.TEX
+%%
+\input{results1.tex}
+%%
+%%%
+%%%   THIS IS RESULTS2.TEX
+%%%
+%%%
+\input{results2.tex}
+%%
+%%
+%%  THIS IS THE BIBLIOMETRIC ANALYSIS
+%%
+%%
+\input{bibliometric.tex}
+
+%%===================== Discussion ======================
+%%
+%%
+%%
+%%
+%%  THIS IS CONCLUSION.TEX
+%%
+%%
+%%
+\section{Conclusion}\label{sec:discussion}
+%%
+\input{conclusion}
+%%
+%\begin{center}
+%\end{center}
+%
+%\clearpage
+%
+%===================== Bibliography ======================
+
+\printbibliography
+
+\appendix
+\newpage
+\FloatBarrier
+
+
+%===================== Figures ======================
+%
+%\clearpage
+%\section{Figures}\label{sec:figures}
+%<<figures, child='figures.Rnw'>>=
+%@
+%
+%\FloatBarrier
+%\newpage
+%
+%===================== Tables ======================
+%
+\section{Appendix}\label{sec:app}
+%
+%
+%
+%
+%
+
+\subsection{Appendix Tables}
+\label{sec:app:tables}
+
+\input{./includes/table_assignments}
+\input{./includes/table_absence}
+
+\input{./includes/table_results_by_year}
+
+\input{./analysis/table_reg_probit_0_fullpartial}
+
+\input{./analysis/table_metrics_OA_app0}
+
+
+%\subsection{Detailed description of the sample}
+%
+%
+%Not all eligible articles were assigned (see Section~\ref{sec:methodology}). Of the assessed articles, reproduction attempts were conducted if a first assessment indicated that data were available. 
+%The  post-completion  questionnaire captured information on \input{./includes/articles_data} for which such an attempt was conducted. 
+%%
+%For \input{./includes/dup_num} articles, multiple reproduction attempts were conducted, leading to a total of \input{./includes/articles_exit} post-completion reports filed for these articles. Of these duplicated articles, \input{./includes/temp_num} arrived at different conclusions about the reproduction success of that article. In these cases, we kept the reproduction attempts that resulted in the more successful outcome. 
+%
+%For the analysis presented in the main text, we retained articles for which information was complete, i.e., information from both the entry and the exit questionnaires. Numbers are significantly lower in 2013 and 2018 than in other years (see Table~\ref{tab:EntryJournalSum} in the main text). Most articles in 2013 stem from an early pilot, and were not coded consistently with the data that is presented here; they are excluded. Articles from 2018 were pulled only from the first quarter issue of the journal, and thus only reflect a partial year.
+%
+%\input{./analysis/table_appendix}
+%
+
+%
+%===================== Supporting lists ======================
+
+\section{Sample directory change}
+\label{app:directorychg}
+
+\input{./includes/appendix-vcs-path.tex}
+
+%=============================================================
+%               Comparison WoS - OpenAlex
+
+\section{Comparison of bibliometric sources}
+\label{app:wos-openalex}
+
+\input{./includes/appendix-wos-openalex.tex}
+
+\clearpage
+
+\section{Summary statistics}
+\label{app:sumstat}
+\input{./includes/appendix_stat.tex}
+
+\section{Alternative specifications}
+\label{app:altspec}
+\input{./includes/appendix_specifications.tex}
+
+
+\FloatBarrier
+%===================== Questionnaires ======================
+
+% Use this setup to get the section heading and form on same page
+% Entry Q
+\includepdf[pages=1,scale=.8,pagecommand=\section{Assessment Questionnaire}\label{app:assessment_form}]{./includes/Entry_Questionnaire.pdf}
+\includepdf[pages=2-,scale=.8,pagecommand={}]{./includes/Entry_Questionnaire.pdf}
+
+% Exit Q
+\includepdf[pages=1,scale=.8,pagecommand=\section{Exit Questionnaire}\label{app:exit_form}]{./includes/Exit_Questionnaire.pdf}
+\includepdf[pages=2-,scale=.8,pagecommand={}]{./includes/Exit_Questionnaire.pdf}
+
+\section{Replication Team}
+The following members of the Replication Lab provided valuable assistance:
+
+% first,initial,last,year
+\csvreader[/csv/head=true,%
+/csv/head to column names=true,%
+/csv/late after line={,},%
+/csv/late after last line=.,%
+]%
+{includes/Replication_Students_Historically.csv}{}{ \first \xspace \initial \xspace \last }
+
+\newpage
+\section{Acronyms Used}
+\input{acronyms}
+
+\end{document}
+

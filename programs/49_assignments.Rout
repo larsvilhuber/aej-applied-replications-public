@@ -1,0 +1,221 @@
+
+R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> # Getting in-scope articles
+> # Code derived from another project
+> # NOTE: THIS REQUIRES R 4.2.0 and newer packages!
+> #
+> 
+> source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+> source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: devtools
+Loading required package: usethis
+Loading required package: rprojroot
+Loading required package: tictoc
+Loading required package: ggplot2
+Loading required package: bindrcpp
+Loading required package: Rcpp
+Loading required package: markdown
+> source(file.path(programs,"libraries.R"), echo=FALSE)
+Loading required package: rcrossref
+Loading required package: readr
+Loading required package: tidyr
+Loading required package: data.table
+
+Attaching package: ‘data.table’
+
+The following object is masked from ‘package:tictoc’:
+
+    shift
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: xtable
+Loading required package: rjson
+Loading required package: stargazer
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+Loading required package: knitr
+Loading required package: stringr
+Loading required package: readxl
+Loading required package: fastDummies
+Loading required package: skimr
+Loading required package: sandwich
+Loading required package: pastecs
+
+Attaching package: ‘pastecs’
+
+The following objects are masked from ‘package:data.table’:
+
+    first, last
+
+The following object is masked from ‘package:tidyr’:
+
+    extract
+
+The following objects are masked from ‘package:dplyr’:
+
+    first, last
+
+Loading required package: formattable
+
+Attaching package: ‘formattable’
+
+The following object is masked from ‘package:xtable’:
+
+    digits
+
+Loading required package: reshape2
+
+Attaching package: ‘reshape2’
+
+The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+  Use `force = TRUE` to force installation
+> source(file.path(programs,"config.R"), echo=FALSE)
+> 
+> 
+> # we need the raw entry dataset
+> 
+> 
+> # Read analysis data
+> source(file.path(programs,"_read_analysis_data.R"),echo=TRUE)
+
+> date.remove <- "2018-12-07 00:00:01 UTC"
+
+> repllist4 <- readRDS(file = file.path(interwrk, "replication_list_clean.Rds"))
+
+> d <- repllist4 %>% mutate(replicated_clean = replicated1_clean)
+
+> message(paste0("d has ", nrow(d), " rows."))
+d has 1231 rows.
+
+> exit <- readRDS(file = file.path(dataloc, "exitQ_pub.Rds")) %>% 
++     mutate(timestamp = strptime(Timestamp, "%m/%d/%Y %H:%M:%S"), 
++         times .... [TRUNCATED] 
+
+> message(paste0("exit has ", nrow(d), " rows."))
+exit has 1231 rows.
+
+> entry <- readRDS(file = file.path(dataloc, "entryQ_pub.Rds")) %>% 
++     mutate(timestamp = strptime(Timestamp, "%m/%d/%Y %H:%M:%S"), 
++         tim .... [TRUNCATED] 
+
+> message(paste0("entry has ", nrow(d), " rows."))
+entry has 1231 rows.
+
+> bibinfo.df <- readRDS(file = file.path(crossrefloc, 
++     "crossref_info.Rds")) %>% select(DOI, year, journal)
+
+> bibinfo.df$journal <- gsub("American Economic Journal: Applied Economics", 
++     "AEJ:AE", bibinfo.df$journal)
+
+> bibinfo.df$journal <- gsub("American Economic Journal: Macroeconomics", 
++     "AEJ:Mac", bibinfo.df$journal)
+
+> bibinfo.df$journal <- gsub("American Economic Journal: Microeconomics", 
++     "AEJ:Mic", bibinfo.df$journal)
+
+> bibinfo.df$journal <- gsub("American Economic Review", 
++     "AER", bibinfo.df$journal)
+
+> d <- d %>% filter(journal == "American Economic Journal: Applied Economics")
+
+> exit <- exit %>% left_join(bibinfo.df, by = "DOI") %>% 
++     filter(journal == "AEJ:AE")
+
+> entry <- entry %>% left_join(bibinfo.df, by = "DOI") %>% 
++     filter(journal == "AEJ:AE")
+
+> data_assessment4 <- unique(d$DOI)
+
+> data_assessment5 <- unique(exit$DOI)
+> 
+> 
+> # get the publication year from the article database
+> 
+> aej_dois <- readRDS(file=openalex.Rds)
+> nrow(aej_dois)
+[1] 630
+> 
+> nrow(aej_dois %>% distinct(DOI))
+[1] 630
+> 
+> 
+> # Remove NA entries for DOIs
+> d_entry <- entry %>% filter(!is.na(DOI))
+> nrow(d_entry)
+[1] 341
+> 
+> d_entry %>%
++   mutate(original_date = lubridate::floor_date(lubridate::mdy_hms(Timestamp)),
++          assignment_year=year(original_date)) %>%
++   select(DOI, assignment_year) %>%
++   left_join(aej_dois %>% select(DOI,publication_year)) -> assignment.year
+Joining with `by = join_by(DOI)`
+> 
+> assignments <- table(assignment.year$publication_year,
++                      assignment.year$assignment_year)
+> xtable(assignments,
++       caption="Assignments by publication year",
++       label="tab:assignments") -> assignments.table
+> 
+> # titles
+> 
+> title <- list(pos=list(0), command="")
+> title$pos[[1]] <- -1
+> title$command <- c('&\\multicolumn{5}{c}{Assignment Years}\\\\')
+> 
+> print(assignments.table,file=file.path(TexIncludes,"table_assignments.tex"),
++       caption.placement = "top",
++       add.to.row = title,hline.after = c(0,nrow(assignments.table)))
+> 
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  13.47    1.52   13.95 

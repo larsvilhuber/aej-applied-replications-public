@@ -1,0 +1,2431 @@
+
+R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> ## OLS REGRESSIONS:
+> #### Create variables for similar OLS regressions as the ones before
+> ### Reproduce the regressions with web of Sciences
+> ### Add author information such as institution and region
+> 
+> 
+> source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+> source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: devtools
+Loading required package: usethis
+Loading required package: rprojroot
+Loading required package: tictoc
+Loading required package: ggplot2
+Loading required package: bindrcpp
+Loading required package: Rcpp
+> source(file.path(programs,"libraries.R"), echo=FALSE)
+Loading required package: rcrossref
+Loading required package: readr
+Loading required package: tidyr
+Loading required package: data.table
+
+Attaching package: ‘data.table’
+
+The following object is masked from ‘package:tictoc’:
+
+    shift
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: xtable
+Loading required package: rjson
+Loading required package: stargazer
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+Loading required package: knitr
+Loading required package: stringr
+Loading required package: readxl
+Loading required package: fastDummies
+Loading required package: skimr
+Loading required package: sandwich
+Loading required package: pastecs
+
+Attaching package: ‘pastecs’
+
+The following objects are masked from ‘package:data.table’:
+
+    first, last
+
+The following object is masked from ‘package:tidyr’:
+
+    extract
+
+The following objects are masked from ‘package:dplyr’:
+
+    first, last
+
+Loading required package: formattable
+
+Attaching package: ‘formattable’
+
+The following object is masked from ‘package:xtable’:
+
+    digits
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
+  Use `force = TRUE` to force installation
+> source(file.path(programs,"config.R"), echo=FALSE)
+> 
+> # Read analysis data
+> # exit_all = any article that reproduction was attempted
+> exit_all <- readRDS(file=file.path(dataloc,"00_exit_all.Rds"))
+> nrow(exit_all %>% distinct(DOI))
+[1] 180
+> skim(exit_all)
+── Data Summary ────────────────────────
+                           Values  
+Name                       exit_all
+Number of rows             180     
+Number of columns          152     
+_______________________            
+Column type frequency:             
+  character                98      
+  logical                  48      
+  numeric                  6       
+________________________           
+Group variables            None    
+
+── Variable type: character ──────────────────────
+   skim_variable                                  
+ 1 DOI                                            
+ 2 Timestamp.x                                    
+ 3 NetID                                          
+ 4 TypeOfArticle                                  
+ 5 OnlineMaterials1_DOI                           
+ 6 DataAbsence                                    
+ 7 OnlineDataDOI2                                 
+ 8 OnlineDataHandle2                              
+ 9 OnlineDataURL2                                 
+10 DataAvailabilityAccess                         
+11 DataAvailabilityExclusive                      
+12 OtherNotes1                                    
+13 Is there some other online material that you w…
+14 OnlineDataFormat2                              
+15 OnlineProgramsDOI                              
+16 OnlineProgramsHDL                              
+17 OnlineProgramsURL                              
+18 ProgramFormat                                  
+19 ProgramSequence                                
+20 ProgramsDocumentation                          
+21 ProgramsHeaderAuthor                           
+22 ProgramsHeaderInfo                             
+23 ProgramsStructureManual                        
+24 GeneralNotes.x                                 
+25 OnlineMaterials                                
+26 OnlineMaterials1                               
+27 Do you want to describe another dataset provid…
+28 OnlineMaterials2                               
+29 OnlineMaterials2_DOI                           
+30 Is there some other online material that you w…
+31 OnlineMaterials3                               
+32 OnlineMaterials3_DOI                           
+33 OnlineMaterials1_Description                   
+34 OnlineMaterials2_Description                   
+35 Programs                                       
+36 OnlineDataProvided                             
+37 DataSetClassification1                         
+38 OnlineDataDOI1                                 
+39 OnlineDataHandle1                              
+40 OnlineDataURL1                                 
+41 OnlineDataFormat1                              
+42 DataSetClassification2                         
+43 OtherNotes2_1                                  
+44 InputData                                      
+45 InputData1                                     
+46 InputDataDOI1                                  
+47 InputDataURL1                                  
+48 InputDataFormat1                               
+49 InputDataAvailability1                         
+50 X94                                            
+51 InputData2                                     
+52 InputDataDOI2                                  
+53 InputDataHandle2                               
+54 InputDataURL2                                  
+55 InputDataFormat2                               
+56 InputDataAvailability2                         
+57 InputDataOtherNotes1                           
+58 InputDataOtherNotes2                           
+59 Flag for follow-up                             
+60 year                                           
+61 journal.x                                      
+62 absence                                        
+63 Timestamp.y                                    
+64 NetID or email                                 
+65 Code_Success                                   
+66 Program_Run_Clean                              
+67 Directory_Change                               
+68 Code_Changes                                   
+69 Output_Accuracy                                
+70 Discrepancy_Location                           
+71 Software_Extensions                            
+72 Software_Version                               
+73 First_Replicator                               
+74 Common_Issues                                  
+75 Overcome_Issues                                
+76 Replication_Helpfulness                        
+77 X18                                            
+78 X19                                            
+79 Comments on difficulty                         
+80 GeneralNotes.y                                 
+81 What Software did you use for the replication …
+82 Replication_Success                            
+83 Main_Issue                                     
+84 Data_Type                                      
+85 Data_Access_Type                               
+86 Software_Type                                  
+87 Data_Type_1                                    
+88 year.y                                         
+89 journal.y                                      
+90 dup                                            
+91 lab                                            
+92 replicated                                     
+93 clarity                                        
+94 rep_list                                       
+95 rep                                            
+96 confdata                                       
+97 reason                                         
+98 change                                         
+   n_missing complete_rate min  max empty n_unique
+ 1         0       1        17   20     0      180
+ 2         0       1        16   19     0      180
+ 3         0       1         4    6     0       34
+ 4         0       1         3    3     0        1
+ 5       151       0.161    17   85     0       29
+ 6       180       0        NA   NA     0        0
+ 7       174       0.0333   20   25     0        6
+ 8       179       0.00556  24   24     0        1
+ 9       148       0.178    25  111     0       32
+10       180       0        NA   NA     0        0
+11       180       0        NA   NA     0        0
+12       101       0.439    10  605     0       79
+13        19       0.894     2    3     0        2
+14       147       0.183     3   12     0        8
+15       128       0.289    17   26     0       52
+16       175       0.0278   24   25     0        5
+17         9       0.95     25  111     0      171
+18         5       0.972     1   13     0        9
+19        13       0.928     2    3     0        2
+20         5       0.972     2    3     0        2
+21        10       0.944     2    3     0        2
+22        11       0.939     2    3     0        2
+23        13       0.928     2    3     0        2
+24       132       0.267     4  331     0       48
+25         0       1         2    3     0        2
+26        23       0.872    15  115     0      157
+27         0       1         2    3     0        2
+28        89       0.506    41  116     0       91
+29       159       0.117    17   85     0       21
+30        85       0.528     2    3     0        2
+31       172       0.0444   51  111     0        8
+32       174       0.0333   20   26     0        6
+33        30       0.833     6  216     0       84
+34        91       0.494     8  213     0       28
+35         0       1         2    3     0        2
+36         0       1         3    3     0        1
+37         1       0.994    10   13     0        3
+38       132       0.267    20  111     0       48
+39       174       0.0333   24   25     0        6
+40         5       0.972    25  111     0      174
+41         0       1         1   18     0       15
+42       146       0.189    10   13     0        3
+43       163       0.0944   10  320     0       17
+44         0       1         2    3     0        2
+45       115       0.361     3  127     0       65
+46       177       0.0167   20   20     0        3
+47       153       0.15     21  205     0       27
+48       144       0.2       2   37     0       18
+49       107       0.406     2   10     0        3
+50       106       0.411     2    3     0        2
+51       154       0.144     3  165     0       26
+52       179       0.00556  20   20     0        1
+53       180       0        NA   NA     0        0
+54       170       0.0556   21   79     0       10
+55       169       0.0611    3   25     0        7
+56       154       0.144     2   10     0        3
+57       142       0.211    15  780     0       38
+58       166       0.0778   17  376     0       14
+59       128       0.289     2    3     0        2
+60         0       1         4    4     0       10
+61         0       1         6    6     0        1
+62         0       1        17   17     0        1
+63         0       1        16   18     0      180
+64         0       1         4   18     0       36
+65        28       0.844     2    3     0        2
+66        52       0.711    31   41     0        2
+67        80       0.556     3   47     0        2
+68       115       0.361    17  447     0       65
+69        53       0.706     3   38     0        2
+70       119       0.339     8 1305     0       60
+71         0       1         2    3     0        3
+72         1       0.994     2    3     0        3
+73         0       1         2    3     0        2
+74       171       0.0500    2    3     0        2
+75       171       0.0500    2   43     0        3
+76       175       0.0278   43  494     0        5
+77         1       0.994     7   64     0        3
+78        91       0.494     4  683     0       89
+79       108       0.4       3  623     0       72
+80       105       0.417     3  529     0       75
+81         3       0.983     2   55     0       50
+82        40       0.778     2    7     0        3
+83       152       0.156    10  164     0       10
+84       155       0.139    14   26     0        4
+85       154       0.144    13   30     0        3
+86        40       0.778     1   18     0        8
+87        40       0.778     1   51     0       12
+88         0       1         4    4     0       10
+89         0       1         6    6     0        1
+90         0       1        20   28     0      180
+91         0       1         2    7     0        4
+92         0       1         2    7     0        3
+93         0       1         7   10     0        3
+94        63       0.65      2    3     0        2
+95         0       1         2    7     0        3
+96         0       1         5   12     0        2
+97         0       1         5   20     0        7
+98        52       0.711     4   16     0        3
+   whitespace
+ 1          0
+ 2          0
+ 3          0
+ 4          0
+ 5          0
+ 6          0
+ 7          0
+ 8          0
+ 9          0
+10          0
+11          0
+12          0
+13          0
+14          0
+15          0
+16          0
+17          0
+18          0
+19          0
+20          0
+21          0
+22          0
+23          0
+24          0
+25          0
+26          0
+27          0
+28          0
+29          0
+30          0
+31          0
+32          0
+33          0
+34          0
+35          0
+36          0
+37          0
+38          0
+39          0
+40          0
+41          0
+42          0
+43          0
+44          0
+45          0
+46          0
+47          0
+48          0
+49          0
+50          0
+51          0
+52          0
+53          0
+54          0
+55          0
+56          0
+57          0
+58          0
+59          0
+60          0
+61          0
+62          0
+63          0
+64          0
+65          0
+66          0
+67          0
+68          0
+69          0
+70          0
+71          0
+72          0
+73          0
+74          0
+75          0
+76          0
+77          0
+78          0
+79          0
+80          0
+81          0
+82          0
+83          0
+84          0
+85          0
+86          0
+87          0
+88          0
+89          0
+90          0
+91          0
+92          0
+93          0
+94          0
+95          0
+96          0
+97          0
+98          0
+
+── Variable type: logical ────────────────────────
+   skim_variable                                  
+ 1 OnlineData                                     
+ 2 AdditionalMaterialNumber                       
+ 3 OnlineData_1                                   
+ 4 DataRunClean                                   
+ 5 DataAvailability                               
+ 6 OnlineDataDOI2_1                               
+ 7 OnlineDataHandle2_1                            
+ 8 OnlineDataURL2_1                               
+ 9 DataAvailability2                              
+10 DataAvailabilityAccess2                        
+11 DataAvailabilityExclusive2                     
+12 OtherNotes2                                    
+13 Do you want to describe another dataset        
+14 OnlineDataDOI3                                 
+15 OnlineDataHandle3                              
+16 OnlineDataURL3                                 
+17 DataAvailability3                              
+18 DataAvailabilityAccess3                        
+19 DataAvailabilityExclusive3                     
+20 OtherNotes3                                    
+21 DataRunFinal                                   
+22 OnlineFinalDataDOI                             
+23 OnlineFinalDataHandle                          
+24 OnlineFinalDataURL                             
+25 FinalDataAvailability                          
+26 FinalDataAvailabilityAccess                    
+27 FinalDataAvailabilityExclusive                 
+28 OtherNotesFinal                                
+29 DataFormatInputs                               
+30 OnlinePrograms                                 
+31 OnlineProgramsInside                           
+32 DocReadmePresent                               
+33 DocReadmeContent                               
+34 X61                                            
+35 X62                                            
+36 OnlineMaterials1_URL                           
+37 OnlineMaterials2_URL                           
+38 OnlineMaterials3_URL                           
+39 AnalysisData                                   
+40 OnlineMaterials3_Description                   
+41 DataSetNumbers                                 
+42 InputDataRef                                   
+43 InputDataHandle1                               
+44 OnlinePrograms_1                               
+45 [Row 1]                                        
+46 X10                                            
+47 X11                                            
+48 What software did the authors use to run their…
+   n_missing complete_rate mean count
+ 1       180             0  NaN ": " 
+ 2       180             0  NaN ": " 
+ 3       180             0  NaN ": " 
+ 4       180             0  NaN ": " 
+ 5       180             0  NaN ": " 
+ 6       180             0  NaN ": " 
+ 7       180             0  NaN ": " 
+ 8       180             0  NaN ": " 
+ 9       180             0  NaN ": " 
+10       180             0  NaN ": " 
+11       180             0  NaN ": " 
+12       180             0  NaN ": " 
+13       180             0  NaN ": " 
+14       180             0  NaN ": " 
+15       180             0  NaN ": " 
+16       180             0  NaN ": " 
+17       180             0  NaN ": " 
+18       180             0  NaN ": " 
+19       180             0  NaN ": " 
+20       180             0  NaN ": " 
+21       180             0  NaN ": " 
+22       180             0  NaN ": " 
+23       180             0  NaN ": " 
+24       180             0  NaN ": " 
+25       180             0  NaN ": " 
+26       180             0  NaN ": " 
+27       180             0  NaN ": " 
+28       180             0  NaN ": " 
+29       180             0  NaN ": " 
+30       180             0  NaN ": " 
+31       180             0  NaN ": " 
+32       180             0  NaN ": " 
+33       180             0  NaN ": " 
+34       180             0  NaN ": " 
+35       180             0  NaN ": " 
+36       180             0  NaN ": " 
+37       180             0  NaN ": " 
+38       180             0  NaN ": " 
+39       180             0  NaN ": " 
+40       180             0  NaN ": " 
+41       180             0  NaN ": " 
+42       180             0  NaN ": " 
+43       180             0  NaN ": " 
+44       180             0  NaN ": " 
+45       180             0  NaN ": " 
+46       180             0  NaN ": " 
+47       180             0  NaN ": " 
+48       180             0  NaN ": " 
+
+── Variable type: numeric ────────────────────────
+  skim_variable                                   
+1 difficult                                       
+2 flag2011                                        
+3 How difficult do you think the replication exer…
+4 Cost of data access (in approximate $)          
+5 Cost of software purchase (in approximate $)    
+6 n                                               
+  n_missing complete_rate   mean       sd p0 p25
+1         0        1        2.39    1.19   1   1
+2         0        1        0       0      0   0
+3         0        1        2.86    1.44   1   2
+4       172        0.0444 375    1061.     0   0
+5       173        0.0389   0       0      0   0
+6         0        1        1.12    0.322  1   1
+  p50 p75 p100 hist 
+1   2   3    5 ▇▇▆▃▂
+2   0   0    0 ▁▁▇▁▁
+3   3   4    5 ▇▆▇▅▆
+4   0   0 3000 ▇▁▁▁▁
+5   0   0    0 ▁▁▇▁▁
+6   1   1    2 ▇▁▁▁▁
+> 
+> #
+> entry_merge <- readRDS(file=file.path(dataloc,"00_entry_merge.Rds"))
+> skim(entry_merge)
+── Data Summary ────────────────────────
+                           Values     
+Name                       entry_merge
+Number of rows             303        
+Number of columns          109        
+_______________________               
+Column type frequency:                
+  character                62         
+  logical                  45         
+  numeric                  2          
+________________________              
+Group variables            None       
+
+── Variable type: character ──────────────────────
+   skim_variable                                  
+ 1 DOI                                            
+ 2 Timestamp                                      
+ 3 NetID                                          
+ 4 TypeOfArticle                                  
+ 5 OnlineMaterials1_DOI                           
+ 6 DataAbsence                                    
+ 7 OnlineDataDOI2                                 
+ 8 OnlineDataHandle2                              
+ 9 OnlineDataURL2                                 
+10 DataAvailabilityAccess                         
+11 DataAvailabilityExclusive                      
+12 OtherNotes1                                    
+13 Is there some other online material that you w…
+14 OnlineDataFormat2                              
+15 OnlineProgramsDOI                              
+16 OnlineProgramsHDL                              
+17 OnlineProgramsURL                              
+18 ProgramFormat                                  
+19 ProgramSequence                                
+20 ProgramsDocumentation                          
+21 ProgramsHeaderAuthor                           
+22 ProgramsHeaderInfo                             
+23 ProgramsStructureManual                        
+24 GeneralNotes                                   
+25 OnlineMaterials                                
+26 OnlineMaterials1                               
+27 Do you want to describe another dataset provid…
+28 OnlineMaterials2                               
+29 OnlineMaterials2_DOI                           
+30 Is there some other online material that you w…
+31 OnlineMaterials3                               
+32 OnlineMaterials3_DOI                           
+33 OnlineMaterials1_Description                   
+34 OnlineMaterials2_Description                   
+35 Programs                                       
+36 OnlineDataProvided                             
+37 DataSetClassification1                         
+38 OnlineDataDOI1                                 
+39 OnlineDataHandle1                              
+40 OnlineDataURL1                                 
+41 OnlineDataFormat1                              
+42 DataSetClassification2                         
+43 OtherNotes2_1                                  
+44 InputData                                      
+45 InputData1                                     
+46 InputDataDOI1                                  
+47 InputDataURL1                                  
+48 InputDataFormat1                               
+49 InputDataAvailability1                         
+50 X94                                            
+51 InputData2                                     
+52 InputDataDOI2                                  
+53 InputDataHandle2                               
+54 InputDataURL2                                  
+55 InputDataFormat2                               
+56 InputDataAvailability2                         
+57 InputDataOtherNotes1                           
+58 InputDataOtherNotes2                           
+59 Flag for follow-up                             
+60 year                                           
+61 journal                                        
+62 absence                                        
+   n_missing complete_rate min max empty n_unique
+ 1         0       1        17  20     0      303
+ 2         0       1        16  19     0      303
+ 3         0       1         4   6     0       34
+ 4         0       1         3   3     0        1
+ 5       253       0.165    17  85     0       50
+ 6       209       0.310    13 251     0       19
+ 7       297       0.0198   20  25     0        6
+ 8       302       0.00330  24  24     0        1
+ 9       268       0.116    25 111     0       35
+10       210       0.307     2   3     0        3
+11       210       0.307     2   3     0        3
+12       212       0.300    10 605     0       91
+13        40       0.868     2   3     0        2
+14       267       0.119     3  12     0        8
+15       221       0.271    17  26     0       82
+16       296       0.0231   24  25     0        7
+17        20       0.934    25 111     0      283
+18        14       0.954     1  51     0       13
+19        33       0.891     2   3     0        2
+20        19       0.937     2   3     0        2
+21        27       0.911     2   3     0        2
+22        28       0.908     2   3     0        2
+23        32       0.894     2   3     0        2
+24       207       0.317     4 763     0       95
+25         0       1         2   3     0        2
+26        44       0.855     8 115     0      258
+27        92       0.696     2   3     0        2
+28       159       0.475    32 116     0      144
+29       265       0.125    16  85     0       38
+30       153       0.495     2   3     0        2
+31       287       0.0528   51 111     0       16
+32       289       0.0462   20  26     0       14
+33        64       0.789     6 291     0      128
+34       164       0.459     8 270     0       34
+35         0       1         2   3     0        2
+36         0       1         2   3     0        2
+37        93       0.693    10  13     0        3
+38       247       0.185    20 111     0       56
+39       296       0.0231   24  25     0        7
+40        97       0.680    25 111     0      205
+41        76       0.749     1  22     0       19
+42       266       0.122    10  13     0        3
+43       284       0.0627   10 320     0       19
+44         0       1         2   3     0        2
+45       176       0.419     3 146     0      123
+46       294       0.0297   20  20     0        9
+47       260       0.142    21 205     0       43
+48       232       0.234     2 137     0       22
+49       160       0.472     2  10     0        3
+50       154       0.492     2   3     0        2
+51       256       0.155     3 165     0       47
+52       299       0.0132   20  20     0        4
+53       303       0        NA  NA     0        0
+54       285       0.0594   21 163     0       18
+55       285       0.0594    2  25     0       11
+56       256       0.155     2  10     0        3
+57       218       0.281    15 780     0       85
+58       275       0.0924   17 376     0       28
+59       212       0.300     2   3     0        2
+60         0       1         4   4     0       10
+61         0       1         6   6     0        1
+62         0       1        17  17     0        3
+   whitespace
+ 1          0
+ 2          0
+ 3          0
+ 4          0
+ 5          0
+ 6          0
+ 7          0
+ 8          0
+ 9          0
+10          0
+11          0
+12          0
+13          0
+14          0
+15          0
+16          0
+17          0
+18          0
+19          0
+20          0
+21          0
+22          0
+23          0
+24          0
+25          0
+26          0
+27          0
+28          0
+29          0
+30          0
+31          0
+32          0
+33          0
+34          0
+35          0
+36          0
+37          0
+38          0
+39          0
+40          0
+41          0
+42          0
+43          0
+44          0
+45          0
+46          0
+47          0
+48          0
+49          0
+50          0
+51          0
+52          0
+53          0
+54          0
+55          0
+56          0
+57          0
+58          0
+59          0
+60          0
+61          0
+62          0
+
+── Variable type: logical ────────────────────────
+   skim_variable                          
+ 1 OnlineData                             
+ 2 AdditionalMaterialNumber               
+ 3 OnlineData_1                           
+ 4 DataRunClean                           
+ 5 DataAvailability                       
+ 6 OnlineDataDOI2_1                       
+ 7 OnlineDataHandle2_1                    
+ 8 OnlineDataURL2_1                       
+ 9 DataAvailability2                      
+10 DataAvailabilityAccess2                
+11 DataAvailabilityExclusive2             
+12 OtherNotes2                            
+13 Do you want to describe another dataset
+14 OnlineDataDOI3                         
+15 OnlineDataHandle3                      
+16 OnlineDataURL3                         
+17 DataAvailability3                      
+18 DataAvailabilityAccess3                
+19 DataAvailabilityExclusive3             
+20 OtherNotes3                            
+21 DataRunFinal                           
+22 OnlineFinalDataDOI                     
+23 OnlineFinalDataHandle                  
+24 OnlineFinalDataURL                     
+25 FinalDataAvailability                  
+26 FinalDataAvailabilityAccess            
+27 FinalDataAvailabilityExclusive         
+28 OtherNotesFinal                        
+29 DataFormatInputs                       
+30 OnlinePrograms                         
+31 OnlineProgramsInside                   
+32 DocReadmePresent                       
+33 DocReadmeContent                       
+34 X61                                    
+35 X62                                    
+36 OnlineMaterials1_URL                   
+37 OnlineMaterials2_URL                   
+38 OnlineMaterials3_URL                   
+39 AnalysisData                           
+40 OnlineMaterials3_Description           
+41 DataSetNumbers                         
+42 InputDataRef                           
+43 InputDataHandle1                       
+44 OnlinePrograms_1                       
+45 [Row 1]                                
+   n_missing complete_rate mean count
+ 1       303             0  NaN ": " 
+ 2       303             0  NaN ": " 
+ 3       303             0  NaN ": " 
+ 4       303             0  NaN ": " 
+ 5       303             0  NaN ": " 
+ 6       303             0  NaN ": " 
+ 7       303             0  NaN ": " 
+ 8       303             0  NaN ": " 
+ 9       303             0  NaN ": " 
+10       303             0  NaN ": " 
+11       303             0  NaN ": " 
+12       303             0  NaN ": " 
+13       303             0  NaN ": " 
+14       303             0  NaN ": " 
+15       303             0  NaN ": " 
+16       303             0  NaN ": " 
+17       303             0  NaN ": " 
+18       303             0  NaN ": " 
+19       303             0  NaN ": " 
+20       303             0  NaN ": " 
+21       303             0  NaN ": " 
+22       303             0  NaN ": " 
+23       303             0  NaN ": " 
+24       303             0  NaN ": " 
+25       303             0  NaN ": " 
+26       303             0  NaN ": " 
+27       303             0  NaN ": " 
+28       303             0  NaN ": " 
+29       303             0  NaN ": " 
+30       303             0  NaN ": " 
+31       303             0  NaN ": " 
+32       303             0  NaN ": " 
+33       303             0  NaN ": " 
+34       303             0  NaN ": " 
+35       303             0  NaN ": " 
+36       303             0  NaN ": " 
+37       303             0  NaN ": " 
+38       303             0  NaN ": " 
+39       303             0  NaN ": " 
+40       303             0  NaN ": " 
+41       303             0  NaN ": " 
+42       303             0  NaN ": " 
+43       303             0  NaN ": " 
+44       303             0  NaN ": " 
+45       303             0  NaN ": " 
+
+── Variable type: numeric ────────────────────────
+  skim_variable n_missing complete_rate mean   sd
+1 difficult             0             1 2.96 1.46
+2 flag2011              0             1 0    0   
+  p0 p25 p50 p75 p100 hist 
+1  1   2   3   4    5 ▇▇▇▅▇
+2  0   0   0   0    0 ▁▁▇▁▁
+> 
+> # complete_sample = any article assigned and with complete initial assessment
+> complete_sample <- readRDS(file=file.path(dataloc,"00_complete_sample.Rds"))
+> nrow(complete_sample %>% distinct(DOI))
+[1] 274
+> skim(complete_sample)
+── Data Summary ────────────────────────
+                           Values         
+Name                       complete_sample
+Number of rows             274            
+Number of columns          155            
+_______________________                   
+Column type frequency:                    
+  character                101            
+  logical                  48             
+  numeric                  6              
+________________________                  
+Group variables            None           
+
+── Variable type: character ──────────────────────
+    skim_variable                                 
+  1 DOI                                           
+  2 Timestamp.x                                   
+  3 NetID                                         
+  4 TypeOfArticle                                 
+  5 OnlineMaterials1_DOI                          
+  6 DataAbsence                                   
+  7 OnlineDataDOI2                                
+  8 OnlineDataHandle2                             
+  9 OnlineDataURL2                                
+ 10 DataAvailabilityAccess                        
+ 11 DataAvailabilityExclusive                     
+ 12 OtherNotes1                                   
+ 13 Is there some other online material that you …
+ 14 OnlineDataFormat2                             
+ 15 OnlineProgramsDOI                             
+ 16 OnlineProgramsHDL                             
+ 17 OnlineProgramsURL                             
+ 18 ProgramFormat                                 
+ 19 ProgramSequence                               
+ 20 ProgramsDocumentation                         
+ 21 ProgramsHeaderAuthor                          
+ 22 ProgramsHeaderInfo                            
+ 23 ProgramsStructureManual                       
+ 24 GeneralNotes.x                                
+ 25 OnlineMaterials                               
+ 26 OnlineMaterials1                              
+ 27 Do you want to describe another dataset provi…
+ 28 OnlineMaterials2                              
+ 29 OnlineMaterials2_DOI                          
+ 30 Is there some other online material that you …
+ 31 OnlineMaterials3                              
+ 32 OnlineMaterials3_DOI                          
+ 33 OnlineMaterials1_Description                  
+ 34 OnlineMaterials2_Description                  
+ 35 Programs                                      
+ 36 OnlineDataProvided                            
+ 37 DataSetClassification1                        
+ 38 OnlineDataDOI1                                
+ 39 OnlineDataHandle1                             
+ 40 OnlineDataURL1                                
+ 41 OnlineDataFormat1                             
+ 42 DataSetClassification2                        
+ 43 OtherNotes2_1                                 
+ 44 InputData                                     
+ 45 InputData1                                    
+ 46 InputDataDOI1                                 
+ 47 InputDataURL1                                 
+ 48 InputDataFormat1                              
+ 49 InputDataAvailability1                        
+ 50 X94                                           
+ 51 InputData2                                    
+ 52 InputDataDOI2                                 
+ 53 InputDataHandle2                              
+ 54 InputDataURL2                                 
+ 55 InputDataFormat2                              
+ 56 InputDataAvailability2                        
+ 57 InputDataOtherNotes1                          
+ 58 InputDataOtherNotes2                          
+ 59 Flag for follow-up                            
+ 60 year                                          
+ 61 journal.x                                     
+ 62 absence                                       
+ 63 Timestamp.y                                   
+ 64 NetID or email                                
+ 65 Code_Success                                  
+ 66 Program_Run_Clean                             
+ 67 Directory_Change                              
+ 68 Code_Changes                                  
+ 69 Output_Accuracy                               
+ 70 Discrepancy_Location                          
+ 71 Software_Extensions                           
+ 72 Software_Version                              
+ 73 First_Replicator                              
+ 74 Common_Issues                                 
+ 75 Overcome_Issues                               
+ 76 Replication_Helpfulness                       
+ 77 X18                                           
+ 78 X19                                           
+ 79 Comments on difficulty                        
+ 80 GeneralNotes.y                                
+ 81 What Software did you use for the replication…
+ 82 Replication_Success                           
+ 83 Main_Issue                                    
+ 84 Data_Type                                     
+ 85 Data_Access_Type                              
+ 86 Software_Type                                 
+ 87 Data_Type_1                                   
+ 88 year.y                                        
+ 89 journal.y                                     
+ 90 dup                                           
+ 91 lab                                           
+ 92 replicated                                    
+ 93 clarity                                       
+ 94 rep_list                                      
+ 95 rep                                           
+ 96 confdata                                      
+ 97 reason                                        
+ 98 change                                        
+ 99 Timestamp                                     
+100 GeneralNotes                                  
+101 journal                                       
+    n_missing complete_rate min  max empty
+  1         0       1        17   20     0
+  2        94       0.657    16   19     0
+  3         0       1         4    6     0
+  4         0       1         3    3     0
+  5       230       0.161    17   85     0
+  6       180       0.343    13  251     0
+  7       268       0.0219   20   25     0
+  8       273       0.00365  24   24     0
+  9       242       0.117    25  111     0
+ 10       181       0.339     2    3     0
+ 11       181       0.339     2    3     0
+ 12       194       0.292    10  605     0
+ 13        33       0.880     2    3     0
+ 14       241       0.120     3   12     0
+ 15       200       0.270    17   26     0
+ 16       268       0.0219   24   25     0
+ 17        20       0.927    25  111     0
+ 18        14       0.949     1   51     0
+ 19        31       0.887     2    3     0
+ 20        19       0.931     2    3     0
+ 21        25       0.909     2    3     0
+ 22        26       0.905     2    3     0
+ 23        30       0.891     2    3     0
+ 24       226       0.175     4  331     0
+ 25         0       1         2    3     0
+ 26        37       0.865     8  115     0
+ 27        92       0.664     2    3     0
+ 28       142       0.482    41  116     0
+ 29       242       0.117    16   85     0
+ 30       136       0.504     2    3     0
+ 31       261       0.0474   51  111     0
+ 32       263       0.0401   20   26     0
+ 33        55       0.799     6  291     0
+ 34       146       0.467     8  213     0
+ 35         0       1         2    3     0
+ 36         0       1         2    3     0
+ 37        93       0.661    10   13     0
+ 38       225       0.179    20  111     0
+ 39       268       0.0219   24   25     0
+ 40        97       0.646    25  111     0
+ 41        76       0.723     1   18     0
+ 42       240       0.124    10   13     0
+ 43       257       0.0620   10  320     0
+ 44         0       1         2    3     0
+ 45       159       0.420     3  127     0
+ 46       266       0.0292   20   20     0
+ 47       235       0.142    21  205     0
+ 48       209       0.237     2  137     0
+ 49       144       0.474     2   10     0
+ 50       139       0.493     2    3     0
+ 51       232       0.153     3  165     0
+ 52       270       0.0146   20   20     0
+ 53       274       0        NA   NA     0
+ 54       258       0.0584   21  163     0
+ 55       257       0.0620    2   25     0
+ 56       232       0.153     2   10     0
+ 57       199       0.274    15  780     0
+ 58       247       0.0985   17  376     0
+ 59       190       0.307     2    3     0
+ 60         0       1         4    4     0
+ 61        94       0.657     6    6     0
+ 62         0       1        17   17     0
+ 63        94       0.657    16   18     0
+ 64        94       0.657     4   18     0
+ 65       122       0.555     2    3     0
+ 66       146       0.467    31   41     0
+ 67       174       0.365     3   47     0
+ 68       209       0.237    17  447     0
+ 69       147       0.464     3   38     0
+ 70       213       0.223     8 1305     0
+ 71        94       0.657     2    3     0
+ 72        95       0.653     2    3     0
+ 73        94       0.657     2    3     0
+ 74       265       0.0328    2    3     0
+ 75       265       0.0328    2   43     0
+ 76       269       0.0182   43  494     0
+ 77        95       0.653     7   64     0
+ 78       185       0.325     4  683     0
+ 79       202       0.263     3  623     0
+ 80       199       0.274     3  529     0
+ 81        97       0.646     2   55     0
+ 82       134       0.511     2    7     0
+ 83       246       0.102    10  164     0
+ 84       249       0.0912   14   26     0
+ 85       248       0.0949   13   30     0
+ 86       134       0.511     1   18     0
+ 87       134       0.511     1   51     0
+ 88        94       0.657     4    4     0
+ 89        94       0.657     6    6     0
+ 90        94       0.657    20   28     0
+ 91        94       0.657     2    7     0
+ 92        94       0.657     2    7     0
+ 93        94       0.657     7   10     0
+ 94       157       0.427     2    3     0
+ 95        94       0.657     2    7     0
+ 96        94       0.657     5   12     0
+ 97        94       0.657     5   20     0
+ 98       146       0.467     4   16     0
+ 99       180       0.343    17   18     0
+100       235       0.142    11  763     0
+101       180       0.343     6    6     0
+    n_unique whitespace
+  1      274          0
+  2      180          0
+  3       34          0
+  4        1          0
+  5       44          0
+  6       19          0
+  7        6          0
+  8        1          0
+  9       32          0
+ 10        3          0
+ 11        3          0
+ 12       80          0
+ 13        2          0
+ 14        8          0
+ 15       74          0
+ 16        6          0
+ 17      254          0
+ 18       13          0
+ 19        2          0
+ 20        2          0
+ 21        2          0
+ 22        2          0
+ 23        2          0
+ 24       48          0
+ 25        2          0
+ 26      236          0
+ 27        2          0
+ 28      132          0
+ 29       32          0
+ 30        2          0
+ 31       13          0
+ 32       11          0
+ 33      118          0
+ 34       33          0
+ 35        2          0
+ 36        2          0
+ 37        3          0
+ 38       49          0
+ 39        6          0
+ 40      176          0
+ 41       17          0
+ 42        3          0
+ 43       17          0
+ 44        2          0
+ 45      111          0
+ 46        8          0
+ 47       39          0
+ 48       20          0
+ 49        3          0
+ 50        2          0
+ 51       42          0
+ 52        4          0
+ 53        0          0
+ 54       16          0
+ 55       10          0
+ 56        3          0
+ 57       75          0
+ 58       27          0
+ 59        2          0
+ 60       10          0
+ 61        1          0
+ 62        3          0
+ 63      180          0
+ 64       36          0
+ 65        2          0
+ 66        2          0
+ 67        2          0
+ 68       65          0
+ 69        2          0
+ 70       60          0
+ 71        3          0
+ 72        3          0
+ 73        2          0
+ 74        2          0
+ 75        3          0
+ 76        5          0
+ 77        3          0
+ 78       89          0
+ 79       72          0
+ 80       75          0
+ 81       50          0
+ 82        3          0
+ 83       10          0
+ 84        4          0
+ 85        3          0
+ 86        8          0
+ 87       12          0
+ 88       10          0
+ 89        1          0
+ 90      180          0
+ 91        4          0
+ 92        3          0
+ 93        3          0
+ 94        2          0
+ 95        3          0
+ 96        2          0
+ 97        7          0
+ 98        3          0
+ 99       94          0
+100       39          0
+101        1          0
+
+── Variable type: logical ────────────────────────
+   skim_variable                                  
+ 1 OnlineData                                     
+ 2 AdditionalMaterialNumber                       
+ 3 OnlineData_1                                   
+ 4 DataRunClean                                   
+ 5 DataAvailability                               
+ 6 OnlineDataDOI2_1                               
+ 7 OnlineDataHandle2_1                            
+ 8 OnlineDataURL2_1                               
+ 9 DataAvailability2                              
+10 DataAvailabilityAccess2                        
+11 DataAvailabilityExclusive2                     
+12 OtherNotes2                                    
+13 Do you want to describe another dataset        
+14 OnlineDataDOI3                                 
+15 OnlineDataHandle3                              
+16 OnlineDataURL3                                 
+17 DataAvailability3                              
+18 DataAvailabilityAccess3                        
+19 DataAvailabilityExclusive3                     
+20 OtherNotes3                                    
+21 DataRunFinal                                   
+22 OnlineFinalDataDOI                             
+23 OnlineFinalDataHandle                          
+24 OnlineFinalDataURL                             
+25 FinalDataAvailability                          
+26 FinalDataAvailabilityAccess                    
+27 FinalDataAvailabilityExclusive                 
+28 OtherNotesFinal                                
+29 DataFormatInputs                               
+30 OnlinePrograms                                 
+31 OnlineProgramsInside                           
+32 DocReadmePresent                               
+33 DocReadmeContent                               
+34 X61                                            
+35 X62                                            
+36 OnlineMaterials1_URL                           
+37 OnlineMaterials2_URL                           
+38 OnlineMaterials3_URL                           
+39 AnalysisData                                   
+40 OnlineMaterials3_Description                   
+41 DataSetNumbers                                 
+42 InputDataRef                                   
+43 InputDataHandle1                               
+44 OnlinePrograms_1                               
+45 [Row 1]                                        
+46 X10                                            
+47 X11                                            
+48 What software did the authors use to run their…
+   n_missing complete_rate mean count
+ 1       274             0  NaN ": " 
+ 2       274             0  NaN ": " 
+ 3       274             0  NaN ": " 
+ 4       274             0  NaN ": " 
+ 5       274             0  NaN ": " 
+ 6       274             0  NaN ": " 
+ 7       274             0  NaN ": " 
+ 8       274             0  NaN ": " 
+ 9       274             0  NaN ": " 
+10       274             0  NaN ": " 
+11       274             0  NaN ": " 
+12       274             0  NaN ": " 
+13       274             0  NaN ": " 
+14       274             0  NaN ": " 
+15       274             0  NaN ": " 
+16       274             0  NaN ": " 
+17       274             0  NaN ": " 
+18       274             0  NaN ": " 
+19       274             0  NaN ": " 
+20       274             0  NaN ": " 
+21       274             0  NaN ": " 
+22       274             0  NaN ": " 
+23       274             0  NaN ": " 
+24       274             0  NaN ": " 
+25       274             0  NaN ": " 
+26       274             0  NaN ": " 
+27       274             0  NaN ": " 
+28       274             0  NaN ": " 
+29       274             0  NaN ": " 
+30       274             0  NaN ": " 
+31       274             0  NaN ": " 
+32       274             0  NaN ": " 
+33       274             0  NaN ": " 
+34       274             0  NaN ": " 
+35       274             0  NaN ": " 
+36       274             0  NaN ": " 
+37       274             0  NaN ": " 
+38       274             0  NaN ": " 
+39       274             0  NaN ": " 
+40       274             0  NaN ": " 
+41       274             0  NaN ": " 
+42       274             0  NaN ": " 
+43       274             0  NaN ": " 
+44       274             0  NaN ": " 
+45       274             0  NaN ": " 
+46       274             0  NaN ": " 
+47       274             0  NaN ": " 
+48       274             0  NaN ": " 
+
+── Variable type: numeric ────────────────────────
+  skim_variable                                   
+1 difficult                                       
+2 flag2011                                        
+3 How difficult do you think the replication exer…
+4 Cost of data access (in approximate $)          
+5 Cost of software purchase (in approximate $)    
+6 n                                               
+  n_missing complete_rate   mean       sd p0 p25
+1         0        1        3.02    1.48   1   2
+2         0        1        0       0      0   0
+3        94        0.657    2.86    1.44   1   2
+4       266        0.0292 375    1061.     0   0
+5       267        0.0255   0       0      0   0
+6        94        0.657    1.12    0.322  1   1
+  p50 p75 p100 hist 
+1   3   5    5 ▆▆▆▃▇
+2   0   0    0 ▁▁▇▁▁
+3   3   4    5 ▇▆▇▅▆
+4   0   0 3000 ▇▁▁▁▁
+5   0   0    0 ▁▁▇▁▁
+6   1   1    2 ▇▁▁▁▁
+> 
+> # data is by au_id (author), article_id (=DOI), year (of observation of citations)
+> bibliometric.rds <- readRDS(file.path(dataloc,"46_biblio_ols.Rds"))
+> nrow(bibliometric.rds %>% distinct(DOI))
+[1] 363
+> # [1] 363
+> nrow(bibliometric.rds %>% distinct(au_id))
+[1] 658
+> # [1] 658
+> nrow(bibliometric.rds %>% distinct(year))
+[1] 12
+> # [1] 12
+> 
+> skim(bibliometric.rds)
+── Data Summary ────────────────────────
+                           Values          
+Name                       bibliometric.rds
+Number of rows             9936            
+Number of columns          14              
+_______________________                    
+Column type frequency:                     
+  character                6               
+  numeric                  8               
+________________________                   
+Group variables            None            
+
+── Variable type: character ──────────────────────
+  skim_variable            n_missing complete_rate
+1 DOI                              0         1    
+2 au_id                            0         1    
+3 article_id                       0         1    
+4 institution_type                12         0.999
+5 institution_country_code        12         0.999
+6 metaregion                      12         0.999
+  min max empty n_unique whitespace
+1  17  20     0      363          0
+2  32  32     0      658          0
+3  29  32     0      363          0
+4   5  10     0        7          0
+5   2   2     0       47          0
+6   2   6     0        5          0
+
+── Variable type: numeric ────────────────────────
+  skim_variable           n_missing complete_rate
+1 year                            0         1    
+2 publication_year                0         1    
+3 max_cited_by_count              0         1    
+4 cited_by_count                  0         1    
+5 ytd_cited_by_count              0         1    
+6 hindex                          0         1    
+7 institution_works_count        12         0.999
+8 earliest_pub                   12         0.999
+       mean        sd   p0   p25    p50     p75
+1   2018.        3.45 2012 2015.  2018.   2020.
+2   2013.        2.74 2009 2011   2013    2016 
+3     96.7      99.2     1   32     60     125.
+4      7.53      9.25    0    1      5      10 
+5     50.3      69.0    -1    7     25      65 
+6     19.4      18.0     0    7     14      26 
+7 120652.   157175.      0 7909  53819  210186 
+8   1998.       10.2  1963 1992   2000    2005 
+    p100 hist 
+1   2023 ▇▅▅▅▇
+2   2018 ▇▇▇▇▆
+3    601 ▇▂▁▁▁
+4    106 ▇▁▁▁▁
+5    601 ▇▁▁▁▁
+6    154 ▇▂▁▁▁
+7 838460 ▇▂▁▁▁
+8   2017 ▁▂▃▇▃
+> 
+> # Note here:
+> # We remove ONE DOI from the sample, because we are unable to unambiguously identify
+> # the author in the bibliometric databases.
+> # > aejdois %>% filter(doi=="10.1257/app.6.1.1")
+> # container.title published.print               doi issue
+> # 1 American Economic Journal: Applied Economics      2014-01-01 10.1257/app.6.1.1     1
+> # title volume
+> # 1 Dynamic Implications of Subjective Expectations: Evidence from Adult Smokers      6
+> # author      issn
+> # 1 Yang, Wang, first, Department of Economics, 213 Simon Center, Lafayette College, Easton, PA, 18042 (e-mail: ) 1945-7790
+> #
+> # Our apologies to the author.
+> 
+> excluded.doi = "10.1257/app.6.1.1"
+> 
+> complete_sample %>% filter(DOI %in% excluded.doi) %>% select(DOI,difficult,replicated)
+                DOI difficult replicated
+1 10.1257/app.6.1.1         5       <NA>
+> # DOI difficult replicated
+> # 1 10.1257/app.6.1.1         5       <NA>
+> 
+> # subset to our sample
+> bibliometricdata <-
++   bibliometric.rds %>%
++   inner_join(complete_sample %>% distinct(DOI)) %>%
++   filter(!DOI %in% excluded.doi)
+Joining with `by = join_by(DOI)`
+> 
+> nrow(bibliometricdata %>% distinct(DOI))
+[1] 273
+> # [1] 274
+> nrow(bibliometricdata %>% distinct(au_id))
+[1] 533
+> # [1] 534
+> nrow(bibliometricdata %>% distinct(year))
+[1] 12
+> # [1] 12
+> 
+> skim(bibliometricdata)
+── Data Summary ────────────────────────
+                           Values          
+Name                       bibliometricdata
+Number of rows             7596            
+Number of columns          14              
+_______________________                    
+Column type frequency:                     
+  character                6               
+  numeric                  8               
+________________________                   
+Group variables            None            
+
+── Variable type: character ──────────────────────
+  skim_variable            n_missing complete_rate
+1 DOI                              0             1
+2 au_id                            0             1
+3 article_id                       0             1
+4 institution_type                 0             1
+5 institution_country_code         0             1
+6 metaregion                       0             1
+  min max empty n_unique whitespace
+1  17  20     0      273          0
+2  32  32     0      533          0
+3  29  32     0      273          0
+4   5  10     0        7          0
+5   2   2     0       45          0
+6   2   6     0        5          0
+
+── Variable type: numeric ────────────────────────
+  skim_variable           n_missing complete_rate
+1 year                            0             1
+2 publication_year                0             1
+3 max_cited_by_count              0             1
+4 cited_by_count                  0             1
+5 ytd_cited_by_count              0             1
+6 hindex                          0             1
+7 institution_works_count         0             1
+8 earliest_pub                    0             1
+       mean        sd   p0   p25    p50     p75
+1   2018.        3.45 2012 2015.  2018.   2020.
+2   2014.        2.77 2009 2011   2014    2016 
+3     96.1     101.      1   30     60     123 
+4      7.49      9.46    0    1      5      10 
+5     49.3      69.6    -1    6     24      63 
+6     19.2      18.3     0    7     14      25 
+7 121761.   159308.      0 7909  53819  211241 
+8   1998.       10.3  1963 1992   2000    2006 
+    p100 hist 
+1   2023 ▇▅▅▅▇
+2   2018 ▅▇▆▇▇
+3    601 ▇▂▁▁▁
+4    106 ▇▁▁▁▁
+5    601 ▇▁▁▁▁
+6    154 ▇▂▁▁▁
+7 838460 ▇▂▁▁▁
+8   2017 ▁▂▃▇▃
+> 
+> # Diagnostic for hindex
+> #diag_hindex <- bibliometricdata %>% filter(is.na(hindex))
+> diag_institution <- bibliometricdata %>% filter(is.na(institution_type))
+> 
+> # Need to add publication_year which was missing
+> #bibliometricdata <- bibliometricdata  %>%
+> # left_join(pub_year,by="DOI")
+> 
+> # double-check
+> nrow(bibliometricdata %>% distinct(au_id,article_id,year))
+[1] 7596
+> nrow(bibliometricdata %>% distinct(article_id))
+[1] 273
+> nrow(bibliometricdata)
+[1] 7596
+> 
+> # names
+> # > names(bibliometricdata)
+> # [1] "DOI"
+> # [2] "year"
+> # [3] "au_id"
+> # [4] "max_cited_by_count"
+> # [5] "cited_by_count"
+> # [6] "ytd_cited_by_count"
+> # [7] "hindex"
+> # [8] "article_id"
+> # [9] "doi.url"
+> # [10] "institution_type"
+> # [11] "institution_works_count"
+> # [12] "institution_country_code"
+> # [13] "metaregion"
+> # [14] "earliest_pub"
+> # [15] "publication_year"
+> 
+> # Replace NA hindex by 0
+> bibliometricdata$hindex <- replace(bibliometricdata$hindex, is.na(bibliometricdata$hindex), 0)
+> bibliometricdata$cited_by_count <- replace(bibliometricdata$cited_by_count, is.na(bibliometricdata$cited_by_count), 0)
+> bibliometricdata$ytd_cited_by_count <- replace(bibliometricdata$ytd_cited_by_count, is.na(bibliometricdata$ytd_cited_by_count), 0)
+> 
+> # correction of missing publciation year, but most missing is because of NA in year
+> 
+> bibliometricdata$publication_year[bibliometricdata$DOI == "10.1257/app.6.1.1"] <- 2014
+> 
+> 
+> # average hindex by DOI, top and low, citations by year and total citations, keep data to 4th year after publi
+> hindex <- bibliometricdata %>% filter(year-publication_year == 4) %>% group_by(DOI,year) %>%
++   summarise(publication_year = max(publication_year),
++             cite = mean(ytd_cited_by_count),
++             avgcite = mean(cited_by_count),
++             avghindex = mean(hindex,na.rm=TRUE),
++             tophindex=max(hindex,na.rm=TRUE),
++             lowhindex = min(hindex,na.rm=TRUE),
++             nauthors=n())
+`summarise()` has grouped output by 'DOI'. You
+can override using the `.groups` argument.
+> 
+> nrow(hindex)
+[1] 273
+> nrow(hindex %>% distinct(DOI))
+[1] 273
+> 
+> #hindex$tophindex[!is.finite(hindex$tophindex)] <- NA
+> #hindex$lowhindex[!is.finite(hindex$lowhindex)] <- NA
+> 
+> 
+> 
+> # Use same exit-all to bring reproducibility results
+> # Define Confidential Data Variable
+> exit_all2 <- exit_all %>%
++   mutate(confdata = ifelse(grepl("confidential",tolower(Main_Issue)) |
++                              grepl("proprietary",tolower(Main_Issue)),"Confidential","Other"))
+> 
+> 
+> ##### Replication of previous tables
+> 
+> ### Replicate table 2 (not in paper): confidential data and citations
+> mainOA <- complete_sample %>% select(DOI,absence) %>% left_join(exit_all2) %>%
++   left_join(hindex,by="DOI") %>%
++   mutate(confidential_data = absence,
++          confidential_data = ifelse(absence %in% c("Confidential Data"),1,confidential_data),
++          confidential_data = ifelse(absence %in% c("Data was Provided"),0,confidential_data),
++          confidential_data = ifelse(absence %in% c("No Data or Reason"),0,confidential_data),
++          confidential_data = as.numeric(confidential_data),
++          confidential_data = ifelse(confidential_data == 0 & confdata == "Confidential",1,confidential_data))
+Joining with `by = join_by(DOI, absence)`
+> 
+> mainOA$confidential_data[grepl("No Data or Reason",mainOA$absence)] <- 0
+> 
+> main <- exit_all2 %>% left_join(hindex,by="DOI")
+> 
+> # From 31:
+> # main <- exit_all2 %>% left_join(hindex,by="DOI")
+> # # Summary Stats by Replication Success
+> # author <- main %>% filter(!is.na(avghindex)) %>%
+> #   group_by(replicated) %>%
+> #   summarise(`Number of Articles` = n(),
+> #             `Avg h-index`=mean(avghindex,na.rm=TRUE),
+> #             `Lowest h-index`=mean(lowhindex,na.rm=TRUE),
+> #             `Number of Authors`=mean(authnum,na.rm=TRUE),
+> #             `Avg Annual Citations`=mean(avgcite,na.rm=TRUE)) %>%
+> #   mutate(replicated = ifelse(replicated == "No","Unsuccessful",replicated),
+> #          replicated = ifelse(replicated == "Yes","Successful",replicated)) %>%
+> #   rename(Outcome = replicated) %>%
+> #   mutate_if(is.numeric, round, digits=1)
+> # it's missing info about 10 total out  of 274
+> 
+> # Create numeric replication variable
+> mainOA <- mainOA %>% mutate(`Fully reproduced` = replicated,
++                             `Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,`Fully reproduced`),
++                             `Fully reproduced` = ifelse(replicated %in% c("Yes"),1,`Fully reproduced`),
++                             `Fully reproduced` = as.numeric(`Fully reproduced`))
+> 
+> # table 11 publication and author  metrics
+> author <- mainOA %>% filter(!is.na(avghindex)) %>% filter(!is.na(replicated)) %>%
++   group_by(replicated) %>%
++   summarise(`Number of Articles` = n(),
++             `Avg h-index`=mean(avghindex,na.rm=TRUE),
++             `Lowest h-index`=mean(lowhindex,na.rm=TRUE),
++             `Number of Authors`=mean(nauthors,na.rm=TRUE),
++             `Avg Annual Citations`=mean(avgcite,na.rm=TRUE)) %>%
++   mutate(replicated = ifelse(replicated == "No","Unsuccessful",replicated),
++          replicated = ifelse(replicated == "Yes","Successful",replicated)) %>%
++   rename(Outcome = replicated) %>%
++   mutate_if(is.numeric, round, digits=1)
+> 
+> # Print table
+> stargazer(author,
++           out=file.path(Outputs,"table_metrics_OA.tex"),
++           type="latex",title = "Publication and Author Metrics (OA)",
++           label="tab:metrics:OA",
++           style="aer",flip=F, summary=F, rownames = F,
++           font.size = fs,column.sep.width = cw)
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Sat, Oct 28, 2023 - 03:04:52 PM
+\begin{table}[!htbp] \centering 
+  \caption{Publication and Author Metrics (OA)} 
+  \label{tab:metrics:OA} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} cccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Outcome & Number of Articles & Avg h-index & Lowest h-index & Number of Authors & Avg Annual Citations \\ 
+\hline \\[-1.8ex] 
+Unsuccessful & 43 & 18.6 & 11.7 & 2.2 & 8.6 \\ 
+Partial & 69 & 16.8 & 9.9 & 2.3 & 7.9 \\ 
+Successful & 68 & 18.5 & 10.4 & 2.6 & 11.3 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+> 
+> #### Some extra numbers
+> nauthors<-round(mean(author$`Number of Authors`),2)
+> cat(nauthors, 					file=file.path(TexIncludes,"nauthorsOA.tex"))
+> ncite<-round(mean(author$`Avg Annual Citations`),2)
+> cat(ncite, 					file=file.path(TexIncludes,"nciteOA.tex"))
+> 
+> diagmainOA <- mainOA %>%filter(!is.na(confidential_data)) %>%filter(!is.na(avghindex))
+> # TO FIX: sample reduces because of NA in avghindex
+> 
+> # Run Regression: total citations on h-indices and confidential data
+> ols.cite.avgh <- lm(cite~avghindex* confidential_data,mainOA)
+> ols.cite.toph <- lm(cite~tophindex* confidential_data,mainOA)
+> ols.cite.lowh <- lm(cite~lowhindex* confidential_data,mainOA)
+> 
+> stargazer(ols.cite.avgh,ols.cite.toph,ols.cite.lowh,
++           title="OLS: Citations vs Confidential Data (OA)",
++           align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="reg2:OA",
++           dep.var.labels = "Total Citations",
++           style="qje", type="latex",
++           column.sep.width = "-15pt",
++           keep.stat = c("n"), out=file.path(Outputs,"table_reg2OA.tex"),
++           notes.label = "",
++           notes = c("Notes: *** Significant at the 1 percent level, ** Significant at the 5 percent level",
++                     "* Significant at the 10 percent level.","Avghindex is the average hindex about the article's authors,  tophindex the maximum",
++                     " hindex among them and lowhindex the lowest. Avghindex:confidential stands for","the interaction between a dummy taking value 1 if the article uses confidential  ","data, and the aforementioned average hindex of authors.")
++ )
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Sat, Oct 28, 2023 - 03:04:52 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Citations vs Confidential Data (OA)} 
+  \label{reg2:OA} 
+\begin{tabular}{@{\extracolsep{-15pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 1.000^{***} &  &  \\ 
+  & (0.300) &  &  \\ 
+  & & & \\ 
+ tophindex &  & 0.600^{***} &  \\ 
+  &  & (0.100) &  \\ 
+  & & & \\ 
+ lowhindex &  &  & 0.600 \\ 
+  &  &  & (0.400) \\ 
+  & & & \\ 
+ confidential\_data & 9.000 & 6.000 & -8.000 \\ 
+  & (9.000) & (8.000) & (8.000) \\ 
+  & & & \\ 
+ avghindex:confidential\_data & -0.700^{*} &  &  \\ 
+  & (0.400) &  &  \\ 
+  & & & \\ 
+ tophindex:confidential\_data &  & -0.400^{*} &  \\ 
+  &  & (0.200) &  \\ 
+  & & & \\ 
+ lowhindex:confidential\_data &  &  & 0.400 \\ 
+  &  &  & (0.700) \\ 
+  & & & \\ 
+ Constant & 21.000^{***} & 26.000^{***} & 36.000^{***} \\ 
+  & (5.000) & (5.000) & (5.000) \\ 
+  & & & \\ 
+\textit{N} & \multicolumn{1}{c}{273} & \multicolumn{1}{c}{273} & \multicolumn{1}{c}{273} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\multicolumn{4}{l}{Notes: *** Significant at the 1 percent level, ** Significant at the 5 percent level} \\ 
+\multicolumn{4}{l}{* Significant at the 10 percent level.} \\ 
+\multicolumn{4}{l}{Avghindex is the average hindex about the article's authors,  tophindex the maximum} \\ 
+\multicolumn{4}{l}{ hindex among them and lowhindex the lowest. Avghindex:confidential stands for} \\ 
+\multicolumn{4}{l}{the interaction between a dummy taking value 1 if the article uses confidential  } \\ 
+\multicolumn{4}{l}{data, and the aforementioned average hindex of authors.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> ### Replicate table 13: Run Regression: citations on h-indices and replication success
+> 
+> mainOA <- exit_all2 %>% filter(confdata=="Other") %>%
++   mutate(`Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,1)) %>%
++   mutate(`Full or Partial`= ifelse(replicated %in% c("No"),0,1)) %>%
++   mutate(doc_qual = ifelse(clarity == "Complete",1,0),
++          `Fully reproduced` = ifelse(replicated == "Yes",1,0)) %>%
++   left_join(hindex,by="DOI")
+> 
+> # Missing 4
+> tialmainOA <- mainOA %>% filter(confdata=="Other")
+> tialmainOA <- mainOA %>% filter(!is.na(avghindex))
+> 
+> avgh <- lm(cite~avghindex* `Fully reproduced`,mainOA)
+> toph <- lm(cite~tophindex* `Fully reproduced`,mainOA)
+> lowh <- lm(cite~lowhindex* `Fully reproduced`,mainOA)
+> 
+> avghp <- lm(cite~avghindex* `Full or Partial`,mainOA)
+> tophp <- lm(cite~tophindex* `Full or Partial`,mainOA)
+> lowhp <- lm(cite~lowhindex* `Full or Partial`,mainOA)
+>  # Make table
+> stargazer(avgh,toph,lowh,
++           title="OLS: Citations vs Reproduction Success (OA)",
++           align=TRUE,
++           no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="reg3:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           out=file.path(Outputs,"table_reg3OA.tex")
++ )
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Sat, Oct 28, 2023 - 03:04:53 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Citations vs Reproduction Success (OA)} 
+  \label{reg3:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 0.900^{**} &  &  \\ 
+  & (0.300) &  &  \\ 
+  & & & \\ 
+ tophindex &  & 0.400^{**} &  \\ 
+  &  & (0.200) &  \\ 
+  & & & \\ 
+ lowhindex &  &  & 0.700 \\ 
+  &  &  & (0.600) \\ 
+  & & & \\ 
+ `Fully reproduced` & -3.000 & -5.000 & 18.000 \\ 
+  & (13.000) & (11.000) & (11.000) \\ 
+  & & & \\ 
+ avghindex:`Fully reproduced` & 1.000^{*} &  &  \\ 
+  & (0.600) &  &  \\ 
+  & & & \\ 
+ tophindex:`Fully reproduced` &  & 0.800^{**} &  \\ 
+  &  & (0.300) &  \\ 
+  & & & \\ 
+ lowhindex:`Fully reproduced` &  &  & -0.090 \\ 
+  &  &  & (0.900) \\ 
+  & & & \\ 
+ Constant & 19.000^{**} & 24.000^{***} & 28.000^{***} \\ 
+  & (7.000) & (6.000) & (7.000) \\ 
+  & & & \\ 
+Observations & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} \\ 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{3}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> ##### Same but with log: table 14
+> # Get exit data without confidential data
+> logmainOA <- exit_all2 %>%
++   filter(confdata=="Other") %>%
++   mutate(`Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,1)) %>%
++   mutate(`Full or Partial`= ifelse(replicated %in% c("No"),0,1)) %>%
++   mutate(doc_qual = ifelse(clarity == "Complete",1,0),
++          `Fully reproduced` = ifelse(replicated == "Yes",1,0)) %>%
++   left_join(hindex,by="DOI") %>%
++   mutate(logcite = log(cite))
+> 
+> 
+> # Run Regression: citations on h-indices and replication success
+> avgh <- lm(logcite~avghindex* `Fully reproduced`,logmainOA)
+> toph <- lm(logcite~tophindex* `Fully reproduced`,logmainOA)
+> lowh <- lm(logcite~lowhindex* `Fully reproduced`,logmainOA)
+> 
+> avghp <- lm(logcite~avghindex* `Full or Partial`,logmainOA)
+> tophp <- lm(logcite~tophindex* `Full or Partial`,logmainOA)
+> lowhp <- lm(logcite~lowhindex* `Full or Partial`,logmainOA)
+> 
+> # Print table
+> stargazer(avgh,toph, lowh, avghp, tophp, lowhp,
++           title="OLS: Log Citations vs Reproduction Success (OA)", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="logreg3alt:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           out=file.path(Outputs,"table_logreg3OA.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Sat, Oct 28, 2023 - 03:04:53 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Log Citations vs Reproduction Success (OA)} 
+  \label{logreg3alt:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{6}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 0.030^{***} &  &  & 0.030^{**} &  &  \\ 
+  & (0.007) &  &  & (0.010) &  &  \\ 
+  & & & & & & \\ 
+ tophindex &  & 0.010^{***} &  &  & 0.010^{**} &  \\ 
+  &  & (0.003) &  &  & (0.006) &  \\ 
+  & & & & & & \\ 
+ lowhindex &  &  & 0.030^{**} &  &  & 0.030^{*} \\ 
+  &  &  & (0.010) &  &  & (0.020) \\ 
+  & & & & & & \\ 
+ `Fully reproduced` & 0.400 & 0.300 & 0.400^{*} &  &  &  \\ 
+  & (0.300) & (0.200) & (0.200) &  &  &  \\ 
+  & & & & & & \\ 
+ avghindex:`Fully reproduced` & -0.006 &  &  &  &  &  \\ 
+  & (0.010) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Fully reproduced` &  & 0.001 &  &  &  &  \\ 
+  &  & (0.007) &  &  &  &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Fully reproduced` &  &  & -0.010 &  &  &  \\ 
+  &  &  & (0.020) &  &  &  \\ 
+  & & & & & & \\ 
+ `Full or Partial` &  &  &  & 0.300 & 0.200 & 0.400 \\ 
+  &  &  &  & (0.300) & (0.300) & (0.300) \\ 
+  & & & & & & \\ 
+ avghindex:`Full or Partial` &  &  &  & -0.001 &  &  \\ 
+  &  &  &  & (0.010) &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Full or Partial` &  &  &  &  & 0.002 &  \\ 
+  &  &  &  &  & (0.007) &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Full or Partial` &  &  &  &  &  & -0.010 \\ 
+  &  &  &  &  &  & (0.020) \\ 
+  & & & & & & \\ 
+ Constant & 3.000^{***} & 3.000^{***} & 3.000^{***} & 3.000^{***} & 3.000^{***} & 3.000^{***} \\ 
+  & (0.100) & (0.100) & (0.100) & (0.300) & (0.300) & (0.300) \\ 
+  & & & & & & \\ 
+Observations & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} \\ 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{6}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{6}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{6}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> ##### Same but with arcsin table  13 and 14 alt
+> 
+> arcsinmainOA <- exit_all2 %>%
++   filter(confdata=="Other") %>%
++   mutate(`Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,1)) %>%
++   mutate(`Full or Partial`= ifelse(replicated %in% c("No"),0,1)) %>%
++   mutate(doc_qual = ifelse(clarity == "Complete",1,0),
++          `Fully reproduced` = ifelse(replicated == "Yes",1,0)) %>%
++   left_join(hindex,by="DOI") %>%
++   mutate(ascite = asinh(cite))
+> 
+> # Run Regression: citations on h-indices and replication success
+> avgh <- lm(ascite~avghindex* `Fully reproduced`,arcsinmainOA)
+> toph <- lm(ascite~tophindex* `Fully reproduced`,arcsinmainOA)
+> lowh <- lm(ascite~lowhindex* `Fully reproduced`,arcsinmainOA)
+> 
+> avghp <- lm(ascite~avghindex* `Full or Partial`,arcsinmainOA)
+> tophp <- lm(ascite~tophindex* `Full or Partial`,arcsinmainOA)
+> lowhp <- lm(ascite~lowhindex* `Full or Partial`,arcsinmainOA)
+> 
+> # Print table
+> stargazer(avgh,toph, lowh, avghp, tophp, lowhp,
++           title="OLS: Arcsin Citations vs Reproduction Success (OA)", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcreg3alt:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           out=file.path(Outputs,"table_arcreg3OA.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Sat, Oct 28, 2023 - 03:04:54 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations vs Reproduction Success (OA)} 
+  \label{arcreg3alt:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{6}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 0.030^{***} &  &  & 0.030^{**} &  &  \\ 
+  & (0.007) &  &  & (0.010) &  &  \\ 
+  & & & & & & \\ 
+ tophindex &  & 0.010^{***} &  &  & 0.010^{**} &  \\ 
+  &  & (0.003) &  &  & (0.006) &  \\ 
+  & & & & & & \\ 
+ lowhindex &  &  & 0.030^{**} &  &  & 0.030^{*} \\ 
+  &  &  & (0.010) &  &  & (0.020) \\ 
+  & & & & & & \\ 
+ `Fully reproduced` & 0.400 & 0.300 & 0.400^{*} &  &  &  \\ 
+  & (0.200) & (0.200) & (0.200) &  &  &  \\ 
+  & & & & & & \\ 
+ avghindex:`Fully reproduced` & -0.005 &  &  &  &  &  \\ 
+  & (0.010) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Fully reproduced` &  & 0.001 &  &  &  &  \\ 
+  &  & (0.007) &  &  &  &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Fully reproduced` &  &  & -0.009 &  &  &  \\ 
+  &  &  & (0.020) &  &  &  \\ 
+  & & & & & & \\ 
+ `Full or Partial` &  &  &  & 0.200 & 0.100 & 0.400 \\ 
+  &  &  &  & (0.300) & (0.300) & (0.300) \\ 
+  & & & & & & \\ 
+ avghindex:`Full or Partial` &  &  &  & -0.000 &  &  \\ 
+  &  &  &  & (0.010) &  &  \\ 
+  & & & & & & \\ 
+ tophindex:`Full or Partial` &  &  &  &  & 0.002 &  \\ 
+  &  &  &  &  & (0.007) &  \\ 
+  & & & & & & \\ 
+ lowhindex:`Full or Partial` &  &  &  &  &  & -0.010 \\ 
+  &  &  &  &  &  & (0.020) \\ 
+  & & & & & & \\ 
+ Constant & 3.000^{***} & 4.000^{***} & 4.000^{***} & 3.000^{***} & 4.000^{***} & 4.000^{***} \\ 
+  & (0.100) & (0.100) & (0.100) & (0.300) & (0.300) & (0.300) \\ 
+  & & & & & & \\ 
+Observations & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} \\ 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{6}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{6}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{6}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> ##### Now, bring in new information we have
+> regiondummies <- fastDummies::dummy_cols(bibliometricdata,  select_columns = "metaregion")%>%
++   select(DOI,year,au_id,
++          max_cited_by_count,cited_by_count,ytd_cited_by_count, metaregion_US, metaregion_Europe, institution_works_count) %>%
++     group_by(DOI) %>%
++     summarise(metaregion_US=max(metaregion_US), institution_works_count=max(institution_works_count))
+> 
+> arcsinmainOA2 <- exit_all2 %>%
++   filter(confdata=="Other") %>%
++   mutate(`Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,1)) %>%
++   mutate(`Full or Partial`= ifelse(replicated %in% c("No"),0,1)) %>%
++   mutate(doc_qual = ifelse(clarity == "Complete",1,0),
++          `Fully reproduced` = ifelse(replicated == "Yes",1,0)) %>%
++   left_join(hindex,by="DOI") %>%
++   left_join(regiondummies,by="DOI") %>%
++   mutate(ascite = asinh(cite))
+> 
+> trial<- arcsinmainOA2 %>%filter(!is.na(institution_works_count))
+> # Run Regression: citations on h-indices and replication success, control for US region
+> avgh2 <- lm(ascite~avghindex* `Fully reproduced` * metaregion_US,arcsinmainOA2)
+> toph2 <- lm(ascite~tophindex* `Fully reproduced` * metaregion_US,arcsinmainOA2)
+> lowh2 <- lm(ascite~lowhindex* `Fully reproduced` * metaregion_US,arcsinmainOA2)
+> 
+> avghp2 <- lm(ascite~avghindex* `Full or Partial` * metaregion_US,arcsinmainOA2)
+> tophp2 <- lm(ascite~tophindex* `Full or Partial` * metaregion_US,arcsinmainOA2)
+> lowhp2 <- lm(ascite~lowhindex* `Full or Partial` * metaregion_US,arcsinmainOA2)
+> 
+> 
+> stargazer(avgh2,toph2, lowh2,
++           title="OLS: Arcsin Citations vs Reproduction Success, control for region (OA)", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcreg3cont:a:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           out=file.path(Outputs,"table_arcreg3OAbis.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Sat, Oct 28, 2023 - 03:04:54 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations vs Reproduction Success, control for region (OA)} 
+  \label{arcreg3cont:a:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 0.050^{***} &  &  \\ 
+  & (0.020) &  &  \\ 
+  & & & \\ 
+ tophindex &  & 0.030^{***} &  \\ 
+  &  & (0.010) &  \\ 
+  & & & \\ 
+ lowhindex &  &  & 0.040 \\ 
+  &  &  & (0.030) \\ 
+  & & & \\ 
+ `Fully reproduced` & 0.800 & 0.700 & 0.600 \\ 
+  & (0.500) & (0.500) & (0.600) \\ 
+  & & & \\ 
+ metaregion\_US & 0.300 & 0.400 & 0.300 \\ 
+  & (0.400) & (0.300) & (0.400) \\ 
+  & & & \\ 
+ avghindex:`Fully reproduced` & -0.050 &  &  \\ 
+  & (0.030) &  &  \\ 
+  & & & \\ 
+ avghindex:metaregion\_US & -0.020 &  &  \\ 
+  & (0.020) &  &  \\ 
+  & & & \\ 
+ tophindex:`Fully reproduced` &  & -0.030 &  \\ 
+  &  & (0.020) &  \\ 
+  & & & \\ 
+ tophindex:metaregion\_US &  & -0.020 &  \\ 
+  &  & (0.010) &  \\ 
+  & & & \\ 
+ lowhindex:`Fully reproduced` &  &  & -0.040 \\ 
+  &  &  & (0.060) \\ 
+  & & & \\ 
+ lowhindex:metaregion\_US &  &  & -0.020 \\ 
+  &  &  & (0.030) \\ 
+  & & & \\ 
+ `Fully reproduced`:metaregion\_US & -0.400 & -0.500 & -0.200 \\ 
+  & (0.600) & (0.500) & (0.700) \\ 
+  & & & \\ 
+ avghindex:`Fully reproduced`:metaregion\_US & 0.050 &  &  \\ 
+  & (0.030) &  &  \\ 
+  & & & \\ 
+ tophindex:`Fully reproduced`:metaregion\_US &  & 0.030^{*} &  \\ 
+  &  & (0.020) &  \\ 
+  & & & \\ 
+ lowhindex:`Fully reproduced`:metaregion\_US &  &  & 0.040 \\ 
+  &  &  & (0.060) \\ 
+  & & & \\ 
+ Constant & 3.000^{***} & 3.000^{***} & 3.000^{***} \\ 
+  & (0.300) & (0.300) & (0.300) \\ 
+  & & & \\ 
+Observations & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} \\ 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{3}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> stargazer(avghp2, tophp2, lowhp2,
++           title="OLS: Arcsin Citations vs Reproduction Success, control for region (OA)", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcreg3cont:b:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           out=file.path(Outputs,"table_arcreg3OAb.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Sat, Oct 28, 2023 - 03:04:55 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations vs Reproduction Success, control for region (OA)} 
+  \label{arcreg3cont:b:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 0.050 &  &  \\ 
+  & (0.040) &  &  \\ 
+  & & & \\ 
+ tophindex &  & 0.020 &  \\ 
+  &  & (0.020) &  \\ 
+  & & & \\ 
+ lowhindex &  &  & 0.100 \\ 
+  &  &  & (0.070) \\ 
+  & & & \\ 
+ `Full or Partial` & 0.100 & -0.300 & 0.700 \\ 
+  & (0.800) & (0.600) & (0.900) \\ 
+  & & & \\ 
+ metaregion\_US & -0.060 & -0.300 & 0.600 \\ 
+  & (0.800) & (0.700) & (0.900) \\ 
+  & & & \\ 
+ avghindex:`Full or Partial` & -0.020 &  &  \\ 
+  & (0.040) &  &  \\ 
+  & & & \\ 
+ avghindex:metaregion\_US & -0.020 &  &  \\ 
+  & (0.040) &  &  \\ 
+  & & & \\ 
+ tophindex:`Full or Partial` &  & 0.003 &  \\ 
+  &  & (0.020) &  \\ 
+  & & & \\ 
+ tophindex:metaregion\_US &  & -0.003 &  \\ 
+  &  & (0.020) &  \\ 
+  & & & \\ 
+ lowhindex:`Full or Partial` &  &  & -0.090 \\ 
+  &  &  & (0.080) \\ 
+  & & & \\ 
+ lowhindex:metaregion\_US &  &  & -0.080 \\ 
+  &  &  & (0.080) \\ 
+  & & & \\ 
+ `Full or Partial`:metaregion\_US & 0.300 & 0.600 & -0.200 \\ 
+  & (0.900) & (0.700) & (1.000) \\ 
+  & & & \\ 
+ avghindex:`Full or Partial`:metaregion\_US & 0.020 &  &  \\ 
+  & (0.050) &  &  \\ 
+  & & & \\ 
+ tophindex:`Full or Partial`:metaregion\_US &  & -0.003 &  \\ 
+  &  & (0.020) &  \\ 
+  & & & \\ 
+ lowhindex:`Full or Partial`:metaregion\_US &  &  & 0.080 \\ 
+  &  &  & (0.080) \\ 
+  & & & \\ 
+ Constant & 3.000^{***} & 4.000^{***} & 3.000^{***} \\ 
+  & (0.700) & (0.600) & (0.800) \\ 
+  & & & \\ 
+Observations & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} \\ 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{3}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> # Run Regression: citations on h-indices and replication success, control for US region
+> avgh3 <- lm(ascite~avghindex* `Fully reproduced` * institution_works_count ,arcsinmainOA2)
+> toph3 <- lm(ascite~tophindex* `Fully reproduced` * institution_works_count,arcsinmainOA2)
+> lowh3 <- lm(ascite~lowhindex* `Fully reproduced` * institution_works_count,arcsinmainOA2)
+> 
+> avghp3 <- lm(ascite~avghindex* `Full or Partial` * institution_works_count,arcsinmainOA2)
+> tophp3 <- lm(ascite~tophindex* `Full or Partial` * institution_works_count,arcsinmainOA2)
+> lowhp3 <- lm(ascite~lowhindex* `Full or Partial` * institution_works_count,arcsinmainOA2)
+> 
+> stargazer(avgh3,toph3, lowh3,
++           title="OLS: Arcsin Citations vs Reproduction Success, control for institution productivity (OA)", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcreg3prod:a:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           out=file.path(Outputs,"table_arcreg3OA2.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Sat, Oct 28, 2023 - 03:04:55 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations vs Reproduction Success, control for institution productivity (OA)} 
+  \label{arcreg3prod:a:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 0.030^{***} &  &  \\ 
+  & (0.010) &  &  \\ 
+  & & & \\ 
+ tophindex &  & 0.020^{***} &  \\ 
+  &  & (0.006) &  \\ 
+  & & & \\ 
+ lowhindex &  &  & 0.020 \\ 
+  &  &  & (0.010) \\ 
+  & & & \\ 
+ `Fully reproduced` & 0.300 & 0.300 & 0.200 \\ 
+  & (0.400) & (0.300) & (0.300) \\ 
+  & & & \\ 
+ institution\_works\_count & 0.000 & 0.000 & 0.000 \\ 
+  & (0.000) & (0.000) & (0.000) \\ 
+  & & & \\ 
+ avghindex:`Fully reproduced` & -0.009 &  &  \\ 
+  & (0.020) &  &  \\ 
+  & & & \\ 
+ avghindex:institution\_works\_count & -0.000 &  &  \\ 
+  & (0.000) &  &  \\ 
+  & & & \\ 
+ tophindex:`Fully reproduced` &  & -0.004 &  \\ 
+  &  & (0.010) &  \\ 
+  & & & \\ 
+ tophindex:institution\_works\_count &  & -0.000 &  \\ 
+  &  & (0.000) &  \\ 
+  & & & \\ 
+ lowhindex:`Fully reproduced` &  &  & 0.009 \\ 
+  &  &  & (0.030) \\ 
+  & & & \\ 
+ lowhindex:institution\_works\_count &  &  & 0.000 \\ 
+  &  &  & (0.000) \\ 
+  & & & \\ 
+ `Fully reproduced`:institution\_works\_count & 0.000 & -0.000 & 0.000 \\ 
+  & (0.000) & (0.000) & (0.000) \\ 
+  & & & \\ 
+ avghindex:`Fully reproduced`:institution\_works\_count & 0.000 &  &  \\ 
+  & (0.000) &  &  \\ 
+  & & & \\ 
+ tophindex:`Fully reproduced`:institution\_works\_count &  & 0.000 &  \\ 
+  &  & (0.000) &  \\ 
+  & & & \\ 
+ lowhindex:`Fully reproduced`:institution\_works\_count &  &  & -0.000 \\ 
+  &  &  & (0.000) \\ 
+  & & & \\ 
+ Constant & 3.000^{***} & 3.000^{***} & 4.000^{***} \\ 
+  & (0.200) & (0.200) & (0.200) \\ 
+  & & & \\ 
+Observations & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} \\ 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{3}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> stargazer(avghp3, tophp3, lowhp3,
++           title="OLS: Arcsin Citations vs Reproduction Success, control for institution productivity (OA)", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcreg3prod:b:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           out=file.path(Outputs,"table_arcreg3OA2b.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Sat, Oct 28, 2023 - 03:04:56 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations vs Reproduction Success, control for institution productivity (OA)} 
+  \label{arcreg3prod:b:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 0.040 &  &  \\ 
+  & (0.020) &  &  \\ 
+  & & & \\ 
+ tophindex &  & 0.020 &  \\ 
+  &  & (0.010) &  \\ 
+  & & & \\ 
+ lowhindex &  &  & 0.020 \\ 
+  &  &  & (0.030) \\ 
+  & & & \\ 
+ `Full or Partial` & -0.030 & -0.200 & -0.300 \\ 
+  & (0.600) & (0.500) & (0.500) \\ 
+  & & & \\ 
+ institution\_works\_count & -0.000 & -0.000 & -0.000 \\ 
+  & (0.000) & (0.000) & (0.000) \\ 
+  & & & \\ 
+ avghindex:`Full or Partial` & -0.005 &  &  \\ 
+  & (0.030) &  &  \\ 
+  & & & \\ 
+ avghindex:institution\_works\_count & -0.000 &  &  \\ 
+  & (0.000) &  &  \\ 
+  & & & \\ 
+ tophindex:`Full or Partial` &  & 0.001 &  \\ 
+  &  & (0.010) &  \\ 
+  & & & \\ 
+ tophindex:institution\_works\_count &  & -0.000 &  \\ 
+  &  & (0.000) &  \\ 
+  & & & \\ 
+ lowhindex:`Full or Partial` &  &  & 0.004 \\ 
+  &  &  & (0.030) \\ 
+  & & & \\ 
+ lowhindex:institution\_works\_count &  &  & 0.000 \\ 
+  &  &  & (0.000) \\ 
+  & & & \\ 
+ `Full or Partial`:institution\_works\_count & 0.000 & 0.000 & 0.000^{*} \\ 
+  & (0.000) & (0.000) & (0.000) \\ 
+  & & & \\ 
+ avghindex:`Full or Partial`:institution\_works\_count & -0.000 &  &  \\ 
+  & (0.000) &  &  \\ 
+  & & & \\ 
+ tophindex:`Full or Partial`:institution\_works\_count &  & -0.000 &  \\ 
+  &  & (0.000) &  \\ 
+  & & & \\ 
+ lowhindex:`Full or Partial`:institution\_works\_count &  &  & -0.000 \\ 
+  &  &  & (0.000) \\ 
+  & & & \\ 
+ Constant & 3.000^{***} & 4.000^{***} & 4.000^{***} \\ 
+  & (0.500) & (0.500) & (0.500) \\ 
+  & & & \\ 
+Observations & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} & \multicolumn{1}{c}{162} \\ 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{3}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{3}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> # Do year since publication, allow for several years
+> hindex2 <- bibliometricdata %>% group_by(DOI,year) %>%
++   summarise(publication_year = mean(publication_year),
++             cite = mean(ytd_cited_by_count),
++             avgcite = mean(cited_by_count),
++             avghindex = mean(hindex,na.rm=TRUE),
++             tophindex=max(hindex,na.rm=TRUE),
++             lowhindex = min(hindex,na.rm=TRUE),
++             nauthors=n()) %>%
++   filter(year-publication_year <=5)
+`summarise()` has grouped output by 'DOI'. You
+can override using the `.groups` argument.
+> 
+> hindex2$yearafterpubli <- hindex2$year-hindex2$publication_year
+> hindex2$dummy2019 <- ""
+> hindex2$dummy2019 <- replace(hindex2$dummy2019, hindex2$year>=2019, 1)
+> hindex2$dummy2019 <- replace(hindex2$dummy2019, hindex2$year<2019, 0)
+> 
+> arcsinmainOA3 <- exit_all2 %>%
++   filter(confdata=="Other") %>%
++   mutate(`Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,1)) %>%
++   mutate(`Full or Partial`= ifelse(replicated %in% c("No"),0,1)) %>%
++   mutate(doc_qual = ifelse(clarity == "Complete",1,0),
++          `Fully reproduced` = ifelse(replicated == "Yes",1,0)) %>%
++   left_join(hindex2,by="DOI") %>%
++   mutate(ascite = asinh(cite))
+Warning message:
+In left_join(., hindex2, by = "DOI") :
+  Each row in `x` is expected to match at most 1
+row in `y`.
+ℹ Row 1 of `x` matches multiple rows.
+ℹ If multiple matches are expected, set `multiple
+  = "all"` to silence this warning.
+> 
+> 
+> # RHS reproducible confidential dummy for "2019 or later" (année où des data editor ont été nommé)
+> avgh <- lm(ascite~avghindex* `Fully reproduced`,arcsinmainOA3)
+> avghD2019 <- lm(ascite~avghindex* `Fully reproduced` * dummy2019,arcsinmainOA3)
+> avghY <- lm(ascite~avghindex* `Fully reproduced` * yearafterpubli,arcsinmainOA3)
+> avghD2019Y <- lm(ascite~avghindex* `Fully reproduced` * dummy2019 * yearafterpubli,arcsinmainOA3)
+> 
+> 
+> stargazer(avgh, avghD2019, avghY,avghD2019Y,
++           title="OLS: Arcsin Citations - Dynamic Effects", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcregdum:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           out=file.path(Outputs,"table_arcreg3OA3b.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Sat, Oct 28, 2023 - 03:04:56 PM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations - Dynamic Effects} 
+  \label{arcregdum:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{4}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ avghindex & 0.050^{***} & 0.050^{***} & 0.030^{***} & 0.030^{***} \\ 
+  & (0.005) & (0.005) & (0.004) & (0.004) \\ 
+  & & & & \\ 
+ `Fully reproduced` & -0.200 & -0.300^{**} & 0.090 & 0.100 \\ 
+  & (0.100) & (0.200) & (0.100) & (0.100) \\ 
+  & & & & \\ 
+ dummy20191 &  & 1.000^{***} &  & 0.900 \\ 
+  &  & (0.300) &  & (0.700) \\ 
+  & & & & \\ 
+ yearafterpubli &  &  & 0.400^{***} & 0.400^{***} \\ 
+  &  &  & (0.020) & (0.020) \\ 
+  & & & & \\ 
+ avghindex:`Fully reproduced` & 0.020^{***} & 0.030^{***} & 0.007 & 0.008 \\ 
+  & (0.008) & (0.008) & (0.007) & (0.007) \\ 
+  & & & & \\ 
+ avghindex:dummy20191 &  & -0.020 &  & -0.030 \\ 
+  &  & (0.010) &  & (0.030) \\ 
+  & & & & \\ 
+ `Fully reproduced`:dummy20191 &  & 0.300 &  & -0.700 \\ 
+  &  & (0.400) &  & (0.900) \\ 
+  & & & & \\ 
+ avghindex:`Fully reproduced`:dummy20191 &  & -0.030^{*} &  & -0.006 \\ 
+  &  & (0.020) &  & (0.050) \\ 
+  & & & & \\ 
+ avghindex:yearafterpubli &  &  & 0.000 & -0.000 \\ 
+  &  &  & (0.001) & (0.001) \\ 
+  & & & & \\ 
+ `Fully reproduced`:yearafterpubli &  &  & 0.040 & 0.040 \\ 
+  &  &  & (0.030) & (0.040) \\ 
+  & & & & \\ 
+ dummy20191:yearafterpubli &  &  &  & -0.300^{*} \\ 
+  &  &  &  & (0.200) \\ 
+  & & & & \\ 
+ avghindex:`Fully reproduced`:yearafterpubli &  &  & -0.001 & -0.000 \\ 
+  &  &  & (0.002) & (0.002) \\ 
+  & & & & \\ 
+ avghindex:dummy20191:yearafterpubli &  &  &  & 0.009 \\ 
+  &  &  &  & (0.008) \\ 
+  & & & & \\ 
+ `Fully reproduced`:dummy20191:yearafterpubli &  &  &  & 0.200 \\ 
+  &  &  &  & (0.200) \\ 
+  & & & & \\ 
+ avghindex:`Fully reproduced`:dummy20191:yearafterpubli &  &  &  & -0.003 \\ 
+  &  &  &  & (0.010) \\ 
+  & & & & \\ 
+ Constant & 2.000^{***} & 2.000^{***} & 2.000^{***} & 2.000^{***} \\ 
+  & (0.090) & (0.090) & (0.070) & (0.070) \\ 
+  & & & & \\ 
+Observations & \multicolumn{1}{c}{1,222} & \multicolumn{1}{c}{1,222} & \multicolumn{1}{c}{1,222} & \multicolumn{1}{c}{1,222} \\ 
+\hline \\[-1.8ex] 
+\textit{Notes:} & \multicolumn{4}{l}{$^{***}$Significant at the 1 percent level.} \\ 
+ & \multicolumn{4}{l}{$^{**}$Significant at the 5 percent level.} \\ 
+ & \multicolumn{4}{l}{$^{*}$Significant at the 10 percent level.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> proc.time()
+   user  system elapsed 
+     28       2      29 

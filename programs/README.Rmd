@@ -1,0 +1,325 @@
+---
+title: "Programs"
+author:
+  '1':
+    name: Lars Vilhuber
+  '2':
+    name: Flavio Stanchi
+  '3':
+    name: Hautahi Kingi
+  '4':
+    name: Sylverie Herbert
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+  word_document: default
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(eval=FALSE)
+```
+
+This README provides details on how to run (or not) the programs associated with the paper. For details on the environment in which they are run, see the main README.
+
+# Programs
+
+All programs can be found in the `programs` folder, except for some configuration parameters which (by necessity) are stored in the root folder. 
+
+> No foldername should be hard-coded.
+
+
+
+## Setup
+
+Every program contains the following lines, and can be run independently:
+
+
+```{r setup_config,eval=TRUE}
+source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+source(file.path(programs,"libraries.R"), echo=FALSE)
+source(file.path(programs,"config.R"), echo=FALSE)
+```
+
+Note that the path `interwrk` is transitory, and is only kept during processing. It will be empty in the replication archive.
+
+Any libraries needed are called and if necessary installed through `libraries.R`, though this is generally handled by the Docker image at build time.
+
+Most parameters are set in `config.R`:
+
+```{r read_config,eval=TRUE}
+source(file.path(programs,"config.R"), echo=TRUE)
+```
+
+## All programs
+
+
+```{r list_files,eval=TRUE,echo=FALSE}
+list.files(path=programs,pattern = "R$") %>% as.data.frame() %>% rename("Program name"=".") %>% kable()
+```
+
+
+## Data cleaning and merging
+
+We combine our collected data with bibliometric data, from three sources:
+
+- collected from [CrossRef](https://www.crossref.org/)
+- extracted from [openAlex](https://openalex.org/)
+- manually extracted from "Web of Science" (WoS). 
+
+The WoS was originally used for the primary bibliometric analysis, but after referee reports, we used the longer time series available in openAlex, and the WoS data was relegated to an appendix. The collected and cleaned WoS is provided as part of the deposit. 
+
+## Download the replication data from Zenodo
+
+```{r compute_zenodo_doi,echo=FALSE}
+zenodo.doi <- paste0("https://doi.org/10.5281/zenodo.",zenodo.id)
+```
+
+
+The responses to the replication attempts were originally stored on Google Sheets, and are considered private (they contain the replicator names). We have separately cleaned the data,  anonymized it, and uploaded to Zenodo.
+
+- See [github.com/labordynamicsinstitute/ldi-replication-dataprep](https://www.github.com/labordynamicsinstitute/ldi-replication-dataprep) for processing
+- See [`r zenodo.doi`](`r zenodo.doi`) for the cleaned and anonymized data.
+
+Here, we simply download the data, with a bit of additional data cleaning. 
+
+ - Input data: On Zenodo
+ - Output data: path `dataloc`
+ 
+```{r download_replication}
+source(file.path(programs,"01_download_replication_data.R"),echo=TRUE)
+```
+
+At the end of this step, the `dataloc` directory  should have the following data files:
+
+- `entryQ_pub.Rds` - the main data from the "Entry" questionnaire (assessment), with minor adjustments for typos in DOIs
+- `exitQ_pub.Rds` - the main data from the post-replication "Exit" questionnaire (assessment)
+- `replication_list_pub.Rds` -  the assignment spreadsheet. 
+
+
+## Get CrossRef information
+
+The master replication list has all the DOIs. Welook up the DOI at CrossRef to obtain author names, article titles, publication dates.
+
+
+Note: downloading references from CrossRef can take a while. The code contains a fallback - if the file `crossref_info.Rds`  exists, no new pull will be computed. To override, delete the file. 
+
+ - inputs: `entryQ_pub, exitQ_pub, replication_list_pub` (in `dataloc`)
+ - outputs: `crossref_info.Rds` (in `crossrefloc`, provided as part of replication package) and intermediate raw data in `interwrk` 
+
+```{r get_crossref}
+source(file.path(programs,"02_get_crossref.R"),echo=TRUE)
+```
+
+### Some diagnostics
+
+When searching for DOIs, some articles might not be found. When that is the case, they are reported here.
+
+```{r doi_diagnostics,echo=TRUE,eval=TRUE,cache=TRUE}
+if ( file.exists(file.path(interwrk,"crossref.diagnostics.Rds"))) {
+  crossref.diagnostics <- readRDS(file=file.path(interwrk,"crossref.diagnostics.Rds"))
+} else {
+  crossref.diagnostics <- data.frame()
+}
+if ( nrow(crossref.diagnostics) > 0 ) {
+  knitr::kable(crossref.diagnostics)
+}
+
+```
+
+Most of these are out of scope for the paper (which focuses on *AEJ:Applied Economics*), one paper was missed.
+
+## Clean the replication list and merge with the bibliographic information
+
+We merge the bibliographic information with the downloaded replication list, and collapse a few verbose outcomes.
+
+
+ - inputs: `replication_list_pub` (in `dataloc`), `crossref_info.Rds` (in `crossrefloc`)
+ - outputs: `replication_list_clean` (in `interwrk`)
+
+
+```{r clean_replication,cache=TRUE}
+source(file.path(programs,"04_clean_replicationlist.R"),echo=TRUE)
+```
+
+---
+
+
+## Download the h-index information
+
+
+## Collect Bibtex info on the articles
+
+```{r}
+# This program collects bibtex information for all the DOIs read by the replicators from crossref
+# It will skip processing if the previously collected data is there.
+# Relies on CrossRef API, which can be fragile.
+source(file.path(programs,"08_get_crossref_bibs.R"),echo=TRUE)
+```
+
+
+## Paper analysis
+
+The paper analysis is run in the `3x*.R`  programs.
+
+```{r prepare_paper}
+source(file.path(programs,'25_prepare_sample.R'),echo=TRUE)
+source(file.path(programs,'30_results1.R'),echo=TRUE)
+source(file.path(programs,'31_results2.R'),echo=TRUE)
+#source(file.path(programs,'20_analytics.R'),echo=TRUE) 
+source(file.path(programs,'32_conclusion.R'),echo=TRUE)
+#source(file.path(programs,'33_tables.R'),echo=TRUE)   # incorporated into 20_analytics.R
+#source(file.path(programs,'34_figures.R'),echo=TRUE)  # incorporated into 20_analytics.R
+#source(file.path(programs,'35_appendix.R'),echo=TRUE)
+source(file.path(programs,'36_list-articles.R'),echo=TRUE)
+```
+
+Note that the path `interwrk` is transitory, and is only kept during processing. It will be empty in the replication archive.
+
+## Outputs
+
+Some numbers are written out to `TexIncludes` (here: `r TexIncludes`) as LaTeX files with a single number. Tables and figures are written out to `Outputs` (here: `r Outputs`). 
+
+Key datasets:
+
+- Complete sample: `r file.path(dataloc,"00_complete_sample.Rds")`, keyed by DOI.
+
+## Revision 1
+
+After referee reports, the following supplementary analysis has been added:
+
+### Adding a clean count of the number of articles in the universe
+
+```{r clean_count_dois}
+source(file.path(programs,'40_supplementary1.R'),echo=TRUE)
+```
+
+
+### Update citations with the latest
+
+Referees wanted to see an updated citation analysis. While we keep the original analysis as-is, the following extracts newer per-year citation counts from openAlex. 
+
+
+
+```{r update_citations,cache=FALSE}
+source(file.path(programs,'41_supplementary2.R'),echo=TRUE)
+```
+
+
+The first output file is `r openalex.Rds`, an extract of OpenAlex for all articles in the sample, with
+
+
+```{r,eval=TRUE}
+names(readRDS(openalex.Rds))
+```
+
+Key to match back to the internal database is `DOI`, a transformation of the OpenAlex-provided `doi` (renamed to `doi.url`. Note that the field `author` contains a list of author ids, as follows:
+
+```{r,eval=TRUE}
+readRDS(openalex.Rds) %>% select(author) %>% tidyr::unnest(author) %>% names()
+```
+
+The column `au_id` is key to matching in later OpenAlex information computed. 
+
+The final output file (`r citations.latest`) is keyed on `DOI` per article, and has both within-year citations, and cumulative year-to-date citations. These must be recomputed based on the available data, because the OpenAlex API only has 10 years worth of data, but the max citations is (?) accurate.
+
+
+```{r,eval=TRUE}
+
+names(readRDS(citations.latest))
+
+```
+
+### Get information on all authors, so we can compute h-index
+
+This is used in several of the following programs. It can take up to 1 hour to run.
+
+
+```{r update_author_openalex}
+source(file.path(programs,'42_prepare_authors.R'),echo=TRUE)
+```
+
+
+Output files:
+
+- openalex.authors.Rds - all works for in-scope authors (authors having published during the time period in AEJ:AE)
+
+Intermediate files
+
+- file.path(interwrk,"authors.df.Rds")) - these are all the *works* by the authors in the sample
+
+Input files:
+
+- file.path(openalexloc,"blacklist.xlsx") - an edited list of author ids to remove, since impossible to find proper data on OpenAlex (usually, because of very very bad name disambiguation)
+
+
+### Institutional affiliations, mapped to regions, also productivity of those institutions 
+
+There are some authors for whom we did not have institutions; we hand-edited some of those. These can be found in
+
+- `r file.path(crossrefloc,"affiliation-impute.xlsx")`
+
+```{r update_institutions}
+source(file.path(programs,'43_supplementary4.R'),echo=TRUE)
+```
+
+
+
+### Getting at experience
+
+In order to get publication experience, we use the first observed publications for an author. This hinges on entity disambiguation by OpenAlex, which does not always get it right. We audited some extreme values, and manually searched for authors' first publication or obtention of Ph.D. 
+
+
+```{r update_experience}
+source(file.path(programs,'44_supplementary_authexp.R'),echo=TRUE)
+```
+
+- Output: `r file.path(interwrk,"authors.exp.df.Rds")`
+- Audit file: `r file.path(crossrefloc,"audit-exp.xlsx")`
+
+
+### Recomputing h-index
+
+In order to recompute the h-index, we pull ALL works by each of the authors in our set, compute year-to-date citations, and compute a as-of-year h-index.
+
+- At least one author was mis-matched by OpenAlex, and the mismatched entity is on a blacklist.
+
+```{r update_hindex}
+source(file.path(programs,'45_supplementary_hindex.R'),echo=TRUE)
+```
+
+Output files:
+
+- openalex.hindex - per-author-year hindex
+
+Intermediate files:
+
+- file.path(interwrk,"citations.df.Rds")) - these are the citations of those works. It can be expanded from the authors.df.
+
+Auxiliary files:
+
+- At least one author was mis-matched by OpenAlex, and the mismatched entity is on a blacklist. `r file.path(crossrefloc,"blacklist.xlsx")`
+
+The final output file `openalex.hindex` (`r openalex.hindex`) is keyed on the OpenAlex author id `au_id`
+
+```{r}
+names(hindex.by.year)
+```
+
+Here's an example:
+```{r,results='asis'}
+# test whether this seems reasonable
+
+#citations.df %>% filter(au_id=="https://openalex.org/A5027614993") %>% kable()
+hindex.by.year %>% filter(au_id=="https://openalex.org/A5027614993") %>% kable()
+
+authors.df %>% filter(article_id=="https://openalex.org/W2577227262") %>% kable()
+citations.df %>% filter(article_id=="https://openalex.org/W2577227262") %>% kable()
+```

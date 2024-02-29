@@ -1,0 +1,942 @@
+
+R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> ## OLS REGRESSIONS:
+> #### Create variables for similar OLS regressions as the ones before
+> ### Reproduce the regressions with web of Sciences
+> ### Add author information such as institution and region
+> 
+> 
+> source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+> source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: devtools
+Loading required package: usethis
+Loading required package: rprojroot
+Loading required package: tictoc
+Loading required package: ggplot2
+Loading required package: bindrcpp
+Loading required package: Rcpp
+Loading required package: markdown
+> source(file.path(programs,"libraries.R"), echo=FALSE)
+Loading required package: rcrossref
+Loading required package: readr
+Loading required package: tidyr
+Loading required package: data.table
+
+Attaching package: ‘data.table’
+
+The following object is masked from ‘package:tictoc’:
+
+    shift
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: xtable
+Loading required package: rjson
+Loading required package: stargazer
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+Loading required package: knitr
+Loading required package: stringr
+Loading required package: readxl
+Loading required package: fastDummies
+Loading required package: skimr
+Loading required package: sandwich
+Loading required package: pastecs
+
+Attaching package: ‘pastecs’
+
+The following objects are masked from ‘package:data.table’:
+
+    first, last
+
+The following object is masked from ‘package:tidyr’:
+
+    extract
+
+The following objects are masked from ‘package:dplyr’:
+
+    first, last
+
+Loading required package: formattable
+
+Attaching package: ‘formattable’
+
+The following object is masked from ‘package:xtable’:
+
+    digits
+
+Loading required package: reshape2
+
+Attaching package: ‘reshape2’
+
+The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+  Use `force = TRUE` to force installation
+> source(file.path(programs,"config.R"), echo=FALSE)
+> 
+> 
+> # Some problematic author names might creep back in
+> blacklist.xlsx <- file.path(openalexloc,"blacklist.xlsx")
+> blacklist <- read_excel(blacklist.xlsx)
+> # how many
+> nrow(blacklist %>% distinct(au_id))
+[1] 1
+> nrow(blacklist %>% distinct(DOI))
+[1] 1
+> 
+> # footnote text
+> source(file.path(programs,"_footnotes.R"))
+> 
+> 
+> # =======================   Read analysis data
+> # exit_all = any article that reproduction was attempted
+> exit_all <- readRDS(file=file.path(dataloc,"00_exit_all.Rds"))
+> nrow(exit_all %>% distinct(DOI))
+[1] 180
+> skim(exit_all)
+── Data Summary ────────────────────────
+                           Values  
+Name                       exit_all
+Number of rows             180     
+Number of columns          147     
+_______________________            
+Column type frequency:             
+  character                96      
+  logical                  43      
+  numeric                  6       
+  POSIXct                  2       
+________________________           
+Group variables            None    
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+   skim_variable                                                         n_missing complete_rate min  max empty n_unique
+ 1 DOI                                                                           0       1        17   20     0      180
+ 2 ID                                                                            0       1        64   64     0       34
+ 3 Timestamp                                                                     0       1        16   19     0      180
+ 4 TypeOfArticle                                                                 0       1         3    3     0        1
+ 5 OnlineMaterials1_DOI                                                        151       0.161    17   85     0       29
+ 6 DataAbsence                                                                 180       0        NA   NA     0        0
+ 7 OnlineDataDOI2                                                              174       0.0333   20   25     0        6
+ 8 OnlineDataHandle2                                                           179       0.00556  24   24     0        1
+ 9 OnlineDataURL2                                                              148       0.178    25  111     0       32
+10 DataAvailabilityAccess                                                      180       0        NA   NA     0        0
+11 DataAvailabilityExclusive                                                   180       0        NA   NA     0        0
+12 OtherNotes1                                                                 101       0.439    10  605     0       79
+13 Is there some other online material that you wish to describe                19       0.894     2    3     0        2
+14 OnlineDataFormat2                                                           147       0.183     3   12     0        8
+15 OnlineProgramsDOI                                                           128       0.289    17   26     0       52
+16 OnlineProgramsHDL                                                           175       0.0278   24   25     0        5
+17 OnlineProgramsURL                                                             9       0.95     25  111     0      171
+18 ProgramFormat                                                                 5       0.972     1   13     0        9
+19 ProgramSequence                                                              13       0.928     2    3     0        2
+20 ProgramsDocumentation                                                         5       0.972     2    3     0        2
+21 ProgramsHeaderAuthor                                                         10       0.944     2    3     0        2
+22 ProgramsHeaderInfo                                                           11       0.939     2    3     0        2
+23 ProgramsStructureManual                                                      13       0.928     2    3     0        2
+24 GeneralNotes                                                                132       0.267     4  331     0       48
+25 OnlineMaterials                                                               0       1         2    3     0        2
+26 OnlineMaterials1                                                             23       0.872    15  115     0      157
+27 Do you want to describe another dataset provided with the article             0       1         2    3     0        2
+28 OnlineMaterials2                                                             89       0.506    41  116     0       91
+29 OnlineMaterials2_DOI                                                        159       0.117    17   85     0       21
+30 Is there some other online material that you wish to describe_1              85       0.528     2    3     0        2
+31 OnlineMaterials3                                                            172       0.0444   51  111     0        8
+32 OnlineMaterials3_DOI                                                        174       0.0333   20   26     0        6
+33 OnlineMaterials1_Description                                                 30       0.833     6  216     0       84
+34 OnlineMaterials2_Description                                                 91       0.494     8  213     0       28
+35 Programs                                                                      0       1         2    3     0        2
+36 OnlineDataProvided                                                            0       1         3    3     0        1
+37 DataSetClassification1                                                        1       0.994    10   13     0        3
+38 OnlineDataDOI1                                                              132       0.267    20  111     0       48
+39 OnlineDataHandle1                                                           174       0.0333   24   25     0        6
+40 OnlineDataURL1                                                                5       0.972    25  111     0      174
+41 OnlineDataFormat1                                                             0       1         1   18     0       15
+42 DataSetClassification2                                                      146       0.189    10   13     0        3
+43 OtherNotes2_1                                                               163       0.0944   10  320     0       17
+44 InputData                                                                     0       1         2    3     0        2
+45 InputData1                                                                  115       0.361     3  127     0       65
+46 InputDataDOI1                                                               177       0.0167   20   20     0        3
+47 InputDataURL1                                                               153       0.15     21  205     0       27
+48 InputDataFormat1                                                            144       0.2       2   37     0       18
+49 InputDataAvailability1                                                      107       0.406     2   10     0        3
+50 InputDataMoreThanOne                                                        106       0.411     2    3     0        2
+51 InputData2                                                                  154       0.144     3  165     0       26
+52 InputDataDOI2                                                               179       0.00556  20   20     0        1
+53 InputDataHandle2                                                            180       0        NA   NA     0        0
+54 InputDataURL2                                                               170       0.0556   21   79     0       10
+55 InputDataFormat2                                                            169       0.0611    3   25     0        7
+56 InputDataAvailability2                                                      154       0.144     2   10     0        3
+57 InputDataOtherNotes1                                                        142       0.211    15  780     0       38
+58 InputDataOtherNotes2                                                        166       0.0778   17  376     0       14
+59 Flag for follow-up                                                          128       0.289     2    3     0        2
+60 year                                                                          0       1         4    4     0       10
+61 journal                                                                       0       1         6    6     0        1
+62 absence                                                                       0       1        17   17     0        1
+63 ID.exit                                                                       0       1        64   64     0       36
+64 Timestamp.exit                                                                0       1        16   18     0      180
+65 Code_Success                                                                 28       0.844     2    3     0        2
+66 Program_Run_Clean                                                            52       0.711    31   41     0        2
+67 Directory_Change                                                             80       0.556     3   47     0        2
+68 Code_Changes                                                                115       0.361    17  447     0       65
+69 Output_Accuracy                                                              53       0.706     3   38     0        2
+70 Discrepancy_Location                                                        119       0.339     8 1305     0       60
+71 Software_Extensions                                                           0       1         2    3     0        3
+72 Software_Version                                                              1       0.994     2    3     0        3
+73 First_Replicator                                                              0       1         2    3     0        2
+74 Common_Issues                                                               171       0.0500    2    3     0        2
+75 Overcome_Issues                                                             171       0.0500    2   43     0        3
+76 Replication_Helpfulness                                                     175       0.0278   43  494     0        5
+77 README_Quality                                                                1       0.994     7   64     0        3
+78 README_Comments                                                              91       0.494     4  683     0       89
+79 Comments on difficulty                                                      108       0.4       3  623     0       72
+80 GeneralNotes.exit                                                           105       0.417     3  529     0       75
+81 What Software did you use for the replication (including the version)         3       0.983     2   55     0       50
+82 Replication_Success                                                          40       0.778     2    7     0        3
+83 Main_Issue                                                                  152       0.156    10  164     0       10
+84 Data_Type                                                                   155       0.139    14   26     0        4
+85 Data_Access_Type                                                            154       0.144    13   30     0        3
+86 Software_Type                                                                40       0.778     1   18     0        8
+87 Data_Type_1                                                                  40       0.778     1   51     0       12
+88 dup                                                                           0       1        20   28     0      180
+89 lab                                                                           0       1         2    7     0        4
+90 replicated                                                                    0       1         2    7     0        3
+91 clarity                                                                       0       1         7   10     0        3
+92 rep_list                                                                     63       0.65      2    3     0        2
+93 rep                                                                           0       1         2    7     0        3
+94 confdata                                                                      0       1         5   12     0        2
+95 reason                                                                        0       1         5   20     0        7
+96 change                                                                       52       0.711     4   16     0        3
+   whitespace
+ 1          0
+ 2          0
+ 3          0
+ 4          0
+ 5          0
+ 6          0
+ 7          0
+ 8          0
+ 9          0
+10          0
+11          0
+12          0
+13          0
+14          0
+15          0
+16          0
+17          0
+18          0
+19          0
+20          0
+21          0
+22          0
+23          0
+24          0
+25          0
+26          0
+27          0
+28          0
+29          0
+30          0
+31          0
+32          0
+33          0
+34          0
+35          0
+36          0
+37          0
+38          0
+39          0
+40          0
+41          0
+42          0
+43          0
+44          0
+45          0
+46          0
+47          0
+48          0
+49          0
+50          0
+51          0
+52          0
+53          0
+54          0
+55          0
+56          0
+57          0
+58          0
+59          0
+60          0
+61          0
+62          0
+63          0
+64          0
+65          0
+66          0
+67          0
+68          0
+69          0
+70          0
+71          0
+72          0
+73          0
+74          0
+75          0
+76          0
+77          0
+78          0
+79          0
+80          0
+81          0
+82          0
+83          0
+84          0
+85          0
+86          0
+87          0
+88          0
+89          0
+90          0
+91          0
+92          0
+93          0
+94          0
+95          0
+96          0
+
+── Variable type: logical ──────────────────────────────────────────────────────────────────────────────────────────────
+   skim_variable                                                          n_missing complete_rate mean count
+ 1 OnlineData                                                                   180             0  NaN ": " 
+ 2 AdditionalMaterialNumber                                                     180             0  NaN ": " 
+ 3 OnlineData_1                                                                 180             0  NaN ": " 
+ 4 DataRunClean                                                                 180             0  NaN ": " 
+ 5 DataAvailability                                                             180             0  NaN ": " 
+ 6 OnlineDataDOI2_1                                                             180             0  NaN ": " 
+ 7 OnlineDataHandle2_1                                                          180             0  NaN ": " 
+ 8 OnlineDataURL2_1                                                             180             0  NaN ": " 
+ 9 DataAvailability2                                                            180             0  NaN ": " 
+10 DataAvailabilityAccess2                                                      180             0  NaN ": " 
+11 DataAvailabilityExclusive2                                                   180             0  NaN ": " 
+12 OtherNotes2                                                                  180             0  NaN ": " 
+13 Do you want to describe another dataset                                      180             0  NaN ": " 
+14 OnlineDataDOI3                                                               180             0  NaN ": " 
+15 OnlineDataHandle3                                                            180             0  NaN ": " 
+16 OnlineDataURL3                                                               180             0  NaN ": " 
+17 DataAvailability3                                                            180             0  NaN ": " 
+18 DataAvailabilityAccess3                                                      180             0  NaN ": " 
+19 DataAvailabilityExclusive3                                                   180             0  NaN ": " 
+20 OtherNotes3                                                                  180             0  NaN ": " 
+21 DataRunFinal                                                                 180             0  NaN ": " 
+22 OnlineFinalDataDOI                                                           180             0  NaN ": " 
+23 OnlineFinalDataHandle                                                        180             0  NaN ": " 
+24 OnlineFinalDataURL                                                           180             0  NaN ": " 
+25 FinalDataAvailability                                                        180             0  NaN ": " 
+26 FinalDataAvailabilityAccess                                                  180             0  NaN ": " 
+27 FinalDataAvailabilityExclusive                                               180             0  NaN ": " 
+28 OtherNotesFinal                                                              180             0  NaN ": " 
+29 DataFormatInputs                                                             180             0  NaN ": " 
+30 OnlinePrograms                                                               180             0  NaN ": " 
+31 OnlineProgramsInside                                                         180             0  NaN ": " 
+32 DocReadmePresent                                                             180             0  NaN ": " 
+33 DocReadmeContent                                                             180             0  NaN ": " 
+34 OnlineMaterials1_URL                                                         180             0  NaN ": " 
+35 OnlineMaterials2_URL                                                         180             0  NaN ": " 
+36 OnlineMaterials3_URL                                                         180             0  NaN ": " 
+37 AnalysisData                                                                 180             0  NaN ": " 
+38 OnlineMaterials3_Description                                                 180             0  NaN ": " 
+39 DataSetNumbers                                                               180             0  NaN ": " 
+40 InputDataRef                                                                 180             0  NaN ": " 
+41 InputDataHandle1                                                             180             0  NaN ": " 
+42 OnlinePrograms_1                                                             180             0  NaN ": " 
+43 What software did the authors use to run their programs (if specified)       180             0  NaN ": " 
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable                                           n_missing complete_rate   mean       sd p0 p25 p50 p75 p100
+1 difficult                                                       0        1        2.39    1.19   1   1   2   3    5
+2 flag2011                                                        0        1        0       0      0   0   0   0    0
+3 How difficult do you think the replication exercise was         0        1        2.86    1.44   1   2   3   4    5
+4 Cost of data access (in approximate $)                        172        0.0444 375    1061.     0   0   0   0 3000
+5 Cost of software purchase (in approximate $)                  173        0.0389   0       0      0   0   0   0    0
+6 n                                                               0        1        1.12    0.322  1   1   1   1    2
+  hist 
+1 ▇▇▆▃▂
+2 ▁▁▇▁▁
+3 ▇▆▇▅▆
+4 ▇▁▁▁▁
+5 ▁▁▇▁▁
+6 ▇▁▁▁▁
+
+── Variable type: POSIXct ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable  n_missing complete_rate min                 max                 median              n_unique
+1 timestamp              0             1 2015-06-11 10:12:25 2018-07-01 16:07:54 2017-07-06 20:01:11      180
+2 timestamp.exit         0             1 2014-08-03 13:59:02 2018-08-02 05:22:09 2017-07-16 16:42:15      180
+> 
+> #
+> entry_merge <- readRDS(file=file.path(dataloc,"00_entry_merge.Rds"))
+> skim(entry_merge)
+── Data Summary ────────────────────────
+                           Values     
+Name                       entry_merge
+Number of rows             303        
+Number of columns          107        
+_______________________               
+Column type frequency:                
+  character                62         
+  logical                  42         
+  numeric                  2          
+  POSIXct                  1          
+________________________              
+Group variables            None       
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+   skim_variable                                                     n_missing complete_rate min max empty n_unique
+ 1 DOI                                                                       0       1        17  20     0      303
+ 2 ID                                                                        0       1        64  64     0       34
+ 3 Timestamp                                                                 0       1        16  19     0      303
+ 4 TypeOfArticle                                                             0       1         3   3     0        1
+ 5 OnlineMaterials1_DOI                                                    253       0.165    17  85     0       50
+ 6 DataAbsence                                                             209       0.310    13 251     0       19
+ 7 OnlineDataDOI2                                                          297       0.0198   20  25     0        6
+ 8 OnlineDataHandle2                                                       302       0.00330  24  24     0        1
+ 9 OnlineDataURL2                                                          268       0.116    25 111     0       35
+10 DataAvailabilityAccess                                                  210       0.307     2   3     0        3
+11 DataAvailabilityExclusive                                               210       0.307     2   3     0        3
+12 OtherNotes1                                                             212       0.300    10 605     0       91
+13 Is there some other online material that you wish to describe            40       0.868     2   3     0        2
+14 OnlineDataFormat2                                                       267       0.119     3  12     0        8
+15 OnlineProgramsDOI                                                       221       0.271    17  26     0       82
+16 OnlineProgramsHDL                                                       296       0.0231   24  25     0        7
+17 OnlineProgramsURL                                                        20       0.934    25 111     0      283
+18 ProgramFormat                                                            14       0.954     1  51     0       13
+19 ProgramSequence                                                          33       0.891     2   3     0        2
+20 ProgramsDocumentation                                                    19       0.937     2   3     0        2
+21 ProgramsHeaderAuthor                                                     27       0.911     2   3     0        2
+22 ProgramsHeaderInfo                                                       28       0.908     2   3     0        2
+23 ProgramsStructureManual                                                  32       0.894     2   3     0        2
+24 GeneralNotes                                                            207       0.317     4 763     0       95
+25 OnlineMaterials                                                           0       1         2   3     0        2
+26 OnlineMaterials1                                                         44       0.855     8 115     0      258
+27 Do you want to describe another dataset provided with the article        92       0.696     2   3     0        2
+28 OnlineMaterials2                                                        159       0.475    32 116     0      144
+29 OnlineMaterials2_DOI                                                    265       0.125    16  85     0       38
+30 Is there some other online material that you wish to describe_1         153       0.495     2   3     0        2
+31 OnlineMaterials3                                                        287       0.0528   51 111     0       16
+32 OnlineMaterials3_DOI                                                    289       0.0462   20  26     0       14
+33 OnlineMaterials1_Description                                             64       0.789     6 291     0      128
+34 OnlineMaterials2_Description                                            164       0.459     8 270     0       34
+35 Programs                                                                  0       1         2   3     0        2
+36 OnlineDataProvided                                                        0       1         2   3     0        2
+37 DataSetClassification1                                                   93       0.693    10  13     0        3
+38 OnlineDataDOI1                                                          247       0.185    20 111     0       56
+39 OnlineDataHandle1                                                       296       0.0231   24  25     0        7
+40 OnlineDataURL1                                                           97       0.680    25 111     0      205
+41 OnlineDataFormat1                                                        76       0.749     1  22     0       19
+42 DataSetClassification2                                                  266       0.122    10  13     0        3
+43 OtherNotes2_1                                                           284       0.0627   10 320     0       19
+44 InputData                                                                 0       1         2   3     0        2
+45 InputData1                                                              176       0.419     3 146     0      123
+46 InputDataDOI1                                                           294       0.0297   20  20     0        9
+47 InputDataURL1                                                           260       0.142    21 205     0       43
+48 InputDataFormat1                                                        232       0.234     2 137     0       22
+49 InputDataAvailability1                                                  160       0.472     2  10     0        3
+50 InputDataMoreThanOne                                                    154       0.492     2   3     0        2
+51 InputData2                                                              256       0.155     3 165     0       47
+52 InputDataDOI2                                                           299       0.0132   20  20     0        4
+53 InputDataHandle2                                                        303       0        NA  NA     0        0
+54 InputDataURL2                                                           285       0.0594   21 163     0       18
+55 InputDataFormat2                                                        285       0.0594    2  25     0       11
+56 InputDataAvailability2                                                  256       0.155     2  10     0        3
+57 InputDataOtherNotes1                                                    218       0.281    15 780     0       85
+58 InputDataOtherNotes2                                                    275       0.0924   17 376     0       28
+59 Flag for follow-up                                                      212       0.300     2   3     0        2
+60 year                                                                      0       1         4   4     0       10
+61 journal                                                                   0       1         6   6     0        1
+62 absence                                                                   0       1        17  17     0        3
+   whitespace
+ 1          0
+ 2          0
+ 3          0
+ 4          0
+ 5          0
+ 6          0
+ 7          0
+ 8          0
+ 9          0
+10          0
+11          0
+12          0
+13          0
+14          0
+15          0
+16          0
+17          0
+18          0
+19          0
+20          0
+21          0
+22          0
+23          0
+24          0
+25          0
+26          0
+27          0
+28          0
+29          0
+30          0
+31          0
+32          0
+33          0
+34          0
+35          0
+36          0
+37          0
+38          0
+39          0
+40          0
+41          0
+42          0
+43          0
+44          0
+45          0
+46          0
+47          0
+48          0
+49          0
+50          0
+51          0
+52          0
+53          0
+54          0
+55          0
+56          0
+57          0
+58          0
+59          0
+60          0
+61          0
+62          0
+
+── Variable type: logical ──────────────────────────────────────────────────────────────────────────────────────────────
+   skim_variable                           n_missing complete_rate mean count
+ 1 OnlineData                                    303             0  NaN ": " 
+ 2 AdditionalMaterialNumber                      303             0  NaN ": " 
+ 3 OnlineData_1                                  303             0  NaN ": " 
+ 4 DataRunClean                                  303             0  NaN ": " 
+ 5 DataAvailability                              303             0  NaN ": " 
+ 6 OnlineDataDOI2_1                              303             0  NaN ": " 
+ 7 OnlineDataHandle2_1                           303             0  NaN ": " 
+ 8 OnlineDataURL2_1                              303             0  NaN ": " 
+ 9 DataAvailability2                             303             0  NaN ": " 
+10 DataAvailabilityAccess2                       303             0  NaN ": " 
+11 DataAvailabilityExclusive2                    303             0  NaN ": " 
+12 OtherNotes2                                   303             0  NaN ": " 
+13 Do you want to describe another dataset       303             0  NaN ": " 
+14 OnlineDataDOI3                                303             0  NaN ": " 
+15 OnlineDataHandle3                             303             0  NaN ": " 
+16 OnlineDataURL3                                303             0  NaN ": " 
+17 DataAvailability3                             303             0  NaN ": " 
+18 DataAvailabilityAccess3                       303             0  NaN ": " 
+19 DataAvailabilityExclusive3                    303             0  NaN ": " 
+20 OtherNotes3                                   303             0  NaN ": " 
+21 DataRunFinal                                  303             0  NaN ": " 
+22 OnlineFinalDataDOI                            303             0  NaN ": " 
+23 OnlineFinalDataHandle                         303             0  NaN ": " 
+24 OnlineFinalDataURL                            303             0  NaN ": " 
+25 FinalDataAvailability                         303             0  NaN ": " 
+26 FinalDataAvailabilityAccess                   303             0  NaN ": " 
+27 FinalDataAvailabilityExclusive                303             0  NaN ": " 
+28 OtherNotesFinal                               303             0  NaN ": " 
+29 DataFormatInputs                              303             0  NaN ": " 
+30 OnlinePrograms                                303             0  NaN ": " 
+31 OnlineProgramsInside                          303             0  NaN ": " 
+32 DocReadmePresent                              303             0  NaN ": " 
+33 DocReadmeContent                              303             0  NaN ": " 
+34 OnlineMaterials1_URL                          303             0  NaN ": " 
+35 OnlineMaterials2_URL                          303             0  NaN ": " 
+36 OnlineMaterials3_URL                          303             0  NaN ": " 
+37 AnalysisData                                  303             0  NaN ": " 
+38 OnlineMaterials3_Description                  303             0  NaN ": " 
+39 DataSetNumbers                                303             0  NaN ": " 
+40 InputDataRef                                  303             0  NaN ": " 
+41 InputDataHandle1                              303             0  NaN ": " 
+42 OnlinePrograms_1                              303             0  NaN ": " 
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable n_missing complete_rate mean   sd p0 p25 p50 p75 p100 hist 
+1 difficult             0             1 2.96 1.46  1   2   3   4    5 ▇▇▇▅▇
+2 flag2011              0             1 0    0     0   0   0   0    0 ▁▁▇▁▁
+
+── Variable type: POSIXct ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable n_missing complete_rate min                 max                 median              n_unique
+1 timestamp             0             1 2015-06-11 10:12:25 2018-07-10 16:00:11 2017-07-06 10:45:19      303
+> 
+> #====================================================================================
+> # complete_sample = any article assigned and with complete initial assessment, as well as outcomes
+> # We do a bit of data cleaning here
+> complete_sample <- readRDS(file=file.path(dataloc,"00_complete_sample.Rds"))
+> nrow(complete_sample %>% distinct(DOI))
+[1] 274
+> 
+> #============================== prepare data
+> 
+> # Note here:
+> # We remove ONE DOI from the sample, because we are unable to unambiguously identify
+> # the author in the bibliometric databases.
+> # > aejdois %>% filter(doi=="10.1257/app.6.1.1")
+> # container.title published.print               doi issue
+> # 1 American Economic Journal: Applied Economics      2014-01-01 10.1257/app.6.1.1     1
+> # title volume
+> # 1 Dynamic Implications of Subjective Expectations: Evidence from Adult Smokers      6
+> # author      issn
+> # 1 Yang, Wang, first, Department of Economics, 213 Simon Center, Lafayette College, Easton, PA, 18042 (e-mail: ) 1945-7790
+> #
+> # Our apologies to the author.
+> 
+> 
+> complete_sample %>%
++   inner_join(blacklist %>% select(DOI)) %>%
++   select(DOI,difficult,replicated)
+Joining with `by = join_by(DOI)`
+                DOI difficult replicated
+1 10.1257/app.6.1.1         5       <NA>
+> # DOI difficult replicated
+> # 1 10.1257/app.6.1.1         5       <NA>
+> 
+> 
+> complete_sample %>%
++   select(DOI, clarity, replicated,difficult,absence,confdata) %>%
++   anti_join(blacklist %>% select(DOI)) %>%
++   mutate(flag_main_issue_confdata = ifelse(confdata=="Confidential",TRUE,FALSE)) %>%
++   mutate(flag_entry_confdata = absence,
++          flag_entry_confdata = ifelse(absence %in% c("Confidential Data"),1,flag_entry_confdata),
++          flag_entry_confdata = ifelse(absence %in% c("Data was Provided"),0,flag_entry_confdata),
++          flag_entry_confdata = ifelse(absence %in% c("No Data or Reason"),1,flag_entry_confdata),
++          flag_entry_confdata = as.numeric(flag_entry_confdata)) %>%
++          #flag_entry_confdata = ifelse(flag_entry_confdata == 0 &
++           #                             flag_main_issue_confdata,1,flag_entry_confdata)) %>%
++   mutate(`Fully reproduced` = if_else(is.na(replicated),NA,
++                                       if_else(replicated %in% c("No","Partial"),0,1)),
++          `Full or Partial`  = if_else(is.na(replicated),NA,
++                                       if_else(replicated %in% c("No"),0,1))
++          )->
++   mainOA
+Joining with `by = join_by(DOI)`
+> 
+> #  mainOA$confidential_data[grepl("No Data or Reason",mainOA$absence)] <- 0
+> skim(mainOA)
+── Data Summary ────────────────────────
+                           Values
+Name                       mainOA
+Number of rows             273   
+Number of columns          10    
+_______________________          
+Column type frequency:           
+  character                5     
+  logical                  1     
+  numeric                  4     
+________________________         
+Group variables            None  
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable n_missing complete_rate min max empty n_unique whitespace
+1 DOI                   0         1      17  20     0      273          0
+2 clarity              93         0.659   7  10     0        3          0
+3 replicated           93         0.659   2   7     0        3          0
+4 absence               0         1      17  17     0        3          0
+5 confdata             93         0.659   5  12     0        2          0
+
+── Variable type: logical ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable            n_missing complete_rate  mean count            
+1 flag_main_issue_confdata        93         0.659 0.156 FAL: 152, TRU: 28
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable       n_missing complete_rate  mean    sd p0 p25 p50 p75 p100 hist 
+1 difficult                   0         1     3.01  1.48   1   2   3   5    5 ▆▆▆▅▇
+2 flag_entry_confdata         0         1     0.341 0.475  0   0   0   1    1 ▇▁▁▁▅
+3 Fully reproduced           93         0.659 0.378 0.486  0   0   0   1    1 ▇▁▁▁▅
+4 Full or Partial            93         0.659 0.761 0.428  0   1   1   1    1 ▂▁▁▁▇
+> names(mainOA)
+ [1] "DOI"                      "clarity"                  "replicated"               "difficult"               
+ [5] "absence"                  "confdata"                 "flag_main_issue_confdata" "flag_entry_confdata"     
+ [9] "Fully reproduced"         "Full or Partial"         
+> # > names(mainOA)
+> # [1] "DOI"
+> # [2] "clarity"
+> # [3] "replicated"
+> # [4] "difficult"
+> # [5] "absence"
+> # [6] "flag_main_issue_confdata"
+> # [7] "flag_entry_confdata"
+> # [8] "Fully reproduced"
+> nrow(mainOA)
+[1] 273
+> # [1] 273
+> 
+> saveRDS(mainOA,file.path(interwrk,"47_mainOA_complete.Rds"))
+> 
+> #===================================================================================
+> # data is by au_id (author), article_id (=DOI), year (of observation of citations)
+> bibliometric.rds <- readRDS(file.path(dataloc,"46_biblio_ols.Rds"))
+> nrow(bibliometric.rds %>% distinct(DOI))
+[1] 363
+> # [1] 363
+> nrow(bibliometric.rds %>% distinct(au_id))
+[1] 658
+> # [1] 658
+> nrow(bibliometric.rds %>% distinct(year))
+[1] 12
+> # [1] 12
+> #
+> skim(bibliometric.rds)
+── Data Summary ────────────────────────
+                           Values          
+Name                       bibliometric.rds
+Number of rows             9936            
+Number of columns          14              
+_______________________                    
+Column type frequency:                     
+  character                6               
+  numeric                  8               
+________________________                   
+Group variables            None            
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable            n_missing complete_rate min max empty n_unique whitespace
+1 DOI                              0         1      17  20     0      363          0
+2 au_id                            0         1      32  32     0      658          0
+3 article_id                       0         1      29  32     0      363          0
+4 institution_type                12         0.999   5  10     0        7          0
+5 institution_country_code        12         0.999   2   2     0       47          0
+6 metaregion                      12         0.999   2   6     0        5          0
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable           n_missing complete_rate      mean        sd   p0   p25    p50     p75   p100 hist 
+1 year                            0         1       2018.        3.45 2012 2015.  2018.   2020.   2023 ▇▅▅▅▇
+2 publication_year                0         1       2013.        2.74 2009 2011   2013    2016    2018 ▇▇▇▇▆
+3 max_cited_by_count              0         1         96.7      99.2     1   32     60     125.    601 ▇▂▁▁▁
+4 cited_by_count                  0         1          7.53      9.25    0    1      5      10     106 ▇▁▁▁▁
+5 ytd_cited_by_count              0         1         50.3      69.0    -1    7     25      65     601 ▇▁▁▁▁
+6 hindex                          0         1         19.4      18.0     0    7     14      26     154 ▇▂▁▁▁
+7 institution_works_count        12         0.999 121060.   157771.      0 7934  53953  210822  839824 ▇▂▁▁▁
+8 earliest_pub                   12         0.999   1998.       10.2  1963 1992   2000    2005    2017 ▁▂▃▇▃
+> 
+> 
+> # subset to our sample
+> bibliometricdata <-
++   bibliometric.rds %>%
++   inner_join(complete_sample %>% distinct(DOI)) %>%
++   anti_join(blacklist %>% select(DOI)) %>%
++   # OpenAlex has citations before year of publication!
++   mutate(years_since_publication = year - publication_year) %>%
++   filter(years_since_publication >=0)
+Joining with `by = join_by(DOI)`
+Joining with `by = join_by(DOI)`
+> 
+> nrow(bibliometricdata %>% distinct(DOI))
+[1] 273
+> # [1] 273
+> nrow(bibliometricdata %>% distinct(au_id))
+[1] 533
+> # [1] 533
+> nrow(bibliometricdata %>% distinct(year))
+[1] 12
+> # [1] 12
+> nrow(bibliometricdata %>% distinct(year,DOI))
+[1] 2692
+> # 2545 different frm 12*274, unbalanced panel!
+> table(bibliometricdata$years_since_publication,useNA = "always")
+
+   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14 <NA> 
+ 467  535  590  633  633  633  585  493  414  357  270  246  166   98   43    0 
+> skim(bibliometricdata)
+── Data Summary ────────────────────────
+                           Values          
+Name                       bibliometricdata
+Number of rows             6163            
+Number of columns          15              
+_______________________                    
+Column type frequency:                     
+  character                6               
+  numeric                  9               
+________________________                   
+Group variables            None            
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable            n_missing complete_rate min max empty n_unique whitespace
+1 DOI                              0             1  17  20     0      273          0
+2 au_id                            0             1  32  32     0      533          0
+3 article_id                       0             1  29  32     0      273          0
+4 institution_type                 0             1   5  10     0        7          0
+5 institution_country_code         0             1   2   2     0       45          0
+6 metaregion                       0             1   2   6     0        5          0
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable           n_missing complete_rate      mean        sd   p0  p25   p50      p75   p100 hist 
+1 year                            0             1   2018.        3.16 2012 2016  2019   2021     2023 ▃▃▅▅▇
+2 publication_year                0             1   2013.        2.68 2009 2011  2013   2016     2018 ▅▇▅▅▅
+3 max_cited_by_count              0             1    104.      104.      1   34    69    131      601 ▇▂▁▁▁
+4 cited_by_count                  0             1      9.05      9.79    0    3     6     12      106 ▇▁▁▁▁
+5 ytd_cited_by_count              0             1     60.1      73.1     0   15    34     77.5    601 ▇▁▁▁▁
+6 hindex                          0             1     21.0      19.0     0    8    15     27      154 ▇▂▁▁▁
+7 institution_works_count         0             1 123598.   160646.      0 8428 53953 213608   839824 ▇▂▁▁▁
+8 earliest_pub                    0             1   1998.       10.3  1963 1992  2000   2005     2017 ▁▂▃▇▃
+9 years_since_publication         0             1      5.20      3.46    0    2     5      8       14 ▇▇▆▃▁
+> 
+> # double-check
+> nrow(bibliometricdata %>% distinct(au_id,article_id,year))
+[1] 6163
+> # [1] 6163
+> nrow(bibliometricdata)
+[1] 6163
+> # [1] 6163
+> 
+> saveRDS(bibliometricdata,file=file.path(interwrk,"47_bibliometricdata.Rds"))
+> 
+> # names
+> # > names(bibliometricdata)
+> # [1] "DOI"
+> # [2] "year"
+> # [3] "au_id"
+> # [4] "article_id"
+> # [5] "publication_year"
+> # [6] "max_cited_by_count"
+> # [7] "cited_by_count"
+> # [8] "ytd_cited_by_count"
+> # [9] "hindex"
+> # [10] "institution_type"
+> # [11] "institution_works_count"
+> # [12] "institution_country_code"
+> # [13] "metaregion"
+> # [14] "earliest_pub"
+> # [15] "years_since_publication"
+> 
+> 
+> # average hindex by DOI, top and low, citations by year and total citations, keep data to 4th year after publi
+> biblio.derived <- fastDummies::dummy_cols(bibliometricdata,  select_columns = "metaregion") %>%
++   ungroup() %>% group_by(DOI,year) %>%
++   summarise(publication_year = max(publication_year),
++             ytd_cites = mean(ytd_cited_by_count),
++             new_cites = mean(cited_by_count),
++             avghindex = mean(hindex,na.rm=TRUE),
++             tophindex=max(hindex,na.rm=TRUE),
++             lowhindex = min(hindex,na.rm=TRUE),
++             metaregion_US=max(metaregion_US,na.rm=TRUE),
++             max_institution_works=max(institution_works_count,na.rm=TRUE),
++             max_experience=max(year-earliest_pub,na.rm=TRUE),
++             nauthors=n()) %>%
++   mutate(years_since_publication = year - publication_year) %>%
++   ungroup()
+`summarise()` has grouped output by 'DOI'. You can override using the `.groups` argument.
+> 
+> nrow(biblio.derived)
+[1] 2692
+> # [1] 2692
+> nrow(biblio.derived %>% distinct(DOI))
+[1] 273
+> # [1] 273
+> nrow(biblio.derived %>% distinct(year))
+[1] 12
+> # [1] 12
+> 
+> saveRDS(biblio.derived,file=file.path(interwrk,"47_hindex_allyears.Rds"))
+> 
+> 
+> 
+> 
+> 
+> # Use same exit-all to bring reproducibility results
+> # Define Confidential Data Variable
+> #exit_all2 <- exit_all %>%
+> #  mutate(confdata = ifelse(grepl("confidential",tolower(Main_Issue)) |
+> #                             grepl("proprietary",tolower(Main_Issue)),"Confidential","Other"))
+> 
+> 
+> ##### Replication of previous tables
+> # First creating selections of our samples for the two main regression samples
+> #exit_all3 <- exit_all2 %>% select(DOI, confdata, clarity)
+> #exit_all4 <- exit_all2 %>% select(DOI, confdata, clarity, replicated)
+> #complete_sample2 <- complete_sample %>% select(DOI,difficult, replicated, absence)
+> #skim(complete_sample2)
+> 
+> 
+> ### Replicate table 2 (not in paper): confidential data and citations
+> # mainOA <- complete_sample2 %>% select(DOI,absence, replicated) %>% left_join(exit_all3) %>%
+> #   left_join(biblio.derived,by="DOI") %>%
+> #   mutate(confidential_data = absence,
+> #          confidential_data = ifelse(absence %in% c("Confidential Data"),1,confidential_data),
+> #          confidential_data = ifelse(absence %in% c("Data was Provided"),0,confidential_data),
+> #          confidential_data = ifelse(absence %in% c("No Data or Reason"),0,confidential_data),
+> #          confidential_data = as.numeric(confidential_data),
+> #          confidential_data = ifelse(confidential_data == 0 & confdata == "Confidential",1,confidential_data))
+> 
+> # mainOA$confidential_data[grepl("No Data or Reason",mainOA$absence)] <- 0
+> 
+> # it's missing info about 10 total out  of 274
+> 
+> # Create numeric replication variable
+> # mainOA <- mainOA %>% mutate(`Fully reproduced` = replicated,
+> #                             `Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,`Fully reproduced`),
+> #                             `Fully reproduced` = ifelse(replicated %in% c("Yes"),1,`Fully reproduced`),
+> #                             `Fully reproduced` = as.numeric(`Fully reproduced`))
+> 
+> mainOAnoconf <- mainOA %>% filter(flag_main_issue_confdata==FALSE) %>%
++   mutate(`Fully reproduced` = ifelse(replicated %in% c("No","Partial"),0,1)) %>%
++   mutate(`Full or Partial`= ifelse(replicated %in% c("No"),0,1)) %>%
++   mutate(doc_qual = ifelse(clarity == "Complete",1,0),
++          `Fully reproduced` = ifelse(replicated == "Yes",1,0)) %>%
++   filter(!is.na(replicated)) %>%
++   left_join(biblio.derived %>% filter(years_since_publication==4),by="DOI")
+> nrow(mainOAnoconf %>% distinct(DOI))
+[1] 152
+> # [1] 152
+> 
+> saveRDS(mainOAnoconf,file.path(interwrk,"47_mainOA_noconf.Rds"))
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  20.09    1.92   20.70 

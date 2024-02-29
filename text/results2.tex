@@ -1,0 +1,95 @@
+
+
+
+\subsection{Analysis of reproducibility}
+
+%\subsection{reproducibility assessment}
+
+%\subsubsection{Extent and sources of non-reproducibility}
+
+Once an article had been assessed and if data appeared to be available, replicators attempted to re-run the code, using the provided data.\footnote{We note that we recruited undergraduates students on the basis of knowledge of the two dominant software packages, Stata and MATLAB. We did not restrict our selection of papers to said software. Replicators did have knowledge of other software, and were assisted, if necessary, by the authors of this paper in running the software. } The outcome for the \input{./includes/total.attempted} attempts was then recorded. 
+%
+Tables and figures obtained as a result of the attempted reproduction may differ in precision (small discrepancies, rounding errors) or coverage (all, some or few results being reproduced). Depending on whether the differences were with respect to precision or coverage, we instructed replicators to categorize articles between partial or non-reproducibility. Assessors were instructed to categorize articles as fully reproducible if all numbers and figures matched, up to some decimals (allowing for some minor rounding errors, hence mainly differences in precision). The second category, partial reproduction, concerned articles for which differences in tables and figures went beyond small precision differences. Articles were categorized as partially reproducible if replicators were able to execute the computer programs that produced the numerical values reported in the articles but that there were differences in the numerical values, beyond rounding errors, for some tables.\footnote{Possible causes may lie in software version discrepancies, uninitialized random number generators, different operating systems, or even different machines. We did not identify the causes of the discrepancy.} However, for articles to be partially reproducible, the results should still be qualitatively similar, or the main results had to hold, but other secondary results and robustness checks could differ. Papers that failed either of these criteria were deemed not reproduced.
+
+
+%We find a moderate reproduction success overall, regardless of the definition of reproducibility rate we consider. %
+%
+Table~\ref{tab:results} presents the main results of the reproduction exercise. \input{./includes/attempted.success} of \input{./includes/total.attempted} reproduction attempts fully reproduced the article's analysis (\input{./includes/attempted.success.rate}\%). 
+%The success rate of full reproduction conditional on non-confidential data was \input{./includes/successrate}\% (\input{./includes/attempted.success} out of \input{./includes/total.attempted.nonconf}). 
+A further \input{./includes/attempted.partial} (\input{./includes/attempted.partial.rate}\%) were at least partially successful.
+%
+The dominant reason for unsuccessful reproductions is the absence of  confidential or proprietary data. For these \input{./includes/conffailed} cases, either assessors had missed the information that no data was available, or the information was not clearly available from the replication package's documentation. 
+%The fact that these articles were not immediately recognized by the assessor is itself an argument for better metadata on journal websites. 
+Combining with the \input{./includes/confabsent} articles identified as relying on confidential data at the initial assessment stage, a total of \input{./includes/conf.total} out of \input{./includes/total.assessed} (\input{./includes/confassessed}\%) relied on confidential or proprietary data, and were thus not reproducible by this project. If we exclude articles that critically rely on confidential data, the headline percentages would be \input{./includes/successrate}\% fully reproduced, and \input{./includes/partialrate}\% partially reproduced. In most of our subsequent analysis, we will exclude  articles relying on confidential data.
+\FloatBarrier
+
+\input{./includes/table_results_both}
+\input{./includes/table_reason}
+
+Table~\ref{tab:results} identifies  \input{./includes/failall} articles that were not able to be reproduced for  reasons other than absence of confidential data. These reasons are listed in Table~\ref{tab:reason}. \input{./includes/faildata} articles did not provide data, with no indication that the data might be confidential. We did not investigate  the reason for this apparent  non-conformance to the \ac{AEJ:AE} data availability policies, although we point out that some non-confidential data are still subject to terms of use that prevent redistribution (earlier years of IPUMS data and any version of PSID data are just two examples). Errors in the provided computer programs prevented the reproduction of \input{./includes/failcode}article\footnote{For instance, one example of assessor's  comment was ``Could not replicate [sic] due to incorrect use of indicator variable function. Did not understand what the author was trying to achieve due to lack of comments in the code, and therefore could not come up with alternate way to generate the dta file.''}, while the data provided in \input{./includes/failcorrupted} articles was corrupted in some way so that the software available to us was not able to read the datasets.  Our replicators did not have access to the software required to run \input{./includes/failsoftware} article.\footnote{The software was ``PostGIS in PostgreSQL'', which was not easily available.} For \input{./includes/failother} articles, the computer programs successfully ran, but the numerical values were inconsistent with those reported in the articles, and the replicators were unable to find a convincing reason.
+\FloatBarrier
+
+
+\input{./analysis/table_code}
+
+Many (partially) successful reproductions required complex code modifications. We tabulate in Table~\ref{tab:code} the extent to which modifications to the provided computer programs were required to successfully reproduce the articles. The majority of successful reproductions required minimal work from the replicators. \input{./includes/change} of the \input{./includes/attempted.success} successful reproductions required, at most, a simple rerouting of directory references. The remaining \input{./includes/complex} successful articles required a deeper understanding of the software, and a more in-depth analysis of the code and/or command of the subject matter. These ``Complex Changes" to the code required more than simple directory adjustments such as, for example, the debugging of classical code errors or the adjustment of outdated commands to reflect newer versions of software or operating systems. The fact that about \input{./includes/ratiocomplex}$\%$ required complex changed calls for at least better documentation in implementing these changes were they unavoidable, along with more robust coding practices.
+
+
+\FloatBarrier
+%\subsubsection{Documentation and reproducibility}
+Good documentation is key to better reproducibility, as emphasized by many authors \parencite{McCullough2006, ChangLi2015,Stark2018}. In our sample,  better documentation is positively correlated with reproduction success (Table~\ref{reg1}), providing some support for this assertion.
+
+\input{./analysis/table_reg1} 
+
+\FloatBarrier
+
+
+
+
+Author characteristics may well affect the reproducibility of replication packages. The code changes needed to make a replication package reproducible, for which Table~\ref{tab:code} provides some indication, are a function of the authors' skills and experience. Institutional support may also affect reproducibility. To explore this dimension, we used the OA data to obtain various characteristics of the authors, their institutions, and the articles. While the next section will investigate the impact on citations, we consider here the potential determinants of reproducibility. Ideally, we would like to measure elements of the training of the authors, for instance during their Ph.D. years. Limitations of the OA prevent that, though, as OA data was only available for the previous 10 years, preventing us from measuring some author characteristics as of time of publication of the paper. 
+%
+We computed the h-index \citep{Hirsch2005} for all authors of a paper for each year that they are present in OA, and then computed the average, the maximum, and the minimum per-paper h-index across all authors, for each year of the data.  We also consider the highest experience (years since publication of the first article) amongst an article's authors, as well as location and productivity of their institution in the relevant year. 
+
+Table~\ref{tab:metrics:OA} presents a summary of these measures, as of four years after publication, categorized by reproduction success and data availability.\footnote{Appendix Table~\ref{tab:metrics:OA:zero} shows the same measures for the subset of articles for which data are available for the year of publication itself (Year 0).} On average within the entire sample, articles have  \input{./includes/nauthorsOA} authors and were cited  \input{./includes/nciteOA} times per year, four years after publication. The author with the longest publication record within each author team has \input{./includes/nexperienceOA} years of experience. Amongst the authors' home institutions, the highest has a faculty that has produced about \input{./includes/nproductvtOA} citable works. The vast majority of papers have at least one author in the United States. 
+%Papers with more authors tend to have more documentation (Table~\ref{tab:authormetrics}).
+
+\input{./analysis/table_metrics_OA}
+
+The data reported in Table~\ref{tab:metrics:OA} do  reveal  some differences across the various outcome categories, albeit without clear patterns. For instance, articles with authors at highly productive institutions do not appear to produce more reproducible replication packages. Full reproducibility is associated with a higher percentage of authors in the US, but also a lower h-index. Articles that are fully reproduced do seem to be associated with a higher number of citations in the fourth year after publication, but are also associated with less experienced author teams. Table~\ref{reg:probit:reproducibility:full:0} therefore disentagles these correlates by means of the likelihood of observing a fully reproduced article, conditional on not relying on confidential data.%
+%
+\footnote{Because of the aforementioned limitation of OA data availability, Table~\ref{reg:probit:reproducibility:full:0} and Appendix Table~\ref{reg:probit:reproducibility:fullpartial:0} only include data for articles first published in 2012 or later.}
+%
+We consider average, minimum, and maximum h-index among co-authors, the productivity of affiliated institutions - both linearly and whether the highest institution falls into the top or bottom third of the productivity distribution of institutions, a linear component in the number of authors, and in column (4), an indicator for whether the article is solo-authored. Only the kitchen-sink specification in column (4) shows some significant determinants of reproducibility. The higher the maximum h-index is, the less likely a replication package is reproducible. The productivity of the home institutions appears to be non-linear, with the middle third of the distribution (omitted from the regression) having a negative impact on reproducibility. Appendix Table~\ref{reg:probit:reproducibility:fullpartial:0} shows the same regressions when the outcome is defined as at least partial reproducibility, and shows no significant correlates. From this exercise, we cannot determine what may cause differential reproduction outcomes.
+
+
+\input{./analysis/table_reg_probit_0_full}
+
+%\input{./analysis/table_reg_probit_4_full}
+
+
+
+\subsubsection{Computing the Reproduction Rate}
+
+
+The literature generally provides a summary or headline ``reproducibility rate'' to describe the outcome of reproducibility exercises like ours.  For instance, \textcite{McCullough2006}'s headline number in the abstract is ``Of more than 150 empirical articles, fewer than 15 could be replicated'' (14 out of 196, to be exact), for a reproducibility rate of 7.1\%. 
+On the other hand, the article notes that only 62 reproductions were attempted (and 7 were skipped due to lack of resources), which yields instead a reproducibility rate of $22.6\%$. 
+
+Choice of the denominator (how many articles to include as the basis of evaluation) and the numerator (what to consider a successful reproduction) matters.  Part of the choice of the numerator depends on how to include the skill level of the replicator. Would a partially successful reproduction attempt have been classified as fully reproducible by a replicator with more advanced skills, better access to support, or simply more time? How to classify reproductions that required changes to the code that would require an interaction with the author, but would ultimately lead to full reproducibility? In the literature, some of the attempts to reproduce analyses allowed  knowledgeable replicators to ``fix'' the code. Choice of the numerator depends critically on how to define the basis. Should one include articles that should be reproducible (for instance, all articles published in a certain time period), but were never assigned and thus not tested? Should one include articles for which the current team of replicators did not have the software, hardware, data, or skill resources, but which replicators with higher endowments in any of these dimensions would succeed, because they have access to licensed software, high-performance computers, restricted or massive data, or know how to compile code in arcane compilers?
+
+In this exercise, aware of the limits of both the scope of the exercise and the skills of the replicators, we carefully define what we call the ``reproduction rate'' --- the percentage of articles that were tested and found to be either reproduced or not. 
+We define the reproduction rate as
+\begin{equation}
+	R_{t,s}=\frac{n_{t}}{d_{s}},
+\end{equation}
+where $n_{t}$ is the number of articles that were either fully or at least partially reproduced (t=$\lbrace full,partial\rbrace$), as defined above. 
+%
+We  define the denominator $d_{s}$ as the number of articles either s=$\lbrace assessed, attempted, nonconfidential\rbrace$,  
+%
+% Denominator: total.assessed = assessed, total.attempted = attempted, 
+% total.attempted.non-conf.tex
+where the first ($assessed$) is the total number of articles we assessed and could have attempted a reproduction for (\input{./includes/total.assessed}). We did not randomly choose which of the assessed articles to attempt a reproduction for - we removed those where we knew that they relied on confidential data that would take extra time to obtain (\input{./includes/confabsent}), or provided neither data nor a reason for the absence of data (\input{./includes/articles_nodata}). We attempted to reproduce the remaining \input{./includes/total.attempted} ($attempted$). Of these, it turns out that \input{./includes/conffailed} also relied on confidential data. Had we been able to properly assess these when making the initial assessment, they would also have been excluded, leaving \input{./includes/total.attempted.nonconf} articles that legitimately should have been reproducible, given the parameters of the exercise ($nonconfidential$).
+
+
+We  report all three reproduction measures in Table~\ref{tab:ratios}, to allow the readers to come to their own conclusions. However, we emphasize the difference between ``reproduced'' (something our results show) and ``reproducible.'' In particular when data are difficult, but not impossible to access, articles may be able to be reproduced by those with access --- thus being plausibly ``reproducible'' until proven otherwise. Many articles that rely on confidential data have been shown to be reproducible in the same way we demonstrate reproducibility here \parencite{perignon2019a,vilhuber2021,vilhuber2022a}. 
+
+\input{./analysis/table_ratios_edited}

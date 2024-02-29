@@ -1,0 +1,234 @@
+
+R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> # Read citations per year for each of the AEJ:AE DOIs.
+> # Outputs:
+> #  - openalex.Rds - mostly unmodified pull by works
+> #  - citations.latest - a file with per-DOI-year cumulative and within-year citations
+> 
+> source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+> source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: devtools
+Loading required package: usethis
+Loading required package: rprojroot
+Loading required package: tictoc
+Loading required package: ggplot2
+Loading required package: bindrcpp
+Loading required package: Rcpp
+Loading required package: markdown
+> source(file.path(programs,"libraries.R"), echo=FALSE)
+Loading required package: rcrossref
+Loading required package: readr
+Loading required package: tidyr
+Loading required package: data.table
+
+Attaching package: ‘data.table’
+
+The following object is masked from ‘package:tictoc’:
+
+    shift
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: xtable
+Loading required package: rjson
+Loading required package: stargazer
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+Loading required package: knitr
+Loading required package: stringr
+Loading required package: readxl
+Loading required package: fastDummies
+Loading required package: skimr
+Loading required package: sandwich
+Loading required package: pastecs
+
+Attaching package: ‘pastecs’
+
+The following objects are masked from ‘package:data.table’:
+
+    first, last
+
+The following object is masked from ‘package:tidyr’:
+
+    extract
+
+The following objects are masked from ‘package:dplyr’:
+
+    first, last
+
+Loading required package: formattable
+
+Attaching package: ‘formattable’
+
+The following object is masked from ‘package:xtable’:
+
+    digits
+
+Loading required package: reshape2
+
+Attaching package: ‘reshape2’
+
+The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+  Use `force = TRUE` to force installation
+> source(file.path(programs,"config.R"), echo=FALSE)
+> 
+> library(openalexR)
+Thank you for using openalexR!
+To acknowledge our work, please cite the package by calling `citation("openalexR")`.
+To suppress this message, add `openalexR.message = suppressed` to your .Renviron file.
+> 
+> # First, get the DOIs from the previous program
+> 
+> if ( file.exists(doi.file.Rds)) {
++   filtered.df <- readRDS(file= doi.file.Rds)
++   nrow(filtered.df)
++ } else {
++   stop(paste0("File missing: ",doi.file.Rds))
++   }
+[1] 646
+> 
+> # now pass these to openAlex
+> 
+> 
+> if ( file.exists(openalex.Rds) ) {
++   message(paste0("File already exists: ",openalex.Rds))
++   message("Loading file from previous version.")
++ } else {
++ 
++   tic.clear()
++   tic("Query to openAlex")
++   dois_toget <- unique(c(filtered.df$doi))
++   works_from_dois <- oa_fetch(entity = "works", doi = dois_toget, verbose = FALSE)
++   toc(log=TRUE)
++   saveRDS(works_from_dois %>%
++           rename(doi.url = doi) %>%
++           mutate(DOI = str_remove(doi.url,"https://doi.org/")),
++           file=openalex.Rds)
++ }
+File already exists: /home/rstudio/data/openalex/openalex-aejae.Rds
+Loading file from previous version.
+> 
+> # load the file from disk
+> works_from_dois <- readRDS(openalex.Rds)
+> skim(works_from_dois %>% select(id,publication_date,doi.url,DOI,type))
+── Data Summary ────────────────────────
+                           Values  
+Name                       %>%(...)
+Number of rows             630     
+Number of columns          5       
+_______________________            
+Column type frequency:             
+  character                5       
+________________________           
+Group variables            None    
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable    n_missing complete_rate min max empty n_unique whitespace
+1 id                       0             1  29  32     0      630          0
+2 publication_date         0             1  10  10     0       59          0
+3 doi.url                  0             1  33  36     0      630          0
+4 DOI                      0             1  17  20     0      630          0
+5 type                     0             1   7   7     0        1          0
+> 
+> # unpack the citation data
+> 
+> works_from_dois %>%
++   # Filter to the in-scope articles
++   filter(publication_year < 2019 ) %>%
++   filter(publication_date < '2018-07-01') %>%
++   rename(max_cited_by_count = cited_by_count) %>%
++   select(DOI,doi.url,max_cited_by_count,counts_by_year)  %>%
++   tidyr::unnest(counts_by_year) -> works.step1
+>   # we now have:
+>   # [1] "DOI"                "doi.url"            "max_cited_by_count" "year"               "cited_by_count"
+>   #
+>   # It turns out, not all publications have citations in all years... those years are missing.
+> works.step1 %>%
++   distinct(DOI,year) %>%
++   expand(DOI,year) -> works.expanded
+> works.step1 %>%
++   right_join(works.expanded) %>%
++   # now to compute year-to-date cumulative citations, given early truncation
++   # max 10 years
++   arrange(DOI,desc(year)) %>%
++   group_by(DOI) %>%
++   mutate(max_cited_by_count  = max(max_cited_by_count,na.rm = TRUE),
++          cited_by_count      = replace_na(cited_by_count,0),
++          neg_cum_citations   = cumsum(replace_na(cited_by_count,0)),
++          ytd_cited_by_count  = max_cited_by_count - neg_cum_citations + cited_by_count) %>%
++   fill(doi.url,.direction = "updown") %>%
++   select(-neg_cum_citations) %>%
++   ungroup() ->
++     works.df
+Joining with `by = join_by(DOI, year)`
+> 
+> names(works.df)
+[1] "DOI"                "doi.url"            "max_cited_by_count" "year"               "cited_by_count"    
+[6] "ytd_cited_by_count"
+> # > names(works.df)
+> # [1] "DOI"                "doi.url"            "max_cited_by_count" "year"               "cited_by_count"
+> # [6] "ytd_cited_by_count"
+> skim(works.df) %>% filter(n_missing >0)
+# A tibble: 0 × 17
+# … with 17 variables: skim_type <chr>, skim_variable <chr>, n_missing <int>, complete_rate <dbl>, character.min <int>,
+#   character.max <int>, character.empty <int>, character.n_unique <int>, character.whitespace <int>,
+#   numeric.mean <dbl>, numeric.sd <dbl>, numeric.p0 <dbl>, numeric.p25 <dbl>, numeric.p50 <dbl>, numeric.p75 <dbl>,
+#   numeric.p100 <dbl>, numeric.hist <chr>
+> # # A tibble: 0 × 17
+> 
+> saveRDS(works.df,citations.latest)
+> 
+> # Get overall h-index as of 2023 and h-index by year
+> 
+> # see next program
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  13.84    1.79   14.35 

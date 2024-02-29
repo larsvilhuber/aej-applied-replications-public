@@ -1,0 +1,1529 @@
+
+R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> ## OLS REGRESSIONS:
+> #### Create variables for similar OLS regressions as the ones before
+> ### Reproduce the regressions with web of Sciences
+> ### Add author information such as institution and region
+> 
+> 
+> source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+> source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: devtools
+Loading required package: usethis
+Loading required package: rprojroot
+Loading required package: tictoc
+Loading required package: ggplot2
+Loading required package: bindrcpp
+Loading required package: Rcpp
+Loading required package: markdown
+> source(file.path(programs,"libraries.R"), echo=FALSE)
+Loading required package: rcrossref
+Loading required package: readr
+Loading required package: tidyr
+Loading required package: data.table
+
+Attaching package: ‘data.table’
+
+The following object is masked from ‘package:tictoc’:
+
+    shift
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: xtable
+Loading required package: rjson
+Loading required package: stargazer
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+Loading required package: knitr
+Loading required package: stringr
+Loading required package: readxl
+Loading required package: fastDummies
+Loading required package: skimr
+Loading required package: sandwich
+Loading required package: pastecs
+
+Attaching package: ‘pastecs’
+
+The following objects are masked from ‘package:data.table’:
+
+    first, last
+
+The following object is masked from ‘package:tidyr’:
+
+    extract
+
+The following objects are masked from ‘package:dplyr’:
+
+    first, last
+
+Loading required package: formattable
+
+Attaching package: ‘formattable’
+
+The following object is masked from ‘package:xtable’:
+
+    digits
+
+Loading required package: reshape2
+
+Attaching package: ‘reshape2’
+
+The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+  Use `force = TRUE` to force installation
+> source(file.path(programs,"config.R"), echo=FALSE)
+> 
+> 
+> # data is by au_id (author), article_id (=DOI), year (of observation of citations)
+> 
+> mainOA           <- readRDS(file=file.path(interwrk,"47_mainOA_complete.Rds"))
+> 
+> hindex.allyears  <- readRDS(file=file.path(interwrk,"47_hindex_allyears.Rds")) %>%
++   mutate(max_institution_works = max_institution_works/10000)
+> name.mapping     <- read_excel(file.path(auxilloc,"mainOA-mapping.xlsx")) %>%
++   # one fix
++   mutate(model.varnames = case_when(
++     model.varnames == "Data absent: confidential"~ "Confidential data",
++     .default = model.varnames
++     ))
+> 
+> # > names(hindex.allyears)
+> # [1] "DOI"
+> # [2] "year"
+> # [3] "publication_year"
+> # [4] "ytd_cites"
+> # [5] "new_cites"
+> # [6] "avghindex"
+> # [7] "`Max H-index`"
+> # [8] "`Min H-index`"
+> # [9] "`Author at US university`"
+> # [10] "max_institution_works"
+> # [11] "max_experience"
+> # [12] "nauthors"
+> # [13] "years_since_publication"
+> 
+> # Combine mainOA with 4th-year ytd citations
+> #
+> # Changes from earlier: confidential_data -> flag_entry_confdata
+> #
+> 
+> mainOA.4yr <- mainOA %>%
++   # first, get the citations in Year 4
++   left_join(hindex.allyears %>%
++               filter(years_since_publication == 4) %>%
++               select(DOI,ytd_cites,new_cites)) %>%
++   # next, get the other data as of year=(4-1)=3
++   left_join(hindex.allyears %>%
++               filter(years_since_publication == 3) %>%
++               select(-ytd_cites,-new_cites)) %>%
++   mutate(log_ytd_cites = log(ytd_cites+1),
++          asin_ytd_cites = asinh(ytd_cites),
++          `Solo-authored` = (nauthors==1))
+Joining with `by = join_by(DOI)`
+Joining with `by = join_by(DOI)`
+> 
+> mainOA.4yrpost2012 <- mainOA %>%
++   # first, get the citations in Year 4
++   left_join(hindex.allyears %>%
++               filter(years_since_publication == 4) %>%
++               select(DOI,ytd_cites,new_cites)) %>%
++   # next, get the other data as of year=(4-1)=3
++   left_join(hindex.allyears %>%
++               filter(years_since_publication == 0) %>%
++               select(-ytd_cites,-new_cites)) %>%
++   filter(publication_year >=2012) %>%
++   mutate(log_ytd_cites = log(ytd_cites+1),
++          asin_ytd_cites = asinh(ytd_cites),
++          `Solo-authored` = (nauthors==1))
+Joining with `by = join_by(DOI)`
+Joining with `by = join_by(DOI)`
+> 
+> mainOA.allyears <- mainOA %>%
++   # first, get the citations in Year x = same
++   left_join(hindex.allyears %>%
++               select(DOI,year,ytd_cites,new_cites,years_since_publication)) %>%
++   filter(years_since_publication > 0) %>%
++   filter(years_since_publication <=5 ) %>%
++   # we lose year = 2012 because OA data only goes back 10 years
++   filter(year > 2012) %>%
++   # next, get the other data as of year=(4-1)=3, so we add a year for merge
++   left_join(hindex.allyears %>%
++               mutate(year = year +1) %>%
++               select(-ytd_cites,-new_cites,-years_since_publication)) %>%
++   mutate(log_ytd_cites = log(ytd_cites+1),
++          asin_ytd_cites = asinh(ytd_cites),
++          asin_new_cites=asinh(new_cites),
++          dummy2019 = (year >=2019),
++          `Solo-authored` = (nauthors==1),
++          `Years squared` = years_since_publication*years_since_publication)
+Joining with `by = join_by(DOI)`
+Joining with `by = join_by(DOI, year)`
+Warning message:
+In left_join(., hindex.allyears %>% select(DOI, year, ytd_cites,  :
+  Each row in `x` is expected to match at most 1 row in `y`.
+ℹ Row 1 of `x` matches multiple rows.
+ℹ If multiple matches are expected, set `multiple = "all"` to silence this warning.
+> nrow(mainOA.allyears %>% distinct(DOI))
+[1] 273
+> # [1] 273
+> skim(mainOA.allyears) %>% filter(n_missing > 0)
+── Data Summary ────────────────────────
+                           Values         
+Name                       mainOA.allyears
+Number of rows             1224           
+Number of columns          28             
+_______________________                   
+Column type frequency:                    
+  character                3              
+  logical                  1              
+  numeric                  2              
+________________________                  
+Group variables            None           
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable n_missing complete_rate min max empty n_unique whitespace
+1 clarity             416         0.660   7  10     0        3          0
+2 replicated          416         0.660   2   7     0        3          0
+3 confdata            416         0.660   5  12     0        2          0
+
+── Variable type: logical ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable            n_missing complete_rate  mean count             
+1 flag_main_issue_confdata       416         0.660 0.144 FAL: 692, TRU: 116
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable    n_missing complete_rate  mean    sd p0 p25 p50 p75 p100 hist 
+1 Fully reproduced       416         0.660 0.376 0.485  0   0   0   1    1 ▇▁▁▁▅
+2 Full or Partial        416         0.660 0.778 0.416  0   1   1   1    1 ▂▁▁▁▇
+> # should only have clarity, replicated, and "Fully Reproduced" with missing.
+> 
+> # do nice labeling
+> # Update the master spreadsheet if necessary!
+> names.main.4yr <- names(mainOA.4yr) %>%
++   as_tibble() %>%
++   rename(names=value)
+> left_join(names.main.4yr,name.mapping) %>%
++   mutate(model.varnames = if_else(is.na(model.varnames),names,model.varnames)) ->
++   mainOA.mapping.4yr
+Joining with `by = join_by(names)`
+> mainOA.mapping.4yr %>% filter(is.na(model.varnames)) -> test.na
+> if ( nrow(test.na) > 0 ) {
++   print(test.na)
++   stop("Error in variable name mapping")
++   }
+> 
+> # assign varnames by renaming
+> names(mainOA.4yr) <- mainOA.mapping.4yr$model.varnames
+> names(mainOA.4yr)
+ [1] "DOI"                                    "Clarify of documentation"              
+ [3] "Reproduced"                             "Difficulty of reproduction"            
+ [5] "Was data absent"                        "confdata"                              
+ [7] "Reproduction failed: confidential data" "Confidential data"                     
+ [9] "Fully reproduced"                       "Full or Partial"                       
+[11] "YTD citations"                          "New citations"                         
+[13] "Year"                                   "Year of publication"                   
+[15] "Avg. H-index"                           "Max H-index"                           
+[17] "Min H-index"                            "Author at US university"               
+[19] "Highest Institution Publications"       "Highest Co-author Experience"          
+[21] "Number of authors"                      "Years since publication"               
+[23] "Log(YTD citations)"                     "AsinH(YTD citations)"                  
+[25] "Solo-authored"                         
+> # > names(mainOA.4yr)
+> # [1] "DOI"
+> # [2] "Clarify of documentation"
+> # [3] "Reproduced"
+> # [4] "Difficulty of reproduction"
+> # [5] "Was data absent"
+> # [6] "Reproduction failed: confidential data"
+> # [7] "Confidential data"
+> # [8] "Fully reproduced"
+> # [9] "YTD citations"
+> # [10] "New citations"
+> # [11] "Year"
+> # [12] "Year of publication"
+> # [13] "Avg. H-index"
+> # [14] "Max H-index"
+> # [15] "Min H-index"
+> # [16] "Author at US university"
+> # [17] "Highest Institution Publications"
+> # [18] "Highest Co-author Experience"
+> # [19] "Number of authors"
+> # [20] "Years since publication"
+> # [21] "Log(YTD citations)"
+> # [22] "AsinH(YTD citations)"
+> 
+> # same for post2012
+> names.main.4yrpost2012 <- names(mainOA.4yrpost2012) %>%
++   as_tibble() %>%
++   rename(names=value)
+> left_join(names.main.4yrpost2012,name.mapping) %>%
++   mutate(model.varnames = if_else(is.na(model.varnames),names,model.varnames)) ->
++   mainOA.mapping.4yrpost2012
+Joining with `by = join_by(names)`
+> mainOA.mapping.4yrpost2012 %>% filter(is.na(model.varnames)) -> test.na
+> if ( nrow(test.na) > 0 ) {
++   print(test.na)
++   stop("Error in variable name mapping")
++ }
+> 
+> # assign varnames by renaming
+> names(mainOA.4yrpost2012) <- mainOA.mapping.4yrpost2012$model.varnames
+> names(mainOA.4yrpost2012)
+ [1] "DOI"                                    "Clarify of documentation"              
+ [3] "Reproduced"                             "Difficulty of reproduction"            
+ [5] "Was data absent"                        "confdata"                              
+ [7] "Reproduction failed: confidential data" "Confidential data"                     
+ [9] "Fully reproduced"                       "Full or Partial"                       
+[11] "YTD citations"                          "New citations"                         
+[13] "Year"                                   "Year of publication"                   
+[15] "Avg. H-index"                           "Max H-index"                           
+[17] "Min H-index"                            "Author at US university"               
+[19] "Highest Institution Publications"       "Highest Co-author Experience"          
+[21] "Number of authors"                      "Years since publication"               
+[23] "Log(YTD citations)"                     "AsinH(YTD citations)"                  
+[25] "Solo-authored"                         
+> 
+> 
+> # Same for the allyear one
+> names.main.allyears <- names(mainOA.allyears) %>%
++   as_tibble() %>%
++   rename(names=value)
+> left_join(names.main.allyears,name.mapping) %>%
++   mutate(model.varnames = case_when(
++     names == "dummy2019" ~ "Year >= 2019",
++     names=="asin_new_cites"  ~ "AsinH(new citations)",
++     .default = model.varnames )) %>%
++   mutate(model.varnames = if_else(is.na(model.varnames),names,model.varnames)) ->
++   mainOA.mapping.allyears
+Joining with `by = join_by(names)`
+> # add dummy
+> 
+> 
+> mainOA.mapping.allyears %>% filter(is.na(model.varnames)) -> test.na
+> if ( nrow(test.na) > 0 ) {
++   print(test.na)
++   stop("Error in variable name mapping")
++ }
+> 
+> # assign varnames by renaming
+> names(mainOA.allyears) <- mainOA.mapping.allyears$model.varnames
+> names(mainOA.allyears)
+ [1] "DOI"                                    "Clarify of documentation"              
+ [3] "Reproduced"                             "Difficulty of reproduction"            
+ [5] "Was data absent"                        "confdata"                              
+ [7] "Reproduction failed: confidential data" "Confidential data"                     
+ [9] "Fully reproduced"                       "Full or Partial"                       
+[11] "Year"                                   "YTD citations"                         
+[13] "New citations"                          "Years since publication"               
+[15] "Year of publication"                    "Avg. H-index"                          
+[17] "Max H-index"                            "Min H-index"                           
+[19] "Author at US university"                "Highest Institution Publications"      
+[21] "Highest Co-author Experience"           "Number of authors"                     
+[23] "Log(YTD citations)"                     "AsinH(YTD citations)"                  
+[25] "AsinH(new citations)"                   "Year >= 2019"                          
+[27] "Solo-authored"                          "Years squared"                         
+> 
+> 
+> ### we are done preparing analysis data. we need them again in 52.
+> 
+> saveRDS(mainOA.4yr,file.path(interwrk,"50_mainOA_4yr.Rds"))
+> saveRDS(mainOA.4yrpost2012,file.path(interwrk,"50_mainOA_4yr_p2012.Rds"))
+> saveRDS(mainOA.allyears,file.path(interwrk,"50_mainOA_allyears.Rds"))
+> 
+> ### repeated footnotes ============================================================
+> 
+> source(file.path(programs,"_footnotes.R"))
+> 
+> 
+> 
+> # Run Regression: total citations on h-indices and confidential data
+> ols.cite.avgh <- lm(`YTD citations`~`Avg. H-index`* `Confidential data` +
++                       `Highest Institution Publications` +
++                       `Highest Co-author Experience`    +
++                       `Number of authors` +
++                       `Author at US university` +
++                       `Solo-authored`
++                       ,mainOA.4yr)
+> ols.cite.toph <- lm(`YTD citations`~`Max H-index`* `Confidential data` +
++                     `Highest Institution Publications` +
++                       `Highest Co-author Experience`    +
++                       `Number of authors` +
++                       `Author at US university`+
++                       `Solo-authored`
++                     ,mainOA.4yr)
+> ols.cite.lowh <- lm(`YTD citations`~`Min H-index`* `Confidential data` +
++                       `Highest Institution Publications` +
++                       `Highest Co-author Experience`    +
++                       `Number of authors` +
++                       `Author at US university`+
++                       `Solo-authored`
++                     ,mainOA.4yr)
+> 
+> ols.cite.kitchen.sink <- lm(`YTD citations`~`Avg. H-index`* `Confidential data` +
++                               `Max H-index`* `Confidential data` +
++                               `Min H-index`* `Confidential data` +
++                               `Highest Institution Publications` +
++                               `Highest Co-author Experience`    +
++                               `Number of authors` +
++                               `Author at US university`+
++                               `Solo-authored`
++                             ,mainOA.4yr)
+> 
+> # weird stuff
+> 
+> names(ols.cite.kitchen.sink$coefficients)[names(ols.cite.kitchen.sink$coefficients) ==
++                                             "`Confidential data`:`Max H-index`"] <- "`Max H-index`:`Confidential data`"
+> names(ols.cite.kitchen.sink$coefficients)[names(ols.cite.kitchen.sink$coefficients) ==
++                                             "`Confidential data`:`Min H-index`"] <- "`Min H-index`:`Confidential data`"
+> 
+> 
+> stargazer(ols.cite.avgh,ols.cite.toph,ols.cite.lowh,ols.cite.kitchen.sink,
++           title="OLS: Citations and Confidential Data",
++           notes.append = FALSE,
++           label="reg2:OA",
++           dep.var.labels = "Total Citations",
++           align=TRUE,no.space=TRUE, style="qje", type="latex",column.sep.width = "-15pt",
++           keep.stat = c("adj.rsq","n"),
++           out=file.path(Outputs,"table_reg2OA.tex"),
++           notes.label = "",
++           notes.align="l",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     "\"Confidential data\" identifies if the article was assessed to have confidential data.",
++                     footnote.sample.assessed)
++ )
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:10 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Citations and Confidential Data} 
+  \label{reg2:OA} 
+\begin{tabular}{@{\extracolsep{-15pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{4}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 1.160^{***} &  &  & 5.380^{***} \\ 
+  & (0.294) &  &  & (1.360) \\ 
+  `Max H-index` &  & 0.490^{***} &  & -1.770^{***} \\ 
+  &  & (0.163) &  & (0.582) \\ 
+  `Min H-index` &  &  & 0.795^{**} & -2.500^{***} \\ 
+  &  &  & (0.399) & (0.840) \\ 
+  `Confidential data` & 10.200 & 6.320 & -4.300 & 9.010 \\ 
+  & (8.770) & (7.820) & (8.170) & (8.920) \\ 
+  `Highest Institution Publications` & 0.114 & 0.094 & 0.130 & 0.095 \\ 
+  & (0.133) & (0.135) & (0.136) & (0.132) \\ 
+  `Highest Co-author Experience` & -0.301 & -0.160 & -0.108 & -0.351 \\ 
+  & (0.262) & (0.260) & (0.257) & (0.258) \\ 
+  `Number of authors` & 6.390^{**} & 4.790 & 7.990^{**} & 9.390^{***} \\ 
+  & (3.090) & (3.190) & (3.180) & (3.350) \\ 
+  `Author at US university` & 4.050 & 5.570 & 5.180 & 2.310 \\ 
+  & (6.360) & (6.410) & (6.470) & (6.280) \\ 
+  `Solo-authored` & 2.740 & 0.669 & -0.213 & 7.400 \\ 
+  & (8.000) & (8.070) & (8.080) & (8.080) \\ 
+  `Avg. H-index`:`Confidential data` & -0.714 &  &  & -7.110^{**} \\ 
+  & (0.449) &  &  & (2.870) \\ 
+  `Max H-index`:`Confidential data` &  & -0.345 &  & 2.560^{*} \\ 
+  &  & (0.249) &  & (1.320) \\ 
+  `Min H-index`:`Confidential data` &  &  & 0.327 & 4.670^{***} \\ 
+  &  &  & (0.713) & (1.690) \\ 
+  Constant & 7.840 & 15.100 & 10.800 & 1.040 \\ 
+  & (11.600) & (11.500) & (11.900) & (12.100) \\ 
+ \textit{N} & \multicolumn{1}{c}{273} & \multicolumn{1}{c}{273} & \multicolumn{1}{c}{273} & \multicolumn{1}{c}{273} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.085} & \multicolumn{1}{c}{0.063} & \multicolumn{1}{c}{0.055} & \multicolumn{1}{c}{0.118} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{5}{l}{Notes: } \\ 
+\multicolumn{5}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{5}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{5}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{5}{l}{"Confidential data" identifies if the article was assessed to have confidential data.} \\ 
+\multicolumn{5}{l}{Results for all articles with complete assessment.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> # add.lines = list(c("Fixed effects?", "No", "No"),
+> # c("Results believable?", "Maybe", "Try again later")))
+> #           omit        = "quarter",
+> # omit.labels = "Quarter dummies?")
+> 
+> ### Replicate table 13: Run Regression: citations on h-indices and replication success
+> 
+> #mainOAexit <- saveRDS(file.path(interwrk,"47_mainOA_exit.Rds"))
+> 
+> lhs.level = "`YTD citations`"
+> lhs.log   = "`Log(YTD citations)`"
+> lhs.arcsin= "`AsinH(YTD citations)`"
+> kitchensink.spec = "`Highest Institution Publications` +  `Highest Co-author Experience` +
++              `Number of authors` + `Author at US university` +`Solo-authored`"
+> 
+> # Regressions
+> 
+> avgh <- lm(as.formula(paste0(lhs.level,"~ `Avg. H-index`* `Fully reproduced` +",
++                             kitchensink.spec)),
++            mainOA.4yr)
+> toph <- lm(as.formula(paste0(lhs.level,"~`Max H-index`* `Fully reproduced`+",
++                              kitchensink.spec)),
++            mainOA.4yr)
+> lowh <- lm(as.formula(paste0(lhs.level,"~`Min H-index`* `Fully reproduced`+",
++                              kitchensink.spec)),
++            mainOA.4yr)
+> kitchen.sink <- lm(as.formula(paste0(lhs.level,"~ `Avg. H-index`* `Fully reproduced`+
++                      `Max H-index`* `Full or Partial`+
++                      `Min H-index`* `Full or Partial`+",
++                             kitchensink.spec)),
++            mainOA.4yr)
+> 
+> avghp <- lm(as.formula(paste0(lhs.level,"~`Avg. H-index`* `Full or Partial`+",
++                               kitchensink.spec)),
++             mainOA.4yr)
+> tophp <- lm(as.formula(paste0(lhs.level,"~`Max H-index`* `Full or Partial`+",
++                               kitchensink.spec)),
++             mainOA.4yr)
+> lowhp <- lm(as.formula(paste0(lhs.level,"~`Min H-index`* `Full or Partial`+",
++                               kitchensink.spec)),
++             mainOA.4yr)
+> kitchen.sink.p <- lm(as.formula(paste0(lhs.level,"~ `Avg. H-index`* `Full or Partial`+
++                      `Max H-index`* `Full or Partial`+
++                      `Min H-index`* `Full or Partial`+",
++                                        kitchensink.spec)),
++                    mainOA.4yr)
+> 
+> # weird stuff
+> 
+> names(kitchen.sink$coefficients)[names(kitchen.sink$coefficients) ==
++                                             "`Fully reproduced`:`Max H-index`"] <- "`Max H-index`:`Fully reproduced`"
+> names(kitchen.sink$coefficients)[names(kitchen.sink$coefficients) ==
++                                             "`Fully reproduced`:`Min H-index`"] <- "`Min H-index`:`Fully reproduced`"
+> 
+> # weird stuff
+> 
+> names(kitchen.sink.p$coefficients)[names(kitchen.sink.p$coefficients) ==
++                                             "`Full or partial`:`Max H-index`"] <- "`Max H-index`:`Full or partial`"
+> names(kitchen.sink.p$coefficients)[names(kitchen.sink.p$coefficients) ==
++                                             "`Full or partial`:`Min H-index`"] <- "`Min H-index`:`Full or partial`"
+> 
+> 
+>  # Make table
+> stargazer(avgh,toph,lowh, kitchen.sink,
++           title="OLS: YTD Citations on Reproduction Outcomes ",
++           align=TRUE,
++           no.space=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="reg3:OA",
++           dep.var.labels.include = FALSE,
++           #dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("adj.rsq","n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     footnote.full.partial, footnote.sample.attempted),
++           out=file.path(Outputs,"table_reg3OA.tex")
++ )
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:11 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: YTD Citations on Reproduction Outcomes } 
+  \label{reg3:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.608 &  &  & 4.500^{***} \\ 
+  & (0.373) &  &  & (1.690) \\ 
+  `Max H-index` &  & 0.208 &  & -1.870^{**} \\ 
+  &  & (0.194) &  & (0.740) \\ 
+  `Full or Partial` &  &  &  & -13.800 \\ 
+  &  &  &  & (13.700) \\ 
+  `Min H-index` &  &  & 0.572 & -1.700 \\ 
+  &  &  & (0.533) & (1.340) \\ 
+  `Fully reproduced` & -11.500 & -11.200 & 8.230 & 0.477 \\ 
+  & (11.600) & (10.400) & (10.400) & (13.000) \\ 
+  `Highest Institution Publications` & 0.163 & 0.141 & 0.161 & 0.115 \\ 
+  & (0.161) & (0.162) & (0.169) & (0.165) \\ 
+  `Highest Co-author Experience` & -0.098 & 0.028 & 0.196 & -0.217 \\ 
+  & (0.338) & (0.332) & (0.339) & (0.339) \\ 
+  `Number of authors` & 9.400^{**} & 7.640^{**} & 10.400^{***} & 13.100^{***} \\ 
+  & (3.630) & (3.710) & (3.850) & (4.110) \\ 
+  `Author at US university` & 3.680 & 4.440 & 5.190 & 3.150 \\ 
+  & (7.700) & (7.730) & (8.000) & (7.720) \\ 
+  `Solo-authored` & 11.500 & 10.900 & 8.600 & 21.000^{*} \\ 
+  & (10.100) & (10.100) & (10.500) & (10.800) \\ 
+  `Avg. H-index`:`Fully reproduced` & 1.420^{**} &  &  & 0.686 \\ 
+  & (0.574) &  &  & (0.671) \\ 
+  `Max H-index`:`Fully reproduced` &  & 0.976^{***} &  &  \\ 
+  &  & (0.326) &  &  \\ 
+  `Min H-index`:`Fully reproduced` &  &  & 0.466 &  \\ 
+  &  &  & (0.846) &  \\ 
+  `Max H-index`:`Full or Partial` &  &  &  & 0.469 \\ 
+  &  &  &  & (0.384) \\ 
+  `Full or Partial`:`Min H-index` &  &  &  & -0.452 \\ 
+  &  &  &  & (1.070) \\ 
+  Constant & -2.850 & 3.060 & -7.530 & -6.180 \\ 
+  & (14.200) & (13.900) & (15.000) & (16.600) \\ 
+ Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.159} & \multicolumn{1}{c}{0.149} & \multicolumn{1}{c}{0.089} & \multicolumn{1}{c}{0.172} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{5}{l}{Notes: } \\ 
+\multicolumn{5}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{5}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{5}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{5}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{5}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> stargazer(avghp, tophp,lowhp, kitchen.sink.p,
++           title="OLS: YTD Citations on Reproduction Outcomes ",
++           align=TRUE,
++           no.space=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="reg3:OA:partial",
++           dep.var.labels.include = FALSE,
++           #dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("adj.rsq","n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     footnote.full.partial, footnote.sample.attempted),
++           out=file.path(Outputs,"table_reg3OA_partial.tex")
++ )
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:11 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: YTD Citations on Reproduction Outcomes } 
+  \label{reg3:OA:partial} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.356 &  &  & 11.200^{**} \\ 
+  & (0.539) &  &  & (4.430) \\ 
+  `Max H-index` &  & 0.036 &  & -4.500^{**} \\ 
+  &  & (0.293) &  & (1.770) \\ 
+  `Min H-index` &  &  & 0.420 & -5.440^{**} \\ 
+  &  &  & (0.840) & (2.660) \\ 
+  `Full or Partial` & -16.200 & -12.800 & -2.190 & -5.700 \\ 
+  & (12.900) & (11.300) & (12.500) & (13.600) \\ 
+  `Highest Institution Publications` & 0.114 & 0.099 & 0.159 & 0.138 \\ 
+  & (0.166) & (0.168) & (0.172) & (0.166) \\ 
+  `Highest Co-author Experience` & -0.130 & 0.052 & 0.180 & -0.254 \\ 
+  & (0.346) & (0.343) & (0.343) & (0.340) \\ 
+  `Number of authors` & 10.000^{***} & 7.990^{**} & 10.900^{***} & 15.000^{***} \\ 
+  & (3.770) & (3.890) & (3.950) & (4.130) \\ 
+  `Author at US university` & 5.340 & 6.180 & 6.830 & 3.900 \\ 
+  & (7.850) & (7.950) & (8.130) & (7.730) \\ 
+  `Solo-authored` & 13.600 & 11.100 & 8.380 & 24.700^{**} \\ 
+  & (10.400) & (10.500) & (10.700) & (10.700) \\ 
+  `Avg. H-index`:`Full or Partial` & 1.030^{*} &  &  & -5.880 \\ 
+  & (0.610) &  &  & (4.560) \\ 
+  `Max H-index`:`Full or Partial` &  & 0.558^{*} &  &  \\ 
+  &  & (0.330) &  &  \\ 
+  `Min H-index`:`Full or Partial` &  &  & 0.438 &  \\ 
+  &  &  & (0.946) &  \\ 
+  `Full or Partial`:`Max H-index` &  &  &  & 2.870 \\ 
+  &  &  &  & (1.840) \\ 
+  `Full or Partial`:`Min H-index` &  &  &  & 3.110 \\ 
+  &  &  &  & (2.780) \\ 
+  Constant & 4.120 & 9.770 & -4.710 & -19.500 \\ 
+  & (16.300) & (15.900) & (16.500) & (18.000) \\ 
+ Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.122} & \multicolumn{1}{c}{0.094} & \multicolumn{1}{c}{0.068} & \multicolumn{1}{c}{0.165} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{5}{l}{Notes: } \\ 
+\multicolumn{5}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{5}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{5}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{5}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{5}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> ##### Same but with log: table 14
+> 
+> # Run Regression: citations on h-indices and replication success
+> 
+> l.avgh <- lm(as.formula(paste0(lhs.log,"~ `Avg. H-index`* `Fully reproduced` +",
++                              kitchensink.spec)),
++            mainOA.4yr)
+> l.toph <- lm(as.formula(paste0(lhs.log,"~`Max H-index`* `Fully reproduced`+",
++                              kitchensink.spec)),
++            mainOA.4yr)
+> l.lowh <- lm(as.formula(paste0(lhs.log,"~`Min H-index`* `Fully reproduced`+",
++                              kitchensink.spec)),
++            mainOA.4yr)
+> l.kitchen.sink <- lm(as.formula(paste0(lhs.log,"~ `Avg. H-index`* `Fully reproduced`+
++                      `Max H-index`* `Fully reproduced`+
++                      `Min H-index`* `Fully reproduced`+",
++                                      kitchensink.spec)),
++                    mainOA.4yr)
+> 
+> l.avghp <- lm(as.formula(paste0(lhs.log,"~`Avg. H-index`* `Full or Partial`+",
++                               kitchensink.spec)),
++             mainOA.4yr)
+> l.tophp <- lm(as.formula(paste0(lhs.log,"~`Max H-index`* `Full or Partial`+",
++                               kitchensink.spec)),
++             mainOA.4yr)
+> l.lowhp <- lm(as.formula(paste0(lhs.log,"~`Min H-index`* `Full or Partial`+",
++                               kitchensink.spec)),
++             mainOA.4yr)
+> l.kitchen.sink.p <- lm(as.formula(paste0(lhs.log,"~ `Avg. H-index`* `Full or Partial`+
++                      `Max H-index`* `Full or Partial`+
++                      `Min H-index`* `Full or Partial`+",
++                                        kitchensink.spec)),
++                      mainOA.4yr)
+> 
+> # weird stuff
+> 
+> names(l.kitchen.sink$coefficients)[names(l.kitchen.sink$coefficients) ==
++                                    "`Fully reproduced`:`Max H-index`"] <- "`Max H-index`:`Fully reproduced`"
+> names(l.kitchen.sink$coefficients)[names(l.kitchen.sink$coefficients) ==
++                                    "`Fully reproduced`:`Min H-index`"] <- "`Min H-index`:`Fully reproduced`"
+> 
+> # weird stuff
+> 
+> names(l.kitchen.sink.p$coefficients)[names(l.kitchen.sink.p$coefficients) ==
++                                      "`Full or Partial`:`Max H-index`"] <- "`Max H-index`:`Full or Partial`"
+> names(l.kitchen.sink.p$coefficients)[names(l.kitchen.sink.p$coefficients) ==
++                                      "`Full or Partial`:`Min H-index`"] <- "`Min H-index`:`Full or Partial`"
+> 
+> 
+> 
+> # Print table
+> stargazer(l.avgh,l.toph, l.lowh, l.kitchen.sink,
++           title="OLS: Log Citations on Reproduction Outcomes ",
++           align=TRUE,
++           no.space=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="logreg3alt:OA",
++           dep.var.labels.include = FALSE,
++           #dep.var.labels = "Log Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("adj.rsq","n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,
++                     "Log(YTD citations) is computed as log(YTD Citations + 1).",
++                     footnote.lag.hindex, footnote.full.partial,
++                     footnote.sample.attempted),
++           out=file.path(Outputs,"table_logreg3OA.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:12 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Log Citations on Reproduction Outcomes } 
+  \label{logreg3alt:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.023^{***} &  &  & 0.104^{***} \\ 
+  & (0.007) &  &  & (0.039) \\ 
+  `Max H-index` &  & 0.009^{**} &  & -0.034^{**} \\ 
+  &  & (0.004) &  & (0.015) \\ 
+  `Min H-index` &  &  & 0.023^{**} & -0.042^{*} \\ 
+  &  &  & (0.010) & (0.025) \\ 
+  `Fully reproduced` & 0.132 & 0.094 & 0.143 & 0.171 \\ 
+  & (0.225) & (0.204) & (0.197) & (0.231) \\ 
+  `Highest Institution Publications` & 0.003 & 0.002 & 0.004 & 0.003 \\ 
+  & (0.003) & (0.003) & (0.003) & (0.003) \\ 
+  `Highest Co-author Experience` & -0.007 & -0.004 & -0.003 & -0.009 \\ 
+  & (0.007) & (0.007) & (0.006) & (0.007) \\ 
+  `Number of authors` & 0.185^{***} & 0.143^{*} & 0.221^{***} & 0.249^{***} \\ 
+  & (0.070) & (0.073) & (0.073) & (0.079) \\ 
+  `Author at US university` & 0.049 & 0.074 & 0.070 & 0.036 \\ 
+  & (0.149) & (0.151) & (0.151) & (0.149) \\ 
+  `Solo-authored` & 0.080 & 0.033 & -0.012 & 0.187 \\ 
+  & (0.196) & (0.198) & (0.198) & (0.205) \\ 
+  `Avg. H-index`:`Fully reproduced` & 0.004 &  &  & -0.094 \\ 
+  & (0.011) &  &  & (0.065) \\ 
+  `Max H-index`:`Fully reproduced` &  & 0.005 &  & 0.040 \\ 
+  &  & (0.006) &  & (0.030) \\ 
+  `Min H-index`:`Fully reproduced` &  &  & 0.005 & 0.056 \\ 
+  &  &  & (0.016) & (0.038) \\ 
+  Constant & 2.570^{***} & 2.740^{***} & 2.530^{***} & 2.370^{***} \\ 
+  & (0.274) & (0.272) & (0.283) & (0.295) \\ 
+ Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.159} & \multicolumn{1}{c}{0.127} & \multicolumn{1}{c}{0.131} & \multicolumn{1}{c}{0.166} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{5}{l}{Notes: } \\ 
+\multicolumn{5}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{5}{l}{Log(YTD citations) is computed as log(YTD Citations + 1).} \\ 
+\multicolumn{5}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{5}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{5}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{5}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> stargazer(l.avghp, l.tophp, l.lowhp,l.kitchen.sink.p,
++           title="OLS: Log Citations on Reproduction Outcomes ",
++           align=TRUE,no.space=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="logreg3alt:OA:partial",
++           dep.var.labels.include = FALSE,
++           #dep.var.labels = "Log Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("adj.rsq","n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,
++                     "Log(YTD citations) is computed as log(YTD Citations + 1).",
++                     footnote.lag.hindex, footnote.full.partial,
++                     footnote.sample.attempted),
++           out=file.path(Outputs,"table_logreg3OA_partial.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:12 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Log Citations on Reproduction Outcomes } 
+  \label{logreg3alt:OA:partial} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.018^{*} &  &  & 0.235^{***} \\ 
+  & (0.010) &  &  & (0.085) \\ 
+  `Max H-index` &  & 0.006 &  & -0.092^{***} \\ 
+  &  & (0.006) &  & (0.034) \\ 
+  `Min H-index` &  &  & 0.026 & -0.102^{**} \\ 
+  &  &  & (0.016) & (0.051) \\ 
+  `Full or Partial` & -0.119 & -0.116 & 0.058 & 0.115 \\ 
+  & (0.245) & (0.216) & (0.235) & (0.261) \\ 
+  `Highest Institution Publications` & 0.003 & 0.002 & 0.004 & 0.004 \\ 
+  & (0.003) & (0.003) & (0.003) & (0.003) \\ 
+  `Highest Co-author Experience` & -0.008 & -0.004 & -0.003 & -0.010 \\ 
+  & (0.007) & (0.007) & (0.006) & (0.007) \\ 
+  `Number of authors` & 0.192^{***} & 0.150^{**} & 0.225^{***} & 0.283^{***} \\ 
+  & (0.072) & (0.075) & (0.074) & (0.080) \\ 
+  `Author at US university` & 0.073 & 0.099 & 0.086 & 0.041 \\ 
+  & (0.150) & (0.152) & (0.153) & (0.149) \\ 
+  `Solo-authored` & 0.078 & 0.025 & -0.027 & 0.231 \\ 
+  & (0.199) & (0.202) & (0.200) & (0.206) \\ 
+  `Avg. H-index`:`Full or Partial` & 0.008 &  &  & -0.176^{**} \\ 
+  & (0.012) &  &  & (0.088) \\ 
+  `Max H-index`:`Full or Partial` &  & 0.005 &  & 0.077^{**} \\ 
+  &  & (0.006) &  & (0.035) \\ 
+  `Min H-index`:`Full or Partial` &  &  & -0.001 & 0.091^{*} \\ 
+  &  &  & (0.018) & (0.054) \\ 
+  Constant & 2.680^{***} & 2.850^{***} & 2.520^{***} & 2.200^{***} \\ 
+  & (0.311) & (0.305) & (0.309) & (0.348) \\ 
+ Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.148} & \multicolumn{1}{c}{0.112} & \multicolumn{1}{c}{0.118} & \multicolumn{1}{c}{0.172} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{5}{l}{Notes: } \\ 
+\multicolumn{5}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{5}{l}{Log(YTD citations) is computed as log(YTD Citations + 1).} \\ 
+\multicolumn{5}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{5}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{5}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{5}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> ##### Same but with arcsin table  13 and 14 alt
+> 
+> # Run Regression: citations on h-indices and replication success
+> 
+> a.avgh <- lm(as.formula(paste0(lhs.arcsin,"~ `Avg. H-index`* `Fully reproduced` +",
++                                kitchensink.spec)),
++              mainOA.4yr)
+> a.toph <- lm(as.formula(paste0(lhs.arcsin,"~`Max H-index`* `Fully reproduced`+",
++                                kitchensink.spec)),
++              mainOA.4yr)
+> a.lowh <- lm(as.formula(paste0(lhs.arcsin,"~`Min H-index`* `Fully reproduced`+",
++                                kitchensink.spec)),
++              mainOA.4yr)
+> a.kitchen.sink <- lm(as.formula(paste0(lhs.arcsin,"~ `Avg. H-index`* `Fully reproduced`+
++                      `Max H-index`* `Fully reproduced`+
++                      `Min H-index`* `Fully reproduced`+",
++                                        kitchensink.spec)),
++                      mainOA.4yr)
+> 
+> a.avghp <- lm(as.formula(paste0(lhs.arcsin,"~`Avg. H-index`* `Full or Partial`+",
++                                 kitchensink.spec)),
++               mainOA.4yr)
+> a.tophp <- lm(as.formula(paste0(lhs.arcsin,"~`Max H-index`* `Full or Partial`+",
++                                 kitchensink.spec)),
++               mainOA.4yr)
+> a.lowhp <- lm(as.formula(paste0(lhs.arcsin,"~`Min H-index`* `Full or Partial`+",
++                                 kitchensink.spec)),
++               mainOA.4yr)
+> a.kitchen.sink.p <- lm(as.formula(paste0(lhs.arcsin,"~ `Avg. H-index`* `Full or Partial`+
++                      `Max H-index`* `Full or Partial`+
++                      `Min H-index`* `Full or Partial`+",
++                                          kitchensink.spec)),
++                        mainOA.4yr)
+> 
+> # weird stuff
+> 
+> names(a.kitchen.sink$coefficients)[names(a.kitchen.sink$coefficients) ==
++                                      "`Fully reproduced`:`Max H-index`"] <- "`Max H-index`:`Fully reproduced`"
+> names(a.kitchen.sink$coefficients)[names(a.kitchen.sink$coefficients) ==
++                                      "`Fully reproduced`:`Min H-index`"] <- "`Min H-index`:`Fully reproduced`"
+> 
+> # weird stuff
+> 
+> names(a.kitchen.sink.p$coefficients)[names(a.kitchen.sink.p$coefficients) ==
++                                        "`Full or Partial`:`Max H-index`"] <- "`Max H-index`:`Full or Partial`"
+> names(a.kitchen.sink.p$coefficients)[names(a.kitchen.sink.p$coefficients) ==
++                                        "`Full or Partial`:`Min H-index`"] <- "`Min H-index`:`Full or Partial`"
+> 
+> 
+> # Print table
+> stargazer(a.avgh,a.toph,a.lowh, a.kitchen.sink,
++           title="OLS: Arcsin Citations on Reproduction Outcomes ",
++           align=TRUE,
++           no.space=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcreg3alt:OA",
++           dep.var.labels.include = FALSE,
++           #dep.var.labels = "ArcSinH of Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("adj.rsq","n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     footnote.full.partial,footnote.sample.attempted),
++           out=file.path(Outputs,"table_arcreg3OA.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:13 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations on Reproduction Outcomes } 
+  \label{arcreg3alt:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.025^{***} &  &  & 0.109^{***} \\ 
+  & (0.008) &  &  & (0.041) \\ 
+  `Max H-index` &  & 0.009^{**} &  & -0.035^{**} \\ 
+  &  & (0.004) &  & (0.016) \\ 
+  `Min H-index` &  &  & 0.025^{**} & -0.043 \\ 
+  &  &  & (0.011) & (0.026) \\ 
+  `Fully reproduced` & 0.154 & 0.113 & 0.156 & 0.193 \\ 
+  & (0.238) & (0.215) & (0.208) & (0.244) \\ 
+  `Highest Institution Publications` & 0.003 & 0.002 & 0.004 & 0.002 \\ 
+  & (0.003) & (0.003) & (0.003) & (0.003) \\ 
+  `Highest Co-author Experience` & -0.008 & -0.004 & -0.003 & -0.009 \\ 
+  & (0.007) & (0.007) & (0.007) & (0.007) \\ 
+  `Number of authors` & 0.191^{**} & 0.147^{*} & 0.230^{***} & 0.259^{***} \\ 
+  & (0.074) & (0.077) & (0.077) & (0.083) \\ 
+  `Author at US university` & 0.046 & 0.073 & 0.068 & 0.033 \\ 
+  & (0.157) & (0.160) & (0.160) & (0.157) \\ 
+  `Solo-authored` & 0.063 & 0.012 & -0.035 & 0.172 \\ 
+  & (0.207) & (0.209) & (0.209) & (0.216) \\ 
+  `Avg. H-index`:`Fully reproduced` & 0.003 &  &  & -0.098 \\ 
+  & (0.012) &  &  & (0.068) \\ 
+  `Max H-index`:`Fully reproduced` &  & 0.004 &  & 0.042 \\ 
+  &  & (0.007) &  & (0.032) \\ 
+  `Min H-index`:`Fully reproduced` &  &  & 0.005 & 0.059 \\ 
+  &  &  & (0.017) & (0.040) \\ 
+  Constant & 3.190^{***} & 3.370^{***} & 3.150^{***} & 2.980^{***} \\ 
+  & (0.290) & (0.288) & (0.299) & (0.312) \\ 
+ Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.158} & \multicolumn{1}{c}{0.126} & \multicolumn{1}{c}{0.131} & \multicolumn{1}{c}{0.164} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{5}{l}{Notes: } \\ 
+\multicolumn{5}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{5}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{5}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{5}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{5}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> stargazer(a.avghp,a.tophp,a.lowhp, a.kitchen.sink.p,
++           title="OLS: Arcsin Citations on Reproduction Outcomes ",
++           align=TRUE,
++           no.space=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcreg3alt:OA:partial",
++           #dep.var.labels = "ArcSinH of Total Citations",
++           dep.var.labels.include = FALSE,
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("adj.rsq","n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     footnote.full.partial,footnote.sample.attempted),
++           out=file.path(Outputs,"table_arcreg3OA_partial.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:13 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations on Reproduction Outcomes } 
+  \label{arcreg3alt:OA:partial} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.020^{*} &  &  & 0.244^{***} \\ 
+  & (0.011) &  &  & (0.090) \\ 
+  `Max H-index` &  & 0.006 &  & -0.096^{***} \\ 
+  &  & (0.006) &  & (0.036) \\ 
+  `Min H-index` &  &  & 0.028^{*} & -0.106^{*} \\ 
+  &  &  & (0.017) & (0.054) \\ 
+  `Full or Partial` & -0.104 & -0.104 & 0.076 & 0.138 \\ 
+  & (0.259) & (0.229) & (0.248) & (0.276) \\ 
+  `Highest Institution Publications` & 0.003 & 0.002 & 0.004 & 0.004 \\ 
+  & (0.003) & (0.003) & (0.003) & (0.003) \\ 
+  `Highest Co-author Experience` & -0.008 & -0.004 & -0.003 & -0.010 \\ 
+  & (0.007) & (0.007) & (0.007) & (0.007) \\ 
+  `Number of authors` & 0.198^{**} & 0.154^{*} & 0.233^{***} & 0.293^{***} \\ 
+  & (0.076) & (0.079) & (0.079) & (0.084) \\ 
+  `Author at US university` & 0.071 & 0.099 & 0.084 & 0.038 \\ 
+  & (0.158) & (0.161) & (0.162) & (0.158) \\ 
+  `Solo-authored` & 0.057 & 0.002 & -0.052 & 0.214 \\ 
+  & (0.210) & (0.213) & (0.212) & (0.218) \\ 
+  `Avg. H-index`:`Full or Partial` & 0.008 &  &  & -0.184^{**} \\ 
+  & (0.012) &  &  & (0.093) \\ 
+  `Max H-index`:`Full or Partial` &  & 0.005 &  & 0.080^{**} \\ 
+  &  & (0.007) &  & (0.037) \\ 
+  `Min H-index`:`Full or Partial` &  &  & -0.002 & 0.094^{*} \\ 
+  &  &  & (0.019) & (0.057) \\ 
+  Constant & 3.300^{***} & 3.480^{***} & 3.140^{***} & 2.790^{***} \\ 
+  & (0.328) & (0.322) & (0.327) & (0.368) \\ 
+ Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.147} & \multicolumn{1}{c}{0.111} & \multicolumn{1}{c}{0.119} & \multicolumn{1}{c}{0.170} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{5}{l}{Notes: } \\ 
+\multicolumn{5}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{5}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{5}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{5}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{5}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> # ##### Now, bring in new information we have
+> # # Run Regression: citations on h-indices and replication success, control for US region
+> # avgh2 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Fully reproduced` * `Author at US university`,mainOA.4yr)
+> # toph2 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Fully reproduced` * `Author at US university`,mainOA.4yr)
+> # lowh2 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Fully reproduced` * `Author at US university`,mainOA.4yr)
+> #
+> # avghp2 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Full or Partial` * `Author at US university`,mainOA.4yr)
+> # tophp2 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Full or Partial` * `Author at US university`,mainOA.4yr)
+> # lowhp2 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Full or Partial` * `Author at US university`,mainOA.4yr)
+> #
+> #
+> # stargazer(avgh2,toph2, lowh2,avghp2, tophp2, lowhp2,
+> #           title="OLS: Arcsin Citations on Reproduction Outcomes, control for region ", align=TRUE,no.space=TRUE,
+> #           notes.align = "l", notes.append = FALSE,
+> #           label="arcreg3cont:a:OA",
+> #           dep.var.labels = "Total Citations",
+> #           style="aer", type="latex",
+> #           column.sep.width = "-20pt",
+> #           keep.stat = c("adj.rsq","n"),
+> #           notes.label = "",
+> #           omit=c(".+:.+:.+",  # matches all 3-way interactions
+> #                  ".+:.+" # all two- and 3-way interactions
+> #                  ),
+> #           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
+> #                     footnote.full.partial,
+> #                         footnote.region.us,footnote.nway,
+> #                     footnote.sample.attempted),
+> #           font.size = "small",
+> #           out=file.path(Outputs,"table_arcreg3OA2.tex"))
+> #
+> #
+> # # Run Regression: citations on h-indices and replication success, control for US region
+> # avgh3 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Fully reproduced` * `Author at US university`*
+> #                                     `Highest Institution Publications` ,mainOA.4yr)
+> # toph3 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Fully reproduced` *  `Author at US university` *
+> #               `Highest Institution Publications`,mainOA.4yr)
+> # lowh3 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Fully reproduced` * `Author at US university` *
+> #               `Highest Institution Publications`,mainOA.4yr)
+> #
+> # avghp3 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Fully reproduced` * `Author at US university` *
+> #                `Highest Institution Publications` * `Highest Co-author Experience`,mainOA.4yr)
+> # tophp3 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Fully reproduced` * `Author at US university` *
+> #                `Highest Institution Publications` * `Highest Co-author Experience`,mainOA.4yr)
+> # lowhp3 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Fully reproduced` * `Author at US university` *
+> #                `Highest Institution Publications` * `Highest Co-author Experience`,mainOA.4yr)
+> #
+> # stargazer(avgh3,avghp3,
+> #           title="OLS: Arcsin Citations on Reproduction Outcomes, control for institution productivity ",
+> #           align=TRUE,no.space=TRUE,
+> #           notes.align = "l", notes.append = FALSE,
+> #           label="arcreg3prod:a:OA",
+> #           dep.var.labels = "Total Citations",
+> #           style="aer", type="latex",
+> #           column.sep.width = "-20pt",
+> #           keep.stat = c("adj.rsq","n"),
+> #           notes.label = "",
+> #           omit=c(".+:.+" # all two-way and higher interactions
+> #           ),
+> #           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
+> #                     footnote.full.partial,
+> #                     footnote.region.us,footnote.productivity,footnote.experience,
+> #                     footnote.nway,footnote.sample.attempted),
+> #           out=file.path(Outputs,"table_arcreg3OA3.tex"))
+> #
+> 
+> # Do year since publication, allow for several years
+> 
+> # RHS reproducible confidential dummy for "2019 or later" (année où des data editor ont été nommés)
+> 
+> sparse = paste0(lhs.arcsin, "~`Avg. H-index`*`Fully reproduced`")
+> sparse.time = paste0(sparse,"*`Years since publication`")
+> sparse.y2019 = paste0(sparse.time,"*`Year >= 2019`")
+> 
+> t.mainOA.allyears <- mainOA.allyears %>%
++   filter(!is.na(Reproduced))
+> 
+> t.articles <- t.mainOA.allyears %>%
++   distinct(DOI) %>% nrow()
+> 
+> t.avgh       <- lm(as.formula(sparse),t.mainOA.allyears)
+> t.avghY      <- lm(as.formula(paste0(sparse.time,"+`Years squared`")),t.mainOA.allyears)
+> t.avghD2019Y  <- lm(as.formula(paste0(sparse.y2019,"+`Years squared`")),t.mainOA.allyears)
+> #t.avghD2019Y <- lm(`AsinH(new citations)`~`Avg. H-index`* `Fully reproduced`*`Year >= 2019` *
+> #                   `Years since publication`,t.mainOA.allyears)
+> # rename coefficients for interactions
+> 
+> 
+> # names(t.avghD2019Y$coefficients)[names(t.avghD2019Y$coefficients) ==
+> #                                          "`Year >= 2019`TRUE:`Years since publication`"] <- "`Max H-index`:`Fully reproduced`"
+> # names(a2012.kitchen.sink$coefficients)[names(a2012.kitchen.sink$coefficients) ==
+> #                                          "`Fully reproduced`:`Min H-index`"] <- "`Min H-index`:`Fully reproduced`"
+> 
+> # > names(t.avghD2019Y$coefficients)
+> # [1] "(Intercept)"
+> # [2] "`Avg. H-index`"
+> # [3] "`Fully reproduced`"
+> # [4] "`Years since publication`"
+> # [5] "`Year >= 2019`TRUE"
+> # [6] "`Years squared`"
+> # [7] "`Avg. H-index`:`Fully reproduced`"
+> # [8] "`Avg. H-index`:`Years since publication`"
+> # [9] "`Fully reproduced`:`Years since publication`"
+> # [10] "`Avg. H-index`:`Year >= 2019`TRUE"
+> # [11] "`Fully reproduced`:`Year >= 2019`TRUE"
+> # [12] "`Years since publication`:`Year >= 2019`TRUE"
+> # [13] "`Avg. H-index`:`Fully reproduced`:`Years since publication`"
+> # [14] "`Avg. H-index`:`Fully reproduced`:`Year >= 2019`TRUE"
+> # [15] "`Avg. H-index`:`Years since publication`:`Year >= 2019`TRUE"
+> # [16] "`Fully reproduced`:`Years since publication`:`Year >= 2019`TRUE"
+> # [17] "`Avg. H-index`:`Fully reproduced`:`Years since publication`:`Year >= 2019`TRUE"
+> order.D2019Y = c("`Avg. H-index`", "`Fully reproduced`" ,
++                  "`Years since publication`","`Years squared`",
++                  "`Year >= 2019`")
+> order.D2019Y.num =c(1,2,3,5,4,6,8,10,7,9)
+> 
+> stargazer(t.avgh, t.avghY,t.avghD2019Y,
++           add.lines = list(c("Articles",t.articles,t.articles,t.articles)),
++           title="OLS: ArcSinH Citations - Dynamic Effect ",
++           align=TRUE,
++           no.space=TRUE,
++           notes.align = "l",
++           notes.append = FALSE,
++           label="arcregdum:OA",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("adj.rsq","n"),
++           notes.label = "",
++           #dep.var.labels = "New Citations",
++           dep.var.labels.include = FALSE,
++           order = order.D2019Y.num,
++           omit = c("`Years since publication`:`Year >= 2019`",
++                    "`Avg. H-index`:`Fully reproduced`:`Year >= 2019`TRUE:`Years since publication`",
++                    "`Fully reproduced`:`Year >= 2019`TRUE:`Years since publication`",
++                    "`Avg. H-index`:`Year >= 2019`TRUE:`Years since publication`"),
++           notes = c(footnote.base,footnote.new.all,footnote.lag.hindex,
++                     footnote.full.partial,footnote.sample.attempted),
++           out=file.path(Outputs,"table_arcreg3OA4.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:14 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: ArcSinH Citations - Dynamic Effect } 
+  \label{arcregdum:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.035^{***} & 0.034^{***} & 0.042^{***} \\ 
+  & (0.004) & (0.009) & (0.010) \\ 
+  `Fully reproduced` & 0.125 & -0.221 & -0.210 \\ 
+  & (0.125) & (0.273) & (0.302) \\ 
+  `Years since publication` &  & 0.585^{***} & 0.657^{***} \\ 
+  &  & (0.116) & (0.119) \\ 
+  `Years squared` &  & -0.043^{**} & -0.045^{**} \\ 
+  &  & (0.018) & (0.019) \\ 
+  `Year \textgreater = 2019` &  &  & 0.831 \\ 
+  &  &  & (0.514) \\ 
+  `Avg. H-index`:`Fully reproduced` & 0.007 & 0.026^{*} & 0.032^{*} \\ 
+  & (0.007) & (0.016) & (0.017) \\ 
+  `Fully reproduced`:`Years since publication` &  & 0.110 & 0.158 \\ 
+  &  & (0.081) & (0.101) \\ 
+  `Fully reproduced`:`Year \textgreater = 2019` &  &  & -0.539 \\ 
+  &  &  & (0.771) \\ 
+  `Avg. H-index`:`Years since publication` &  & -0.002 & -0.004 \\ 
+  &  & (0.002) & (0.003) \\ 
+  `Avg. H-index`:`Year \textgreater = 2019` &  &  & -0.050^{*} \\ 
+  &  &  & (0.027) \\ 
+  `Avg. H-index`:`Fully reproduced`:`Years since publication` &  & -0.006 & -0.009 \\ 
+  &  & (0.004) & (0.005) \\ 
+  `Avg. H-index`:`Fully reproduced`:`Year \textgreater = 2019` &  &  & -0.030 \\ 
+  &  &  & (0.044) \\ 
+  Constant & 3.090^{***} & 1.850^{***} & 1.710^{***} \\ 
+  & (0.070) & (0.192) & (0.194) \\ 
+ Articles & 180 & 180 & 180 \\ 
+Observations & \multicolumn{1}{c}{808} & \multicolumn{1}{c}{808} & \multicolumn{1}{c}{808} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.169} & \multicolumn{1}{c}{0.332} & \multicolumn{1}{c}{0.356} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{4}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{4}{l}{New citations are the new citations to the article in each year 1 to 5.} \\ 
+\multicolumn{4}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{4}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{4}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{4}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> ###  Robustness regression: only post2012
+> 
+> 
+> a2012.avgh <- lm(as.formula(paste0(lhs.arcsin,"~ `Avg. H-index`* `Fully reproduced` +",
++                                kitchensink.spec)),
++              mainOA.4yrpost2012)
+> a2012.toph <- lm(as.formula(paste0(lhs.arcsin,"~`Max H-index`* `Fully reproduced`+",
++                                kitchensink.spec)),
++              mainOA.4yrpost2012)
+> a2012.lowh <- lm(as.formula(paste0(lhs.arcsin,"~`Min H-index`* `Fully reproduced`+",
++                                kitchensink.spec)),
++              mainOA.4yrpost2012)
+> a2012.kitchen.sink <- lm(as.formula(paste0(lhs.arcsin,"~ `Avg. H-index`* `Fully reproduced`+
++                      `Max H-index`* `Fully reproduced`+
++                      `Min H-index`* `Fully reproduced`+",
++                                        kitchensink.spec)),
++                      mainOA.4yrpost2012)
+> 
+> a2012.avghp <- lm(as.formula(paste0(lhs.arcsin,"~`Avg. H-index`* `Full or Partial`+",
++                                 kitchensink.spec)),
++               mainOA.4yrpost2012)
+> a2012.tophp <- lm(as.formula(paste0(lhs.arcsin,"~`Max H-index`* `Full or Partial`+",
++                                 kitchensink.spec)),
++               mainOA.4yrpost2012)
+> a2012.lowhp <- lm(as.formula(paste0(lhs.arcsin,"~`Min H-index`* `Full or Partial`+",
++                                 kitchensink.spec)),
++               mainOA.4yrpost2012)
+> a2012.kitchen.sink.p <- lm(as.formula(paste0(lhs.arcsin,"~ `Avg. H-index`* `Full or Partial`+
++                      `Max H-index`* `Full or Partial`+
++                      `Min H-index`* `Full or Partial`+",
++                                          kitchensink.spec)),
++                        mainOA.4yrpost2012)
+> 
+> 
+> # weird stuff
+> 
+> 
+> names(a2012.kitchen.sink$coefficients)[names(a2012.kitchen.sink$coefficients) ==
++                                    "`Fully reproduced`:`Max H-index`"] <- "`Max H-index`:`Fully reproduced`"
+> names(a2012.kitchen.sink$coefficients)[names(a2012.kitchen.sink$coefficients) ==
++                                    "`Fully reproduced`:`Min H-index`"] <- "`Min H-index`:`Fully reproduced`"
+> 
+> names(a2012.kitchen.sink.p$coefficients)[names(a2012.kitchen.sink.p$coefficients) ==
++                                      "`Full or partial`:`Max H-index`"] <- "`Max H-index`:`Full or partial`"
+> names(a2012.kitchen.sink.p$coefficients)[names(a2012.kitchen.sink.p$coefficients) ==
++                                      "`Full or partial`:`Min H-index`"] <- "`Min H-index`:`Full or partial`"
+> 
+> # Print table
+> stargazer(a2012.avgh,a2012.toph,a2012.lowh,a2012.kitchen.sink,
++           title="OLS: Arcsin Citations on Reproduction Outcomes, post-2012",
++           align=TRUE,
++           no.space=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcregp2012:OA",
++           dep.var.labels.include = FALSE,
++           #dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("adj.rsq","n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag0.hindex,
++                     footnote.full.partial,footnote.post2012),
++           out=file.path(Outputs,"table_arcregpost12OA.tex")
++           )
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:15 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations on Reproduction Outcomes, post-2012} 
+  \label{arcregp2012:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.019^{*} &  &  & 0.051 \\ 
+  & (0.011) &  &  & (0.049) \\ 
+  `Max H-index` &  & 0.008 &  & -0.013 \\ 
+  &  & (0.005) &  & (0.019) \\ 
+  `Min H-index` &  &  & 0.021 & -0.015 \\ 
+  &  &  & (0.018) & (0.035) \\ 
+  `Fully reproduced` & -0.084 & -0.051 & 0.021 & -0.098 \\ 
+  & (0.251) & (0.231) & (0.225) & (0.259) \\ 
+  `Highest Institution Publications` & 0.007^{*} & 0.007^{*} & 0.008^{**} & 0.007^{*} \\ 
+  & (0.004) & (0.004) & (0.004) & (0.004) \\ 
+  `Highest Co-author Experience` & -0.003 & 0.000 & -0.001 & -0.005 \\ 
+  & (0.008) & (0.008) & (0.008) & (0.008) \\ 
+  `Number of authors` & 0.238^{***} & 0.198^{**} & 0.278^{***} & 0.260^{***} \\ 
+  & (0.080) & (0.083) & (0.084) & (0.091) \\ 
+  `Author at US university` & -0.078 & -0.057 & -0.034 & -0.073 \\ 
+  & (0.175) & (0.177) & (0.176) & (0.177) \\ 
+  `Solo-authored` & 0.028 & -0.005 & -0.064 & 0.025 \\ 
+  & (0.238) & (0.238) & (0.242) & (0.249) \\ 
+  `Avg. H-index`:`Fully reproduced` & 0.023 &  &  & -0.065 \\ 
+  & (0.015) &  &  & (0.088) \\ 
+  `Max H-index`:`Fully reproduced` &  & 0.015^{*} &  & 0.038 \\ 
+  &  & (0.009) &  & (0.040) \\ 
+  `Min H-index`:`Fully reproduced` &  &  & 0.028 & 0.057 \\ 
+  &  &  & (0.024) & (0.053) \\ 
+  Constant & 3.010^{***} & 3.120^{***} & 2.950^{***} & 2.980^{***} \\ 
+  & (0.311) & (0.307) & (0.329) & (0.340) \\ 
+ Observations & \multicolumn{1}{c}{129} & \multicolumn{1}{c}{129} & \multicolumn{1}{c}{129} & \multicolumn{1}{c}{129} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.259} & \multicolumn{1}{c}{0.239} & \multicolumn{1}{c}{0.237} & \multicolumn{1}{c}{0.245} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{5}{l}{Notes: } \\ 
+\multicolumn{5}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{5}{l}{H-index measures are computed across all authors of an article, in the year the} \\ 
+\multicolumn{5}{l}{article was published. An author without citations has an h-index of 0. } \\ 
+\multicolumn{5}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{5}{l}{Sample restricted to articles published in 2012 and later, with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> stargazer(a2012.avghp,a2012.tophp,a2012.lowhp,a2012.kitchen.sink.p,
++           title="OLS: Arcsin Citations on Reproduction Outcomes, post-2012",
++           align=TRUE,
++           no.space=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcregp2012:OA:partial",
++           dep.var.labels.include = FALSE,
++           #dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("adj.rsq","n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     footnote.full.partial,footnote.sample.attempted,footnote.post2012),
++           out=file.path(Outputs,"table_arcregpost12OA_partial.tex")
++ )
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:15 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations on Reproduction Outcomes, post-2012} 
+  \label{arcregp2012:OA:partial} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.029 &  &  & 0.236 \\ 
+  & (0.018) &  &  & (0.156) \\ 
+  `Max H-index` &  & 0.012 &  & -0.084 \\ 
+  &  & (0.010) &  & (0.063) \\ 
+  `Min H-index` &  &  & 0.036 & -0.121 \\ 
+  &  &  & (0.028) & (0.102) \\ 
+  `Full or Partial` & 0.217 & 0.240 & 0.226 & 0.271 \\ 
+  & (0.311) & (0.292) & (0.288) & (0.319) \\ 
+  `Highest Institution Publications` & 0.007^{*} & 0.007^{*} & 0.008^{**} & 0.008^{*} \\ 
+  & (0.004) & (0.004) & (0.004) & (0.004) \\ 
+  `Highest Co-author Experience` & -0.004 & -0.000 & -0.002 & -0.006 \\ 
+  & (0.008) & (0.008) & (0.008) & (0.008) \\ 
+  `Number of authors` & 0.231^{***} & 0.192^{**} & 0.277^{***} & 0.292^{***} \\ 
+  & (0.082) & (0.085) & (0.085) & (0.093) \\ 
+  `Author at US university` & -0.035 & 0.003 & -0.020 & -0.023 \\ 
+  & (0.176) & (0.178) & (0.179) & (0.181) \\ 
+  `Solo-authored` & -0.004 & -0.073 & -0.081 & 0.059 \\ 
+  & (0.241) & (0.243) & (0.241) & (0.250) \\ 
+  `Avg. H-index`:`Full or Partial` & -0.001 &  &  & -0.194 \\ 
+  & (0.019) &  &  & (0.160) \\ 
+  `Max H-index`:`Full or Partial` &  & -0.002 &  &  \\ 
+  &  & (0.011) &  &  \\ 
+  `Min H-index`:`Full or Partial` &  &  & 0.000 &  \\ 
+  &  &  & (0.031) &  \\ 
+  `Full or Partial`:`Max H-index` &  &  &  & 0.074 \\ 
+  &  &  &  & (0.065) \\ 
+  `Full or Partial`:`Min H-index` &  &  &  & 0.130 \\ 
+  &  &  &  & (0.105) \\ 
+  Constant & 2.820^{***} & 2.950^{***} & 2.750^{***} & 2.580^{***} \\ 
+  & (0.393) & (0.393) & (0.372) & (0.416) \\ 
+ Observations & \multicolumn{1}{c}{129} & \multicolumn{1}{c}{129} & \multicolumn{1}{c}{129} & \multicolumn{1}{c}{129} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.237} & \multicolumn{1}{c}{0.208} & \multicolumn{1}{c}{0.224} & \multicolumn{1}{c}{0.231} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{5}{l}{Notes: } \\ 
+\multicolumn{5}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{5}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{5}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{5}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{5}{l}{Results for all articles with attempted reproduction.} \\ 
+\multicolumn{5}{l}{Sample restricted to articles published in 2012 and later, with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> ###
+> 
+> mainOAnoconf  <- readRDS(file=file.path(interwrk,"47_mainOA_noconf.Rds"))
+> 
+> # table of summary stats
+> st1 <- mainOA.4yr %>% select(`Fully reproduced`, `Full or Partial`, `AsinH(YTD citations)`,  `Avg. H-index`,`Max H-index`, `Min H-index`)
+> st2 <- mainOA.4yr %>% filter(!is.na(Reproduced)) %>% select(`Fully reproduced`, `Full or Partial`, `AsinH(YTD citations)`,  `Avg. H-index`,`Max H-index`, `Min H-index`)
+> 
+> stargazer(st1,
++           title="Summary statistics", align=TRUE,no.space=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="tab:statdesc:assessed",
++           style="aer",
++           flip=FALSE,
++           #font.size = fs,
++           column.sep.width = cw,
++           notes = c("Notes: ", footnote.full.partial, footnote.sample.assessed),
++           out=file.path(Outputs,"table_stassessed.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:16 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Summary statistics} 
+  \label{tab:statdesc:assessed} 
+\begin{tabular}{@{\extracolsep{0.4pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+Fully reproduced & 180 & 0.378 & 0.486 & 0 & 1 \\ 
+Full or Partial & 180 & 0.761 & 0.428 & 0 & 1 \\ 
+AsinH(YTD citations) & 273 & 4.040 & 0.886 & 0.000 & 6.540 \\ 
+Avg. H-index & 273 & 16.400 & 11.000 & 1.000 & 63.000 \\ 
+Max H-index & 273 & 24.800 & 20.400 & 1 & 133 \\ 
+Min H-index & 273 & 9.360 & 7.340 & 1 & 52 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{6}{l}{Notes: } \\ 
+\multicolumn{6}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{6}{l}{Results for all articles with complete assessment.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> stargazer(st2,
++           title="Summary statistics", align=TRUE,no.space=TRUE,rownames=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="tab:statdesc:attemped",
++           style="aer",
++           flip=FALSE,
++           #font.size = fs,
++           column.sep.width = cw,
++           notes = c("Notes: ", footnote.full.partial, footnote.sample.attempted),
++           out=file.path(Outputs,"table_stattempted.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Mar 11, 2024 - 01:14:16 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Summary statistics} 
+  \label{tab:statdesc:attemped} 
+\begin{tabular}{@{\extracolsep{0.4pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+Fully reproduced & 180 & 0.378 & 0.486 & 0 & 1 \\ 
+Full or Partial & 180 & 0.761 & 0.428 & 0 & 1 \\ 
+AsinH(YTD citations) & 180 & 4.060 & 0.875 & 0.881 & 6.540 \\ 
+Avg. H-index & 180 & 16.800 & 11.100 & 1.000 & 63.000 \\ 
+Max H-index & 180 & 25.500 & 20.900 & 1 & 133 \\ 
+Min H-index & 180 & 9.710 & 7.630 & 1 & 52 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{6}{l}{Notes: } \\ 
+\multicolumn{6}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{6}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  20.19    3.55   20.68 

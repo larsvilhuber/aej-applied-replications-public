@@ -1,0 +1,260 @@
+### R code from vignette source 'results1.Rnw'
+
+###################################################
+### code chunk number 1: setparent
+###################################################
+#knitr::set_parent('Replication_aejae.Rnw')
+
+source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+source(file.path(programs,"libraries.R"), echo=FALSE)
+source(file.path(programs,"config.R"), echo=FALSE)
+
+# Read analysis data
+source(file.path(programs,"_read_analysis_data.R"),echo=TRUE)
+
+# Remove NA entries for DOIs
+d_entry <- entry %>% filter(!is.na(DOI))
+uniquedoi <- length(unique(d_entry$DOI))
+# TODO: this needs to provide a bit of an assessment how reliable assessor are
+
+         
+
+
+# this unique doi will be used in a later code
+saveRDS(uniquedoi,file=file.path(dataloc,"00_uniquedoi.Rds"))
+
+         
+
+###################################################
+### code chunk number 2: entry_merge
+###################################################
+
+
+# Remove duplicates while combining information. Define data absence variable.
+# QUESTION: if there is conflicting information, which one takes precedence? The first one. So it only grabs the second if there is an NA in the first
+# Note: this create a function taking a data frame as input, it does not create df so far
+coalesce_by_column <- function(df) { return(coalesce(df[1], df[2]))}
+entry_merge <- d_entry %>% group_by(DOI) %>% summarise_all(coalesce_by_column) %>%
+  rename(difficult=`How difficult do you think replicating the article will be`) %>%
+  mutate(absence = ifelse(is.na(DataAbsence),"Data was Provided","No Data or Reason"),
+         absence = ifelse(grepl("confidential",tolower(DataAbsence)) |
+                          grepl("proprietary",tolower(DataAbsence)) |
+                          grepl("need to retrieve",tolower(DataAbsence)) |
+                          grepl("purchased",tolower(DataAbsence)) |
+                          grepl("payment",tolower(DataAbsence)) |
+                          grepl("restriction",tolower(DataAbsence)) |
+                          grepl("register",tolower(DataAbsence)) |
+                          grepl("redistribution not authorized",tolower(DataAbsence)) |
+                          grepl("download site",tolower(DataAbsence)) |
+                          grepl("licensed",tolower(DataAbsence)),"Confidential Data",absence),
+         absence = ifelse(grepl("theoretical",tolower(DataAbsence)) |
+                          grepl("parameters",tolower(DataAbsence)) |
+                          grepl("generate the necessary",tolower(DataAbsence)) |
+                          grepl("analytical",tolower(DataAbsence)),"Simulations Only",absence)
+         )
+
+# #### Eligible articles are those that are empirical but for the stats we need also the confidential and no data/reason
+# all complete records
+eligible <- entry_merge %>% filter(TypeOfArticle == "Yes")
+sample_confdata <- eligible %>% filter(absence == "Confidential Data")
+sample_nodata <- eligible %>% filter(absence == "No Data or Reason")
+
+#### Now
+# Get eligible DOIs from Entry Q with provided data: eligible DOIs are taken from entry,  limited to AEJ:AE (out of 394 plausible,
+# 342 done)
+eligible_DOIs <- unique(eligible$DOI[eligible$absence == "Data was Provided"])
+
+# Limit to Exit Q to the eligible articles
+exit_d <- exit %>% filter(DOI %in% eligible_DOIs)
+
+# Inspect replicated options
+#unique(exit$Replication_Success)
+
+# Find DOIs which had at least two types of replication outcome
+temp <- exit_d %>%
+  mutate(dup = paste(DOI,Replication_Success)) %>%
+  distinct(dup, .keep_all = TRUE) %>%
+  group_by(DOI) %>%
+  mutate(id=1:n()) %>%
+  filter(id==2) %>%
+  select(DOI)
+
+temp_num<-length(temp$DOI)
+cat(temp_num, 						file=file.path(TexIncludes,"temp_num.tex"))
+
+dup_num<-sum(duplicated(exit_d$DOI))
+temp_num<-length(temp$DOI)
+cat(dup_num, 						file=file.path(TexIncludes,"dup_num.tex"))
+
+# Remove duplicates, making sure to keep duplicates that are more successful
+# Also categorize documentation clarity, according to these categories:
+cat1 <- c("no readme file was provided.")
+cat2 <- c("complete. provided all information required to run the programs.")
+cat3 <- c("incomplete. was ambiguous or left out crucial steps.")
+exit_d <- exit_d %>%
+  mutate(README_Quality = if_else(DOI=="10.1257/app.3.2.1","No Info", README_Quality))  %>%
+  mutate(README_Quality = if_else(DOI=="10.1257/app.20160089","Complete. Provided all information required to run the programs.",README_Quality))
+
+exit_merge <- exit_d %>%
+  mutate(dup = paste(DOI,Replication_Success)) %>%
+  distinct(dup, .keep_all = TRUE) %>%
+  group_by(DOI) %>%
+  mutate(lab=paste(Replication_Success, collapse = " "),n = n()) %>%
+  filter(n == 1 | grepl("Yes", lab) |
+           (grepl("Partial", lab) & grepl("No", lab)) | (grepl("Partial", lab) & grepl("NA", lab)) |
+           (grepl("NA", lab) & grepl("No", lab)) ) %>%
+  mutate(lab = ifelse(grepl("Yes", lab),"Yes",lab),
+         lab = ifelse(grepl("Partial", lab) & grepl("No", lab),"Partial",lab),
+         lab = ifelse(grepl("Partial", lab) & grepl("NA", lab),"Partial",lab),
+         lab = ifelse(grepl("No", lab) & grepl("NA", lab),"No",lab),
+         replicated = lab) %>%
+  distinct(DOI, .keep_all = TRUE) %>%
+  mutate(clarity = ifelse(tolower(README_Quality) %in% cat1,"No ReadMe Provided","No Info"),
+         clarity = ifelse(tolower(README_Quality) %in% cat2,"Complete",clarity),
+         clarity = ifelse(tolower(README_Quality) %in% cat3,"Incomplete",clarity))
+# some code moved to FRAGMENTS.RNW
+# Correct two Noreadme provided to correct categories
+
+
+###################################################
+### code chunk number 12: df
+###################################################
+df <- d %>%
+  mutate(replicated =
+           ifelse(replicated1_clean %in% c("yes") | replicated2_clean %in% c("yes"),
+                  "yes","no"),
+         replicated =
+           ifelse(replicated1_clean %in% c("partially") | replicated2_clean %in% c("partially"),
+                  "partially",replicated))
+
+# Remove duplicates of same DOI and result
+df <- df %>% mutate(dup = paste(DOI,replicated)) %>% distinct(dup, .keep_all = TRUE)
+
+# Keep duplicates that are more successful
+df <- df %>% group_by(DOI) %>% mutate(lab = paste(replicated, collapse = " "),n = n()) %>%
+  mutate(rep_list = ifelse(grepl("partially", lab),"partial","no"),
+         rep_list = ifelse(grepl("yes", lab),"yes",rep_list)) %>%
+  filter(rep_list == replicated) %>% select(DOI,rep_list) %>%
+  mutate(rep_list = ifelse(rep_list == "yes","Yes",rep_list),
+         rep_list = ifelse(rep_list == "partial","Partial",rep_list),
+         rep_list = ifelse(rep_list == "no","No",rep_list))
+
+# Merge results onto exit
+exit_merge <- exit_merge %>% left_join(df,by="DOI") %>%
+  mutate(rep = ifelse(replicated == "NA",rep_list,replicated),
+         replicated = rep)
+
+
+#################### Define variables which we will need later
+
+# Remove non-results, and add confdata
+
+conf1 <- "are not public-use"
+conf2 <- "could not get the input data"
+
+# Define categories
+cat1 <- c("no data available","missing dataset (publically available)","broken link missing data",
+          "one variable could not be found","main dataset needs to be purchased",
+          "missing variables (undefined), missing secondary datasets","missing data set",
+          "data not provided, must contact provider for access",
+          "missing data (available but cannot be redistributed)",
+          "one variable could not be found")
+cat2 <- c("missing code","missing code, data not provided")
+cat3 <- c("no code provided","no programs")
+cat4 <- c("code error")
+cat5 <- c("given my ciser license, i could not run the provided mathematica code, and therefore it was impossible to replicate this article", "requires dynare",
+          "data file requires eviews to open, also no other programs are provided",
+          "do not have access to software",
+          "missing required software on ciser computer",
+          "matlab, data requires application and not included")
+cat6 <- c("none of the output numbers")
+# special cases
+cat7 <- c("doesn't give any")
+cat8 <- c("some necessary files were not provided")
+cat9 <- c("didn't try to obtain the nss") # should be caught earlier
+cat10 <- c("datasets were not provided")
+
+reasons <- c("Missing Data","Corrupted Data","Missing Code","Code Error",
+             "Software Unavailable","Most Numbers Differ","Other")
+
+# Define categories for change directory
+cdcat1 <- c("yes, no changes were necessary.")
+cdcat2 <- c("yes")
+cdcat3 <- c("no, the changes to the code were more involved.")
+
+
+exit_merge <- exit_merge %>% filter(replicated != "NA") %>%
+  # Define Confidential Data Variable
+  mutate(confdata = ifelse(grepl("confidential",tolower(Main_Issue)) |
+                             grepl("proprietary",tolower(Main_Issue)) |
+                             grepl("proprietary",tolower(`Comments on difficulty`)) |
+                             grepl("confidential",tolower(`GeneralNotes`)) |
+                             grepl("proprietary",tolower(`GeneralNotes`)) |
+                             grepl(conf1,tolower(`GeneralNotes`)) |
+                             grepl(conf2,tolower(`GeneralNotes`)) |
+                             grepl("property",tolower(`Comments on difficulty`)) |
+                             grepl("nss data",tolower(`Comments on difficulty`)),
+                           "Confidential","Other")) %>%
+  # Define reason for unsuccessful replication variable
+  mutate(reason = ifelse(tolower(Main_Issue) %in% cat1,reasons[1],reasons[length(reasons)]),
+         reason = ifelse(tolower(Main_Issue) %in% cat2,reasons[2],reason),
+         reason = ifelse(tolower(Main_Issue) %in% cat3,reasons[3],reason),
+         reason = ifelse(tolower(Main_Issue) %in% cat4,reasons[4],reason),
+         reason = ifelse(tolower(Main_Issue) %in% cat5,reasons[5],reason),
+         reason = ifelse(grepl(cat6,tolower(Main_Issue)),reasons[6],reason),
+         # special case, reclassifications
+         reason = ifelse(grepl(cat7,tolower(`Comments on difficulty`)),
+                         reasons[3],reason),
+         reason = ifelse(grepl(cat8,tolower(`Comments on difficulty`)),
+                         reasons[1],reason),
+         reason = ifelse(grepl(cat10,tolower(GeneralNotes)),
+                         reasons[1],reason)
+  ) %>%
+  # Define Change Directory variable
+  mutate(change = case_when(
+    tolower(Program_Run_Clean) %in% cdcat1 ~ "None",
+    tolower(Directory_Change)  %in% cdcat2 ~ "Directory Change",
+    tolower(Directory_Change)  %in% cdcat3 ~ "Complex Change",
+    TRUE ~ NA))
+
+
+# bring in info entry
+
+exit_all <- merge(x = entry_merge, 
+                  y = exit_merge %>% select(-year,-journal), 
+                  by = "DOI",
+                  suffixes=c("",".exit"))
+
+# This is the sample for the statistics we use
+
+complete_sample <- bind_rows(exit_all, sample_confdata, sample_nodata)
+
+# save it
+
+saveRDS(complete_sample,
+        file=file.path(dataloc,"00_complete_sample.Rds"))
+saveRDS(exit_all,
+        file=file.path(dataloc,"00_exit_all.Rds"))
+saveRDS(entry_merge,
+        file=file.path(dataloc,"00_entry_merge.Rds"))
+
+### Now, can do stats on effective sample
+
+
+# Some numbers for the papers
+articlesdoi <- length(unique(complete_sample$DOI))
+cat(articlesdoi, 					file=file.path(TexIncludes,"articlesdoi.tex"))
+
+articles_confdata <- length(unique(sample_confdata$DOI))
+cat(articles_confdata, 					file=file.path(TexIncludes,"articles_confdata.tex"))
+
+articles_nodata <- length(unique(sample_nodata$DOI))
+cat(articles_nodata, 					file=file.path(TexIncludes,"articles_nodata.tex"))
+
+articles_data <- length(unique(exit_all$DOI))
+cat(articles_data, 					file=file.path(TexIncludes,"articles_data.tex"))
+
+articles_exit   <- length(unique(exit_d))
+cat(articles_exit, 					file=file.path(TexIncludes,"articles_exit.tex"))
+
