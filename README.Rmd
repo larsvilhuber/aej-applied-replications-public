@@ -1,0 +1,332 @@
+---
+title: "Code and Data for: Reproduce to Validate: a Comprehensive Study on the Reproducibility of Economics Research"
+author:
+  '1':
+    name: Sylverie Herbert
+  '2':
+    name: Flavio Stanchi
+  '3':
+    name: Hautahi Kingi
+  '4':
+    name: Lars Vilhuber
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+  word_document: default
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+bibliography: 
+  - text/data.bib
+  - text/includes/paper.bib
+csl: aux/chicago-author-date.csl
+---
+
+```{r setup,echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(eval=FALSE)
+
+source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+
+we.are.README <- TRUE
+
+source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+#source(file.path(programs,"libraries.R"), echo=FALSE)
+source(file.path(programs,"config.R"), echo=FALSE)
+
+library(knitr)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(readxl)
+library(stringr)
+
+```
+
+
+# Overview
+
+The code in this replication package constructs the analysis file from the four data sources [@raw-data-2019; @openalex-data; @webofscience2018; @crossref-data]. The code is in R, but also uses public APIs to download some data. The replication package also includes PDF copies the survey used to query the replicators. The original Google Forms surveys cannot be exported. 
+
+# Data Availability and Provenance Statements
+
+All data are public, and can be redistributed. The key data [@raw-data-2019] are provided in a separate repository ([https://doi.org/10.5281/zenodo.`r zenodo.id`](https://doi.org/10.5281/zenodo.`r zenodo.id`)), but are downloaded automatically. Data pulled via APIs are provided as of the date last downloaded, with no guarantees that the code to access the API still works.
+
+## Statement about Rights
+
+- [x] I certify that the author(s) of the manuscript have legitimate access to and permission to use the data used in this manuscript. 
+- [x] I certify that the author(s) of the manuscript have documented permission to redistribute/publish the data contained within this replication package. Appropriate permission are documented in the [LICENSE.txt](LICENSE.txt) file.
+
+
+## License for Data
+
+- Original data [@raw-data-2019] (not included) are licensed as [CC-BY-NC-4.0](https://creativecommons.org/licenses/by-nc/4.0/legalcode).
+- Data from @openalex-data are obtained under a [CC0](https://creativecommons.org/publicdomain/zero/1.0/) Public Domain attribution.
+- Data from @webofscience2018 are proprietary, but redistribution of small extracts is permitted.
+- Data fom @crossref-data is "is open and available for reuse without restriction" ([https://www.crossref.org/documentation/retrieve-metadata/](https://www.crossref.org/documentation/retrieve-metadata/))
+
+All derivative data contained herein, if not otherwise encumbered, is available under a [CC-BY-NC-4.0](https://creativecommons.org/licenses/by-nc/4.0/legalcode) license. Usage by commercial entities is permitted, reselling the data is not.
+
+
+## Summary of Availability
+
+- [x] All data **are** publicly available.
+- [ ] Some data **cannot be made** publicly available.
+- [ ] **No data can be made** publicly available.
+
+
+```{r summary_data,echo=FALSE,eval=TRUE}
+datafiles <- read_excel("aux/datafiles.xlsx") %>%
+  arrange(Order,`Data Source`) %>%
+# find files present
+  mutate(Provided.real = file.exists(Filename),
+         Provided.norm = (Provided == "Yes"),
+         congruence   = Provided.real != Provided.norm)
+
+table(datafiles$congruence) %>% as.data.frame() -> check.files
+
+check.files.failure <- check.files %>% filter(Var1=="FALSE") %>% pull(Freq)
+if ( is.numeric(check.files.failure) & check.files.failure > 0 ) {
+  warning(paste0(check.files.failure," files fail check - are present but should be absent"))
+}
+
+
+```
+
+```{r show_table,echo=FALSE,results='asis',eval=TRUE}
+
+datafiles %>% select(`Data Source`,Filename,Provided = Provided.real) %>%
+  kable()
+```
+
+
+
+## Details on each Data Source
+
+### @raw-data-2019 
+
+The data were collected through the methods described in the paper. Data were collected over several years, and deposited at @raw-data-2019 in 2019, with replicator names replaced by random identifiers. 
+
+```{r own_data,echo=FALSE,eval=TRUE,results='asis'}
+
+datafiles %>% 
+  filter(Order==1|Order==11) %>%
+  select(`Data Source`,Filename,Provided = Provided.real) %>%
+  kable()
+```
+
+
+### Crossref data
+
+Crossref were extracted as needed to obtain bibliographic information (author names, article titles, publication dates) [@crossref-data]. The database itself is free to access. More information about it can be read about in @crossref-paper .
+
+```{r crossref_data,echo=FALSE,eval=TRUE,results='asis'}
+
+datafiles %>% 
+  filter(Order==2|Order==12) %>%
+  select(`Data Source`,Filename,Provided = Provided.real) %>%
+  kable()
+```
+
+
+### openAlex data
+
+Data were accessed in 2023 to increase the time series covered by the bibliometric analysis [@openalex-data]. The openAlex database is described in @openalex2022. OpenAlex data are accessed via an API, and computed statistics, such as the h-index, are limited to the past 10 years. We therefore had to recompute some numbers. We also saved our extract, as future extracts may have different numbers, due to improvements in entity disambiguation (author names) and other factors outside of our control.
+
+Not all data elements are complete in the openAlex data. We output data for various quality checks, and did manual research to "impute" attributes such as affiliations. All "overrides" are captured in a separate file. 
+
+Thus, the openAlex data has (a) the raw data as downloaded; (b) the problematic data, as output for manual review (c) the edited/imputed data as used to complement the downloaded data.
+
+```{r openalex_data,echo=FALSE,eval=TRUE,results='asis'}
+
+datafiles %>% 
+  filter(Order==3|Order==13) %>%
+  select(`Data Source`,Filename,Provided = Provided.real) %>%
+  kable()
+```
+
+### Web of Science data
+
+The bibliometric information, in particular on h-index, was originally extracted from Web of Science [@WebofScience;@webofscience2018], and was used in the early working papers [@kingi2018;@herbert2021]. In response to referee comments, the primary bibliometric analysis shifted to the use of openAlex data (described next). OpenAlex data is compared to WoS data in the appendix.
+
+WoS is proprietary data and requires a subscription. We accessed the interface thanks to Cornell's subscription.
+
+Data were manually extracted from the WoS web interface, with RAs following guidance on what data to extract (see [`data/h_index_data/README.md`](data/h_index_data/README.md)). The collated data is provided in XLSX and CSV formats.
+
+
+```{r wos_data,echo=FALSE,eval=TRUE,results='asis'}
+
+datafiles %>% 
+  filter(Order==4|Order==14) %>%
+  select(`Data Source`,Filename,Provided = Provided.real) %>%
+  kable()
+```
+
+
+# Computational requirements
+
+
+## Software Requirements
+
+```{r prepare_sys,echo=FALSE,eval=TRUE}
+# Read the rocker image
+readLines(file.path("Dockerfile")) %>% as.data.frame() -> dockerfile
+names(dockerfile) <- "line"
+dockerfile %>% filter(str_detect(line,"FROM")) %>% separate(line,into=c("key","value"),sep=" ") %>% pull(value) -> docker.image
+
+# find libraries
+as.data.frame(list.files(".",pattern="*.R$",recursive=TRUE)) -> library.files
+names(library.files) <- "file"
+
+
+
+```
+
+- [x] The replication package contains one or more programs to install all dependencies and set up the necessary directory structure. 
+
+- `r version$version.string` on `r version$system`
+  - Docker image is used (see appendix), with system libraries defined by the relevant image (`r docker.image`)
+  - RSPM (now PPM) is used, set to `r mran.date`. All libraries are installed from that repository.
+  - Libraries are defined in
+
+```{r list_libs,echo=FALSE}
+library.files %>% filter(str_detect(file,"librar")) %>% kable()
+
+
+```
+
+
+
+## Controlled Randomness
+
+
+
+- [ ] Random seed is set at line _____ of program ______
+- [x] No Pseudo random generator is used in the analysis described here.
+
+## Memory, Runtime, Storage Requirements
+
+### Summary
+
+Approximate time needed to reproduce the analyses on a standard (CURRENT YEAR) desktop machine:
+
+- [ ] <10 minutes
+- [x] 10-60 minutes
+- [ ] 1-2 hours
+- [ ] 2-8 hours
+- [ ] 8-24 hours
+- [ ] 1-3 days
+- [ ] 3-14 days
+- [ ] > 14 days
+
+Approximate storage space needed:
+
+- [ ] < 25 MBytes
+- [x] 25 MB - 250 MB
+- [ ] 250 MB - 2 GB
+- [ ] 2 GB - 25 GB
+- [ ] 25 GB - 250 GB
+- [ ] > 250 GB
+
+- [ ] Not feasible to run on a desktop machine, as described below.
+
+### Details
+
+The code was last run on 
+
+- OS: "openSUSE Leap 15.5"
+- Processor:  AMD Ryzen 9 3900X 12-Core Processor, 24 cores
+- Memory available: 31GB memory
+- Docker version 24.0.7-ce, build 311b9ff0aa93
+
+as well as a Macbook with 16GB of memory.
+
+
+# Description of programs/code
+
+Each numbered R program can be run independently, in the sequence implied by the numbering scheme. 
+A convenience bash main script (`run.sh`) to run all programs is provided in the root of the project, and will run all data cleaning and analysis programs.
+
+Of note, several programs leverage APIs, which can yield different results, and might take  long time. The programs will detect previously downloaded data files, and skip the download part if those files are present. To start with a fresh download, delete the following files:
+
+- `r paste0(crossref.file,".Rds")` - Crossref extract.
+- `r bibtex_all` - bibtex file of articles analyzed
+- `r openalex.Rds` - extract of articles analyzed from openAlex
+- `r openalex.authors.Rds` - bibliometric information from openAlex on all the authors of articles analyzed
+- `r doi.file.Rds` - bibliographic information from Crossref for later analysis
+
+Internet access is required to run the programs, unless the key input files [@raw-data-2019] are manually downloaded from [https://doi.org/10.5281/zenodo.`r zenodo.id`](https://doi.org/10.5281/zenodo.`r zenodo.id`).
+
+##  License for Code
+
+
+The code is licensed under a BSD license. See [LICENSE.txt](LICENSE.txt) for details.
+
+# Instructions to Replicators
+
+If using Docker image on Linux or macOS system:
+
+- run `start_rstudio.sh` and connect to [https://localhost:8787](https://localhost:8787)
+- in the "Terminal" of the RStudio app, run `bash ./run.sh`
+
+Alternative ways to run this, with untested results:
+
+- optionally, before running project code, run `Rscript -e "renv::init()"` (on Windows, `Rscript.exe -e "renv::init()"` ) to isolate the project libraries from your system (assumes `renv` is installed, see [renv](https://rstudio.github.io/renv/articles/renv.html)).
+- Using the same R version as described above, open [`programs/README.Rmd`](programs/README.Rmd), and knit. All necessary libraries will be installed on first run.
+- Using the same R version as described above, run each program individually as desired, in the order indicated above.
+
+## Details
+
+```{r program_details, echo=FALSE,eval=TRUE,results='asis'}
+programs_info <- read_excel("aux/programs-info.xlsx")
+kable(programs_info)
+```
+
+
+# List of tables and programs
+
+
+The provided code reproduces:
+
+- [x] All numbers provided in text in the paper
+- [x] All tables and figures in the paper
+- [ ] Selected tables and figures in the paper, as explained and justified below.
+
+MISING TABLE OF PROGRAMS AND TABLES/FIGURES
+
+
+---
+
+# Acknowledgements
+
+This README based on the template created by @template-readme. 
+
+# References
+
+
+<div id="refs"></div>
+
+# (APPENDIX) Appendix {-} 
+
+## Appendix: System and package info
+
+
+```{r sysinfo,eval=TRUE,echo=FALSE}
+# we don't want to capture what the Rmarkdown session is running, but rather, what the computational session is running
+system("cd programs && R CMD BATCH 99_zz_info.R")
+```
+
+```{r includetext,echo=FALSE,eval=TRUE}
+cat(readLines(file.path(programs,"99_zz_info.txt")), sep = '\n')
+
+```
+
+## Appendix: Dockerfile
+
+
+```{r includedocker,echo=FALSE,eval=TRUE}
+cat(readLines(file.path("Dockerfile")), sep = '\n')
+```
