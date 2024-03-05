@@ -52,6 +52,7 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
+Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -107,7 +108,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
+Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
@@ -127,7 +128,7 @@ To suppress this message, add `openalexR.message = suppressed` to your .Renviron
 + } else {
 +   stop(paste0("File missing: ",doi.file.Rds))
 + }
-[1] 630
+[1] 647
 > 
 > 
 > # utility function
@@ -279,4 +280,4 @@ Joining with `by = join_by(au_id)`
 > 
 > proc.time()
    user  system elapsed 
-  23.92    2.14   24.84 
+  15.72    1.78   16.17 

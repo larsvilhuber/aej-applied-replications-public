@@ -25,70 +25,102 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(eval=FALSE)
 ```
+
+This README provides details on how to run (or not) the programs associated with the paper. For details on the environment in which they are run, see the main README.
+
 # Programs
+
+All programs can be found in the `programs` folder, except for some configuration parameters which (by necessity) are stored in the root folder. 
+
+> No foldername should be hard-coded.
+
+
 
 ## Setup
 
+Every program contains the following lines, and can be run independently:
+
 
 ```{r setup_config,eval=TRUE}
-source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=TRUE)
+source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+source(file.path(programs,"libraries.R"), echo=FALSE)
+source(file.path(programs,"config.R"), echo=FALSE)
 ```
 
 Note that the path `interwrk` is transitory, and is only kept during processing. It will be empty in the replication archive.
 
-Any libraries needed are called and if necessary installed through `libraries.R`:
+Any libraries needed are called and if necessary installed through `libraries.R`, though this is generally handled by the Docker image at build time.
 
-```{r setup_libraries,eval=TRUE}
-source(file.path(basepath,"global-libraries.R"),echo=TRUE)
-source(file.path(programs,"libraries.R"), echo=TRUE)
+Most parameters are set in `config.R`:
+
+```{r read_config,eval=TRUE}
+source(file.path(programs,"config.R"), echo=TRUE)
 ```
 
-Most parameters are set in the `config.R`:
+## All programs
 
-```{r setup_config2,eval=TRUE}
-source(file.path(programs,"config.R"), echo=TRUE)
+
+```{r list_files,eval=TRUE,echo=FALSE}
+list.files(path=programs,pattern = "R$") %>% as.data.frame() %>% rename("Program name"=".") %>% kable()
 ```
 
 
 ## Data cleaning and merging
 
-We combine our collected data with bibliometric data, both manually extracted from "Web of Science" and collected from CrossRef. We also download the cleaned data for both the replication and the Web of Science data here. These programs should be runnable by anybody.
+We combine our collected data with bibliometric data, from three sources:
 
+- collected from [CrossRef](https://www.crossref.org/)
+- extracted from [openAlex](https://openalex.org/)
+- manually extracted from "Web of Science" (WoS). 
 
+The WoS was originally used for the primary bibliometric analysis, but after referee reports, we used the longer time series available in openAlex, and the WoS data was relegated to an appendix. The collected and cleaned WoS is provided as part of the deposit. 
 
 ## Download the replication data from Zenodo
-The responses to the replication attempts are stored on Google Sheets, and considered private. We have separately cleaned the data,  anonymized it, and uploaded to Zenodo (see https://www.github.com/labordynamicsinstitute/ldi-replication-dataprep). Here, we simply download the data, with a bit of additional data cleaning. 
+
+```{r compute_zenodo_doi,echo=FALSE}
+zenodo.doi <- paste0("https://doi.org/10.5281/zenodo.",zenodo.id)
+```
+
+
+The responses to the replication attempts were originally stored on Google Sheets, and are considered private (they contain the replicator names). We have separately cleaned the data,  anonymized it, and uploaded to Zenodo.
+
+- See [github.com/labordynamicsinstitute/ldi-replication-dataprep](https://www.github.com/labordynamicsinstitute/ldi-replication-dataprep) for processing
+- See [`r zenodo.doi`](`r zenodo.doi`) for the cleaned and anonymized data.
+
+Here, we simply download the data, with a bit of additional data cleaning. 
 
  - Input data: On Zenodo
- - Output data: path `interwrk',"repllist2.Rds"
+ - Output data: path `dataloc`
  
 ```{r download_replication}
 source(file.path(programs,"01_download_replication_data.R"),echo=TRUE)
 ```
 
-At the end of this step, the `interwrk` directory  should have the following data files:
+At the end of this step, the `dataloc` directory  should have the following data files:
 
-- entryQ_pub.Rds - the main data from the "Entry" questionnaire (assessment) 
-- exitQ_pub.Rds - the main data from the post-replication "Exit" questionnaire (assessment)
-- replication_list_pub.Rds -  the assignment spreadsheet. 
+- `entryQ_pub.Rds` - the main data from the "Entry" questionnaire (assessment), with minor adjustments for typos in DOIs
+- `exitQ_pub.Rds` - the main data from the post-replication "Exit" questionnaire (assessment)
+- `replication_list_pub.Rds` -  the assignment spreadsheet. 
 
 
 ## Get CrossRef information
-The master replication list has all the DOIs. We   look up the DOI at CrossRef.
+
+The master replication list has all the DOIs. Welook up the DOI at CrossRef to obtain author names, article titles, publication dates.
 
 
 Note: downloading references from CrossRef can take a while. The code contains a fallback - if the file `crossref_info.Rds`  exists, no new pull will be computed. To override, delete the file. 
 
- - inputs: entryQ_pub, exitQ_pub, replication list (in `dataloc`)
- - outputs: crossref_info.Rds (in `crossrefloc`) and intermediate raw data in `interwrk`
+ - inputs: `entryQ_pub, exitQ_pub, replication_list_pub` (in `dataloc`)
+ - outputs: `crossref_info.Rds` (in `crossrefloc`, provided as part of replication package) and intermediate raw data in `interwrk` 
 
-```{r get_crossref,eval=TRUE}
+```{r get_crossref}
 source(file.path(programs,"02_get_crossref.R"),echo=TRUE)
 ```
 
 ### Some diagnostics
 
-When finding DOIs, some articles might not be found. When that is the case, they are reported here.
+When searching for DOIs, some articles might not be found. When that is the case, they are reported here.
 
 ```{r doi_diagnostics,echo=TRUE,eval=TRUE,cache=TRUE}
 if ( file.exists(file.path(interwrk,"crossref.diagnostics.Rds"))) {
@@ -96,34 +128,32 @@ if ( file.exists(file.path(interwrk,"crossref.diagnostics.Rds"))) {
 } else {
   crossref.diagnostics <- data.frame()
 }
-```
-
-###- DOIs to download (unique DOIs in all replication files): **r NROW(dois.df) **
-###- DOIs successfully looked up on CrossRef: **r nrow(bibinfo.df)**
-###- DOIs not found: **r nrow(crossref.diagnostics)**   (should be ZERO)
-
-```{r doi_diagnostics2,echo=FALSE,eval=TRUE}
 if ( nrow(crossref.diagnostics) > 0 ) {
   knitr::kable(crossref.diagnostics)
 }
 
 ```
 
+Most of these are out of scope for the paper (which focuses on *AEJ:Applied Economics*), one paper was missed.
+
+## Clean the replication list and merge with the bibliographic information
+
+We merge the bibliographic information with the downloaded replication list, and collapse a few verbose outcomes.
+
+
+ - inputs: `replication_list_pub` (in `dataloc`), `crossref_info.Rds` (in `crossrefloc`)
+ - outputs: `replication_list_clean` (in `interwrk`)
+
 
 ```{r clean_replication,cache=TRUE}
 source(file.path(programs,"04_clean_replicationlist.R"),echo=TRUE)
 ```
 
+---
 
 
 ## Download the h-index information
 
-```{r download_hindex,eval=TRUE,cache=TRUE}
-source(file.path(programs,"06_gen_hindex_list.R"),echo=TRUE)
-```
-```{r clean_hindex,eval=TRUE,cache=TRUE}
-source(file.path(programs,"07_readclean_hindex_list.R"),echo=TRUE)
-```
 
 ## Collect Bibtex info on the articles
 
@@ -139,7 +169,7 @@ source(file.path(programs,"08_get_crossref_bibs.R"),echo=TRUE)
 
 The paper analysis is run in the `3x*.R`  programs.
 
-```{r prepare_paper,eval=TRUE}
+```{r prepare_paper}
 source(file.path(programs,'25_prepare_sample.R'),echo=TRUE)
 source(file.path(programs,'30_results1.R'),echo=TRUE)
 source(file.path(programs,'31_results2.R'),echo=TRUE)
@@ -167,7 +197,7 @@ After referee reports, the following supplementary analysis has been added:
 
 ### Adding a clean count of the number of articles in the universe
 
-```{r clean_count_dois,eval=TRUE}
+```{r clean_count_dois}
 source(file.path(programs,'40_supplementary1.R'),echo=TRUE)
 ```
 
@@ -178,7 +208,7 @@ Referees wanted to see an updated citation analysis. While we keep the original 
 
 
 
-```{r update_citations,eval=TRUE,cache=FALSE}
+```{r update_citations,cache=FALSE}
 source(file.path(programs,'41_supplementary2.R'),echo=TRUE)
 ```
 
@@ -212,7 +242,7 @@ names(readRDS(citations.latest))
 This is used in several of the following programs. It can take up to 1 hour to run.
 
 
-```{r update_author_openalex,eval=TRUE}
+```{r update_author_openalex}
 source(file.path(programs,'42_prepare_authors.R'),echo=TRUE)
 ```
 
@@ -236,7 +266,7 @@ There are some authors for whom we did not have institutions; we hand-edited som
 
 - `r file.path(crossrefloc,"affiliation-impute.xlsx")`
 
-```{r update_institutions,eval=TRUE}
+```{r update_institutions}
 source(file.path(programs,'43_supplementary4.R'),echo=TRUE)
 ```
 
@@ -247,12 +277,12 @@ source(file.path(programs,'43_supplementary4.R'),echo=TRUE)
 In order to get publication experience, we use the first observed publications for an author. This hinges on entity disambiguation by OpenAlex, which does not always get it right. We audited some extreme values, and manually searched for authors' first publication or obtention of Ph.D. 
 
 
-```{r update_experience,eval=TRUE}
+```{r update_experience}
 source(file.path(programs,'44_supplementary_authexp.R'),echo=TRUE)
 ```
 
 - Output: `r file.path(interwrk,"authors.exp.df.Rds")`
-- Audit file: `r file.path(crossrefloc,"audit-exp.xlsx"))`
+- Audit file: `r file.path(crossrefloc,"audit-exp.xlsx")`
 
 
 ### Recomputing h-index
@@ -261,7 +291,7 @@ In order to recompute the h-index, we pull ALL works by each of the authors in o
 
 - At least one author was mis-matched by OpenAlex, and the mismatched entity is on a blacklist.
 
-```{r update_hindex,eval=TRUE}
+```{r update_hindex}
 source(file.path(programs,'45_supplementary_hindex.R'),echo=TRUE)
 ```
 
@@ -279,12 +309,12 @@ Auxiliary files:
 
 The final output file `openalex.hindex` (`r openalex.hindex`) is keyed on the OpenAlex author id `au_id`
 
-```{r,eval=TRUE}
+```{r}
 names(hindex.by.year)
 ```
 
 Here's an example:
-```{r,results='asis',eval=TRUE}
+```{r,results='asis'}
 # test whether this seems reasonable
 
 #citations.df %>% filter(au_id=="https://openalex.org/A5027614993") %>% kable()

@@ -19,8 +19,7 @@ Type 'q()' to quit R.
 
 [Previously saved workspace restored]
 
-> # simply capture system info
-> 
+> # This program creates the list of files for which to capture hindex data
 > 
 > source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
 > source(file.path(basepath,"global-libraries.R"),echo=FALSE)
@@ -43,7 +42,6 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -103,11 +101,19 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
-> sink(file.path(programs,"99_zz_info.txt"),type = "output")
-> devtools::session_info()
-> version
-> sink()
+> # Read the compiled replication lists
+> hindex_request.df <- readRDS(file=file.path(interwrk,"replication_list_clean.Rds")) %>%
++   select(DOI,"title","author","year","volume","number","url","journal")
+> 
+> # Need to add columns for each article in the desired format
+> #
+> # Need to split out authors and create entry for each of them
+> 
+> # Save the information as dataframes
+> saveRDS(hindex_request.df,file=file.path(interwrk,"hindex_request.Rds"))
+> write.csv(hindex_request.df,file=file.path(interwrk,"hindex_request.csv"))
+> 
 > 
 > proc.time()
    user  system elapsed 
-  14.75    1.81   15.10 
+   1.58    1.58    1.61 

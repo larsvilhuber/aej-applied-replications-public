@@ -45,6 +45,7 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
+Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -100,7 +101,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
+Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
@@ -116,78 +117,9 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has no
 > d <- repllist4 %>% mutate(replicated_clean = replicated1_clean)
 
 > exit <- readRDS(file = file.path(dataloc, "exitQ.Rds"))
-
-> entry <- readRDS(file = file.path(dataloc, "entryQ.Rds"))
-
-> bibinfo.df <- readRDS(file = file.path(interwrk, "crossref_info.Rds")) %>% 
-+     select(DOI, year, journal)
-
-> bibinfo.df$journal <- gsub("American Economic Journal: Applied Economics", 
-+     "AEJ:AE", bibinfo.df$journal)
-
-> bibinfo.df$journal <- gsub("American Economic Journal: Macroeconomics", 
-+     "AEJ:Mac", bibinfo.df$journal)
-
-> bibinfo.df$journal <- gsub("American Economic Journal: Microeconomics", 
-+     "AEJ:Mic", bibinfo.df$journal)
-
-> bibinfo.df$journal <- gsub("American Economic Review", 
-+     "AER", bibinfo.df$journal)
-
-> d <- d %>% filter(journal == "American Economic Journal: Applied Economics")
-
-> exit <- exit %>% left_join(bibinfo.df, by = "DOI") %>% 
-+     filter(journal == "AEJ:AE")
-
-> entry <- entry %>% left_join(bibinfo.df, by = "DOI") %>% 
-+     filter(journal == "AEJ:AE")
-
-> data_assessment4 <- unique(d$DOI)
-
-> data_assessment5 <- unique(exit$DOI)
-> 
-> 
-> # get the publication year from the article database
-> 
-> aej_dois <- readRDS(file=openalex.Rds)
-> nrow(aej_dois)
-[1] 630
-> 
-> nrow(aej_dois %>% distinct(DOI))
-[1] 630
-> 
-> 
-> # Remove NA entries for DOIs
-> d_entry <- entry %>% filter(!is.na(DOI))
-> nrow(d_entry)
-[1] 342
-> 
-> d_entry %>%
-+   mutate(original_date = lubridate::floor_date(lubridate::mdy_hms(Timestamp)),
-+          assignment_year=year(original_date)) %>%
-+   select(DOI, assignment_year) %>%
-+   left_join(aej_dois %>% select(DOI,publication_year)) -> assignment.year
-Joining with `by = join_by(DOI)`
-> 
-> assignments <- table(assignment.year$publication_year,
-+                      assignment.year$assignment_year)
-> xtable(assignments,
-+       caption="Assignments by publication year",
-+       label="tab:assignments") -> assignments.table
-> 
-> # titles
-> 
-> title <- list(pos=list(0), command="")
-> title$pos[[1]] <- -1
-> title$command <- c('&\\multicolumn{5}{c}{Assignment Years}\\\\')
-> 
-> print(assignments.table,file=file.path(TexIncludes,"table_assignments.tex"),
-+       caption.placement = "top",
-+       add.to.row = title,hline.after = c(0,nrow(assignments.table)))
-> 
-> 
-> 
-> 
-> proc.time()
-   user  system elapsed 
-  13.53    1.83   14.10 
+Error in gzfile(file, "rb") : cannot open the connection
+Calls: source -> withVisible -> eval -> eval -> readRDS -> gzfile
+In addition: Warning message:
+In gzfile(file, "rb") :
+  cannot open compressed file '/home/rstudio/data/replication_data/exitQ.Rds', probable reason 'No such file or directory'
+Execution halted

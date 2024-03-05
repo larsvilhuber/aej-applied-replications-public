@@ -1,0 +1,204 @@
+
+R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #' ---
+> #' title: "Preparing the H-index data"
+> #' author: "Lars Vilhuber"
+> #' date: "March 30, 2017"
+> #' output:
+> #'    html_document:
+> #'       highlight: tango
+> #'       keep_md: yes
+> #'       theme: readable
+> #'       toc: yes
+> #' ---
+> 
+> source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+> source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: devtools
+Loading required package: usethis
+Loading required package: rprojroot
+Loading required package: tictoc
+Loading required package: ggplot2
+Loading required package: bindrcpp
+Loading required package: Rcpp
+Loading required package: markdown
+> source(file.path(programs,"libraries.R"), echo=FALSE)
+Loading required package: rcrossref
+Loading required package: readr
+Loading required package: tidyr
+Loading required package: data.table
+
+Attaching package: ‘data.table’
+
+The following object is masked from ‘package:tictoc’:
+
+    shift
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: xtable
+Loading required package: rjson
+Loading required package: stargazer
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+Loading required package: knitr
+Loading required package: stringr
+Loading required package: readxl
+Loading required package: fastDummies
+Loading required package: skimr
+Loading required package: sandwich
+Loading required package: pastecs
+
+Attaching package: ‘pastecs’
+
+The following objects are masked from ‘package:data.table’:
+
+    first, last
+
+The following object is masked from ‘package:tidyr’:
+
+    extract
+
+The following objects are masked from ‘package:dplyr’:
+
+    first, last
+
+Loading required package: formattable
+
+Attaching package: ‘formattable’
+
+The following object is masked from ‘package:xtable’:
+
+    digits
+
+Loading required package: reshape2
+
+Attaching package: ‘reshape2’
+
+The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+  Use `force = TRUE` to force installation
+> source(file.path(programs,"config.R"), echo=FALSE)
+> 
+> 
+> #' ## Get the h-index data
+> #' The data is originally in a Google Spreadsheet. We downloaded it by hand from there.
+> #'
+> #+ data prep
+> h.index <- read.csv(paste(hindexloc,HindexRaw,sep="/"),header = TRUE)
+> 
+> # Reformat the somewhat quirky data
+> h.index.melt <- reshape2::melt(data = h.index, id.vars=c('DOI','Total.Citations','Average.per.Year'),
++                      measure.vars=c('Author.1','Author.2','Author.3','Author.4','Author.5','Author.6')
++                      )
+> # Rename some of the columns from (variable, value)
+> names(h.index.melt)[4:5] <- c("Author.Order","Author.Name")
+> # Remove the "Author." prefix
+> h.index.melt$Author.Order <- sub("Author.([1-6])","\\1",h.index.melt$Author.Order,perl = TRUE)
+> 
+> # Now do the same thing with the second set of variables to obtain the per-author h-index
+> h.index.melt2 <- reshape2::melt(data = h.index, id.vars=c('Title','DOI','Total.Citations','Average.per.Year'),
++                       measure.vars=c('h_index..Author.1.','h_index..Author.2.','h_index..Author.3.','h_index..Author.4.','h_index..Author.5.','h_index..Author.6.')
++                       )
+> names(h.index.melt2)[5:6] <- c("Author.Order","h-index")
+> h.index.melt2$Author.Order <- sub("h_index..Author.([1-6]).","\\1",h.index.melt2$Author.Order,perl = TRUE)
+> 
+> # merge them back together to obtain the final file
+> h.index.clean <- merge(h.index.melt[which(h.index.melt$DOI != ""
++                                      & h.index.melt$Author.Name != ""),],
++                   h.index.melt2[which(h.index.melt2$DOI != ""),])
+> 
+> #' ## Compute some statistics
+> #' How many authors
+> nrow(h.index.clean)
+[1] 796
+> #' How many UNIQUE authors
+> #+ unique_authors
+> authors.publications <- as.data.frame(table(h.index.clean$Author.Name))
+> names(authors.publications)[1] <- "Author.Name"
+> nrow(authors.publications)
+[1] 582
+> #' Of which x have published more than once
+> #+ dups
+> multiply.published <- authors.publications[which(authors.publications[,2]>1),]
+> #' Thus, `r nrow(authors.publications)` have published `r nrow(h.index)` articles, of which `r nrow(multiply.published)`
+> #' authors have published multiple times.
+> #'
+> #' ## More  statistics
+> #'
+> #' - The original data is unduplicated by article
+> #' - The modified data has duplicated authors
+> #' - data.authors has unduplicated author information
+> #'
+> #' ### mean, median, max for h-index
+> #+ stats_authors
+> data.authors <- h.index.clean[!duplicated(h.index.clean$Author.Name),c("Author.Name","h-index")]
+> summary(data.authors[,2])[c(3,4,6)]
+Median   Mean   Max. 
+  6.00   7.22  40.00 
+> hist(data.authors[,2],
++      main = "h-index",
++      xlab = "",
++      breaks = max(data.authors[,2],na.rm = TRUE)
++      )
+> #' mean number of citations of articles, not adjusted for publication year
+> #+ stats_papers
+> summary(h.index$Total.Citations,na.rm = TRUE)[c(3,4,6)]
+Median   Mean   Max. 
+    17     25    209 
+> hist(h.index$Total.Citations,
++      main = "Total number of citations",
++      xlab = "",
++      max(h.index$Total.Citations,na.rm = TRUE)
++      )
+> 
+> #' ## Save stuff
+> write.csv(h.index.clean, paste(Outputs,HindexClean,sep="/"), row.names=FALSE)
+> 
+> proc.time()
+   user  system elapsed 
+  14.30    1.88   14.78 

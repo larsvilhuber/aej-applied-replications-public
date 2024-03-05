@@ -12,7 +12,6 @@ R CMD BATCH 04_clean_replicationlist.R
 #R CMD BATCH 06_gen_hindex_list.R
 R CMD BATCH 07_readclean_hindex_list.R
 #R CMD BATCH 08_get_crossref_bibs.R
-R CMD BATCH 20_analytics.R
 R CMD BATCH 25_prepare_sample.R
 R CMD BATCH 30_results1.R
 R CMD BATCH 31_results2.R
