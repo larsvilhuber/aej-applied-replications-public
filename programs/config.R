@@ -26,6 +26,8 @@ doi.file <- file.path(dataloc,"crossref_aejdois")
 doi.file.Rds <- paste(doi.file,"Rds",sep=".")
 doi.file.csv <- paste(doi.file,"csv",sep=".")
 
+crossref.file <- file.path(crossrefloc,"crossref_info")
+
 # openAlex related filenames
 
 
@@ -45,11 +47,13 @@ bibtex_all = file.path(TexIncludes,"Replication_write.bib")
 
 # output the config.tex with paths we need
 
+if ( !we.are.README ) {
 config.tex <- tibble("String" = "% Automatically created, do not edit")
 config.tex[2,] <- ("String" = paste("\\newcommand{\\TexIncludes}{",TexIncludes,"}",sep=""))
 config.tex[3,] <- ("String" = paste("\\newcommand{\\ROutputs}{",Outputs,"}",sep=""))
 config.tex[4,] <- ("String" = paste("\\newcommand{\\Rprograms}{",programs,"}",sep=""))
 write.table(config.tex,file=file.path(TexIncludes,"config.tex"),quote = FALSE,col.names = FALSE,row.names = F)
+}
 
 # Set knitr settings
 options(scipen = 100, digits = 3,width=120)

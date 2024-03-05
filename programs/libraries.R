@@ -5,7 +5,8 @@
 #' Define the list of libraries
 libraries <- c("dplyr","devtools","rcrossref","readr","tidyr","data.table","xtable",
                "rjson","ggplot2","Rcpp","stargazer","knitr","stringr","readxl",
-               "fastDummies","skimr","sandwich","pastecs","formattable")
+               "fastDummies","skimr","sandwich","pastecs","formattable","markdown",
+               "reshape2")
 
 
 

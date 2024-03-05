@@ -34,3 +34,4 @@ for ( dir in list(dataloc,interwrk,hindexloc,crossrefloc,openalexloc,TexIncludes
 #options(repos = c(CRAN = paste0("https://packagemanager.posit.co/cran/__linux__/focal/",MRAN.snapshot)))
 
 
+we.are.README <- FALSE

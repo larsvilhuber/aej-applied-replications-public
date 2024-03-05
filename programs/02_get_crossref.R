@@ -9,7 +9,6 @@ source(file.path(programs,"config.R"), echo=FALSE)
 repllist.doi <- readRDS(file=file.path(dataloc,"replication_list_pub.Rds")) %>% select(DOI)
 exit.doi <- readRDS(file=file.path(dataloc,"exitQ_pub.Rds")) %>% select(DOI)
 entry.doi <- readRDS(file=file.path(dataloc,"entryQ_pub.Rds")) %>% select(DOI)
-crossref.file <- file.path(crossrefloc,"crossref_info")
 
 # Gather DOIs
 dois_toget <- unique(c(repllist.doi$DOI,exit.doi$DOI,entry.doi$DOI))

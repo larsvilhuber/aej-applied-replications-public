@@ -6,6 +6,7 @@ source(file.path(programs,"libraries.R"), echo=FALSE)
 source(file.path(programs,"config.R"), echo=FALSE)
 
 # we combine the generic Zenodo API with the file identifier
+# 2024-02-29: This needed to be updated to the new Zenodo API.
 
 download.file(paste0(zenodo.api,zenodo.id),destfile=file.path(dataloc,"metadata.json"))
 latest <- fromJSON(file=file.path(dataloc,"metadata.json"))
@@ -20,9 +21,9 @@ file.list <- as.data.frame(latest$files) %>% select(starts_with("self")) %>% gat
 for ( value in file.list$value ) {
 	print(value)
 	if ( grepl("Rds",value ) ) {
-	    print("Downloading...")
-	    file.name <- basename(value)
-	    download.file(value,destfile=file.path(dataloc,basename(value)))
+	    file.name <- basename(value %>% str_remove("/content"))
+	    message(paste0("Downloading... ",file.name))
+	    download.file(value,destfile=file.path(dataloc,file.name))
 	}
 }
 

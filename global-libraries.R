@@ -43,6 +43,6 @@ pkgTest <- function(x)
 	return("OK")
 }
 
-global.libraries <- c("dplyr","devtools","rprojroot","tictoc","ggplot2","bindrcpp","Rcpp")
+global.libraries <- c("dplyr","devtools","rprojroot","tictoc","ggplot2","bindrcpp","Rcpp","markdown")
 
 results <- sapply(as.list(global.libraries), pkgTest)
