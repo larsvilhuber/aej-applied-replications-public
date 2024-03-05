@@ -4,11 +4,10 @@
 ### code chunk number 1: setparent
 ###################################################
 #knitr::set_parent('Replication_aejae.Rnw')
-#load("../data/interwrk/my_work_space.RData")
+
 source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
 source(file.path(basepath,"global-libraries.R"),echo=FALSE)
 source(file.path(programs,"libraries.R"), echo=FALSE)
-#source(file.path(TexBase,"libraries.R"), echo=FALSE)
 source(file.path(programs,"config.R"), echo=FALSE)
 
 # Read analysis data
@@ -90,8 +89,8 @@ cat1 <- c("no readme file was provided.")
 cat2 <- c("complete. provided all information required to run the programs.")
 cat3 <- c("incomplete. was ambiguous or left out crucial steps.")
 exit_d <- exit_d %>%
-  mutate(X18 = if_else(DOI=="10.1257/app.3.2.1","No Info", X18))  %>%
-  mutate(X18 = if_else(DOI=="10.1257/app.20160089","Complete. Provided all information required to run the programs.",X18))
+  mutate(README_Quality = if_else(DOI=="10.1257/app.3.2.1","No Info", README_Quality))  %>%
+  mutate(README_Quality = if_else(DOI=="10.1257/app.20160089","Complete. Provided all information required to run the programs.",README_Quality))
 
 exit_merge <- exit_d %>%
   mutate(dup = paste(DOI,Replication_Success)) %>%
@@ -107,9 +106,9 @@ exit_merge <- exit_d %>%
          lab = ifelse(grepl("No", lab) & grepl("NA", lab),"No",lab),
          replicated = lab) %>%
   distinct(DOI, .keep_all = TRUE) %>%
-  mutate(clarity = ifelse(tolower(X18) %in% cat1,"No ReadMe Provided","No Info"),
-         clarity = ifelse(tolower(X18) %in% cat2,"Complete",clarity),
-         clarity = ifelse(tolower(X18) %in% cat3,"Incomplete",clarity))
+  mutate(clarity = ifelse(tolower(README_Quality) %in% cat1,"No ReadMe Provided","No Info"),
+         clarity = ifelse(tolower(README_Quality) %in% cat2,"Complete",clarity),
+         clarity = ifelse(tolower(README_Quality) %in% cat3,"Incomplete",clarity))
 # some code moved to FRAGMENTS.RNW
 # Correct two Noreadme provided to correct categories
 
