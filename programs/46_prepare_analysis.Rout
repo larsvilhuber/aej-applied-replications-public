@@ -51,7 +51,6 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -107,7 +106,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
@@ -268,8 +267,8 @@ Group variables            None
 4 metaregion                       0             1   2   6     0        5          0
 
 ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
-  skim_variable           n_missing complete_rate    mean      sd p0   p25   p50    p75   p100 hist 
-1 institution_works_count         0             1 128405. 167509.  0 7644. 56762 216482 859973 ▇▂▁▁▁
+  skim_variable           n_missing complete_rate    mean      sd p0  p25   p50    p75   p100 hist 
+1 institution_works_count         0             1 122605. 160267.  0 7934 53953 205453 839824 ▇▂▁▁▁
 > # > names(readRDS(authors.completed.df.rds))
 > # [1] "article_id"                 "au_id"                      "au_display_name"
 > # [5] "au_affiliation_raw"         "publication_year"           "is_nber"                    "institution_type"
@@ -303,8 +302,8 @@ Group variables            None
 4 metaregion                       0             1   2   6     0        5          0
 
 ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
-  skim_variable           n_missing complete_rate    mean      sd p0   p25   p50    p75   p100 hist 
-1 institution_works_count         0             1 128405. 167509.  0 7644. 56762 216482 859973 ▇▂▁▁▁
+  skim_variable           n_missing complete_rate    mean      sd p0  p25   p50    p75   p100 hist 
+1 institution_works_count         0             1 122605. 160267.  0 7934 53953 205453 839824 ▇▂▁▁▁
 > 
 > ## AUTHOR OWN INFORMATION: Publication experience
 > ## Keys: au_id
@@ -312,9 +311,200 @@ Group variables            None
 > 
 > rhs.c <- readRDS(authors.exp.df.rds) %>%
 +   select(au_id,earliest_pub)
-Error in gzfile(file, "rb") : cannot open the connection
-Calls: %>% -> select -> readRDS -> gzfile
-In addition: Warning message:
-In gzfile(file, "rb") :
-  cannot open compressed file '/home/rstudio/data/interwrk/authors.exp.df.Rds', probable reason 'No such file or directory'
-Execution halted
+> # [1] "au_id"           "au_display_name" "earliest_pub"    "latest_pub"
+> nrow(rhs.c)
+[1] 1114
+> 
+> 
+> # We need a crosswalk between DOI and article_id
+> 
+> # First, expand LHS to DOI,year,au_id
+> 
+> step1 <-
++   left_join(lhs,
++           aej_dois %>% select(DOI,author,article_id=id,publication_year),
++           by=c("DOI")) %>%
++   tidyr::unnest(author) %>%
++   select(DOI,year,au_id,article_id,publication_year,
++          max_cited_by_count,cited_by_count,ytd_cited_by_count)
+> nrow(step1)
+[1] 9936
+> nrow(step1 %>% distinct(DOI,year,au_id))
+[1] 9936
+> nrow(step1 %>% distinct(DOI))
+[1] 363
+> # [1] 363
+> nrow(step1 %>% distinct(au_id))
+[1] 658
+> # [1] 658
+> skim(step1)
+── Data Summary ────────────────────────
+                           Values
+Name                       step1 
+Number of rows             9936  
+Number of columns          8     
+_______________________          
+Column type frequency:           
+  character                3     
+  numeric                  5     
+________________________         
+Group variables            None  
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable n_missing complete_rate min max empty n_unique whitespace
+1 DOI                   0             1  17  20     0      363          0
+2 au_id                 0             1  32  32     0      658          0
+3 article_id            0             1  29  32     0      363          0
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable      n_missing complete_rate    mean    sd   p0   p25   p50   p75 p100 hist 
+1 year                       0             1 2018.    3.45 2012 2015. 2018. 2020. 2023 ▇▅▅▅▇
+2 publication_year           0             1 2013.    2.74 2009 2011  2013  2016  2018 ▇▇▇▇▆
+3 max_cited_by_count         0             1   96.7  99.2     1   32    60   125.  601 ▇▂▁▁▁
+4 cited_by_count             0             1    7.53  9.25    0    1     5    10   106 ▇▁▁▁▁
+5 ytd_cited_by_count         0             1   50.3  69.0    -1    7    25    65   601 ▇▁▁▁▁
+> 
+> # Add h-index
+> ## Keys: au_id,year
+> 
+> step2 <-
++   left_join(step1,rhs.a,by=c("au_id","year")) %>%
++   # a few hindex are missing, we set them to zero
++   mutate(hindex = replace_na(hindex,0))
+> skim(step2)
+── Data Summary ────────────────────────
+                           Values
+Name                       step2 
+Number of rows             9936  
+Number of columns          9     
+_______________________          
+Column type frequency:           
+  character                3     
+  numeric                  6     
+________________________         
+Group variables            None  
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable n_missing complete_rate min max empty n_unique whitespace
+1 DOI                   0             1  17  20     0      363          0
+2 au_id                 0             1  32  32     0      658          0
+3 article_id            0             1  29  32     0      363          0
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable      n_missing complete_rate    mean    sd   p0   p25   p50   p75 p100 hist 
+1 year                       0             1 2018.    3.45 2012 2015. 2018. 2020. 2023 ▇▅▅▅▇
+2 publication_year           0             1 2013.    2.74 2009 2011  2013  2016  2018 ▇▇▇▇▆
+3 max_cited_by_count         0             1   96.7  99.2     1   32    60   125.  601 ▇▂▁▁▁
+4 cited_by_count             0             1    7.53  9.25    0    1     5    10   106 ▇▁▁▁▁
+5 ytd_cited_by_count         0             1   50.3  69.0    -1    7    25    65   601 ▇▁▁▁▁
+6 hindex                     0             1   19.4  18.0     0    7    14    26   154 ▇▂▁▁▁
+> nrow(step2 %>% distinct(au_id))
+[1] 658
+> # [1] 658
+> nrow(step2 %>% distinct(article_id))
+[1] 363
+> # [1] 363
+> 
+> ## AUTHOR INSTITUTION INFORMATION
+> ## Keys: article_id,au_id
+> 
+> step3 <-
++   left_join(step2,
++             rhs.b ,
++             by=c("au_id"))
+> skim(step3)
+── Data Summary ────────────────────────
+                           Values
+Name                       step3 
+Number of rows             9936  
+Number of columns          13    
+_______________________          
+Column type frequency:           
+  character                6     
+  numeric                  7     
+________________________         
+Group variables            None  
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable            n_missing complete_rate min max empty n_unique whitespace
+1 DOI                              0         1      17  20     0      363          0
+2 au_id                            0         1      32  32     0      658          0
+3 article_id                       0         1      29  32     0      363          0
+4 institution_type                12         0.999   5  10     0        7          0
+5 institution_country_code        12         0.999   2   2     0       47          0
+6 metaregion                      12         0.999   2   6     0        5          0
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable           n_missing complete_rate      mean        sd   p0   p25    p50     p75   p100 hist 
+1 year                            0         1       2018.        3.45 2012 2015.  2018.   2020.   2023 ▇▅▅▅▇
+2 publication_year                0         1       2013.        2.74 2009 2011   2013    2016    2018 ▇▇▇▇▆
+3 max_cited_by_count              0         1         96.7      99.2     1   32     60     125.    601 ▇▂▁▁▁
+4 cited_by_count                  0         1          7.53      9.25    0    1      5      10     106 ▇▁▁▁▁
+5 ytd_cited_by_count              0         1         50.3      69.0    -1    7     25      65     601 ▇▁▁▁▁
+6 hindex                          0         1         19.4      18.0     0    7     14      26     154 ▇▂▁▁▁
+7 institution_works_count        12         0.999 121060.   157771.      0 7934  53953  210822  839824 ▇▂▁▁▁
+> nrow(step3 %>% distinct(au_id))
+[1] 658
+> # [1] 658
+> nrow(step3 %>% distinct(article_id))
+[1] 363
+> # [1] 363
+> 
+> ## Author self information
+> ## Keys: au_id
+> 
+> step4 <-
++   left_join(step3,rhs.c,by="au_id")
+> skim(step4)
+── Data Summary ────────────────────────
+                           Values
+Name                       step4 
+Number of rows             9936  
+Number of columns          14    
+_______________________          
+Column type frequency:           
+  character                6     
+  numeric                  8     
+________________________         
+Group variables            None  
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable            n_missing complete_rate min max empty n_unique whitespace
+1 DOI                              0         1      17  20     0      363          0
+2 au_id                            0         1      32  32     0      658          0
+3 article_id                       0         1      29  32     0      363          0
+4 institution_type                12         0.999   5  10     0        7          0
+5 institution_country_code        12         0.999   2   2     0       47          0
+6 metaregion                      12         0.999   2   6     0        5          0
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable           n_missing complete_rate      mean        sd   p0   p25    p50     p75   p100 hist 
+1 year                            0         1       2018.        3.45 2012 2015.  2018.   2020.   2023 ▇▅▅▅▇
+2 publication_year                0         1       2013.        2.74 2009 2011   2013    2016    2018 ▇▇▇▇▆
+3 max_cited_by_count              0         1         96.7      99.2     1   32     60     125.    601 ▇▂▁▁▁
+4 cited_by_count                  0         1          7.53      9.25    0    1      5      10     106 ▇▁▁▁▁
+5 ytd_cited_by_count              0         1         50.3      69.0    -1    7     25      65     601 ▇▁▁▁▁
+6 hindex                          0         1         19.4      18.0     0    7     14      26     154 ▇▂▁▁▁
+7 institution_works_count        12         0.999 121060.   157771.      0 7934  53953  210822  839824 ▇▂▁▁▁
+8 earliest_pub                   12         0.999   1998.       10.2  1963 1992   2000    2005    2017 ▁▂▃▇▃
+> nrow(step4 %>% distinct(au_id))
+[1] 658
+> # [1] 658
+> nrow(step4 %>% distinct(article_id))
+[1] 363
+> # [1] 363
+> 
+> names(step4)
+ [1] "DOI"                      "year"                     "au_id"                    "article_id"              
+ [5] "publication_year"         "max_cited_by_count"       "cited_by_count"           "ytd_cited_by_count"      
+ [9] "hindex"                   "institution_type"         "institution_works_count"  "institution_country_code"
+[13] "metaregion"               "earliest_pub"            
+> 
+> saveRDS(step4,bibliometric.rds)
+> 
+> ## OLS REGRESSIONS: next program
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  16.37    1.84   17.13 

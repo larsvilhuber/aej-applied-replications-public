@@ -46,7 +46,6 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -102,7 +101,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
@@ -111,9 +110,901 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 > 
 > 
 > mainOA.4yr <- readRDS(file.path(interwrk,"50_mainOA_4yr.Rds"))
-Error in gzfile(file, "rb") : cannot open the connection
-Calls: readRDS -> gzfile
-In addition: Warning message:
-In gzfile(file, "rb") :
-  cannot open compressed file '/home/rstudio/data/interwrk/50_mainOA_4yr.Rds', probable reason 'No such file or directory'
-Execution halted
+> mainOA.4yrpost2012 <- readRDS(file.path(interwrk,"50_mainOA_4yr_p2012.Rds"))
+> mainOA.allyears <- readRDS(file.path(interwrk,"50_mainOA_allyears.Rds"))
+> 
+> ### repeated footnotes ============================================================
+> 
+> 
+> source(file.path(programs,"_footnotes.R"))
+> 
+> 
+> # Run Regression: total citations on h-indices and confidential data
+> ols.cite.avgh <- lm(`YTD citations`~`Avg. H-index`* `Confidential data`,mainOA.4yr)
+> ols.cite.toph <- lm(`YTD citations`~`Max H-index`* `Confidential data`,mainOA.4yr)
+> ols.cite.lowh <- lm(`YTD citations`~`Min H-index`* `Confidential data`,mainOA.4yr)
+> 
+> covavgh <- vcovHC(ols.cite.avgh, type = "HC")
+> robust.seavgh <- sqrt(diag(covavgh))
+> covtoph <- vcovHC(ols.cite.toph, type = "HC")
+> robust.setoph <- sqrt(diag(covtoph))
+> covlowh <- vcovHC(ols.cite.lowh, type = "HC")
+> robust.selowh <- sqrt(diag(covlowh))
+> 
+> stargazer(ols.cite.avgh,ols.cite.toph,ols.cite.lowh,
++           title="OLS: Citations and Confidential Data",
++           align=TRUE,no.space=FALSE,
++           notes.append = FALSE,
++           label="reg2:OA:robust", se=list(NULL, robust.seavgh, robust.setoph,  robust.selowh),
++           dep.var.labels = "Total Citations",
++           style="qje", type="latex",
++           column.sep.width = "-15pt",
++           keep.stat = c("n"), out=file.path(Outputs,"table_reg2OA_rob.tex"),
++           notes.label = "",
++           notes.align="l",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     "\"Confidential data\" identifies if the article was assessed to have confidential data.",
++                     footnote.sample.assessed)
++ )
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 05:33:03 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Citations and Confidential Data} 
+  \label{reg2:OA:robust} 
+\begin{tabular}{@{\extracolsep{-15pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{3}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 1.200^{***} &  &  \\ 
+  & (0.258) &  &  \\ 
+  & & & \\ 
+ `Max H-index` &  & 0.594 &  \\ 
+  &  &  &  \\ 
+  & & & \\ 
+ `Min H-index` &  &  & 0.639 \\ 
+  &  &  &  \\ 
+  & & & \\ 
+ `Confidential data` & 8.440 & 6.010 & -6.870 \\ 
+  & (8.730) & (8.350) & (6.530) \\ 
+  & & & \\ 
+ `Avg. H-index`:`Confidential data` & -0.665 &  &  \\ 
+  & (0.451) &  &  \\ 
+  & & & \\ 
+ `Max H-index`:`Confidential data` &  & -0.346 &  \\ 
+  &  &  &  \\ 
+  & & & \\ 
+ `Min H-index`:`Confidential data` &  &  & 0.478 \\ 
+  &  &  &  \\ 
+  & & & \\ 
+ Constant & 21.600^{***} & 26.600^{***} & 35.600^{***} \\ 
+  & (5.200) & (5.940) & (4.710) \\ 
+  & & & \\ 
+\textit{N} & \multicolumn{1}{c}{273} & \multicolumn{1}{c}{273} & \multicolumn{1}{c}{273} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\multicolumn{4}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{4}{l}{Notes: } \\ 
+\multicolumn{4}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{4}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{4}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{4}{l}{"Confidential data" identifies if the article was assessed to have confidential data.} \\ 
+\multicolumn{4}{l}{Results for all articles with complete assessment.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> # add.lines = list(c("Fixed effects?", "No", "No"),
+> # c("Results believable?", "Maybe", "Try again later")))
+> #           omit        = "quarter",
+> # omit.labels = "Quarter dummies?")
+> 
+> ### Replicate table 13: Run Regression: citations on h-indices and replication success
+> 
+> #mainOAexit <- saveRDS(file.path(interwrk,"47_mainOA_exit.Rds"))
+> 
+> 
+> # Regressions
+> 
+> avgh <- lm(`YTD citations`~`Avg. H-index`* `Fully reproduced`,mainOA.4yr)
+> toph <- lm(`YTD citations`~`Max H-index`* `Fully reproduced`,mainOA.4yr)
+> lowh <- lm(`YTD citations`~`Min H-index`* `Fully reproduced`,mainOA.4yr)
+> 
+> avghp <- lm(`YTD citations`~`Avg. H-index`* `Full or Partial`,mainOA.4yr)
+> tophp <- lm(`YTD citations`~`Max H-index`* `Full or Partial`,mainOA.4yr)
+> lowhp <- lm(`YTD citations`~`Min H-index`* `Full or Partial`,mainOA.4yr)
+> covavgh <- vcovHC(avgh, type = "HC")
+> robust.seavgh <- sqrt(diag(covavgh))
+> covtoph <- vcovHC(toph, type = "HC")
+> robust.setoph <- sqrt(diag(covtoph))
+> covlowh <- vcovHC(lowh, type = "HC")
+> robust.selowh <- sqrt(diag(covlowh))
+> covavghp <- vcovHC(avghp, type = "HC")
+> robust.seavghp <- sqrt(diag(covavghp))
+> covtophp <- vcovHC(tophp, type = "HC")
+> robust.setophp <- sqrt(diag(covtophp))
+> covlowhp <- vcovHC(lowhp, type = "HC")
+> robust.selowhp <- sqrt(diag(covlowhp))
+> 
+> # Make table
+> stargazer(avgh,toph,lowh, avghp, tophp,lowhp,
++           title="OLS: Citations on Reproducibility (OA)",
++           align=TRUE,
++           no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="reg3:OA", se=list(NULL, robust.seavgh, robust.setoph,  robust.selowh, robust.seavghp, robust.setophp,  robust.selowhp),
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     footnote.full.partial, footnote.sample.attempted),
++           out=file.path(Outputs,"table_reg3OA_rob.tex")
++ )
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 05:33:03 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Citations on Reproducibility (OA)} 
+  \label{reg3:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{6}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.768^{**} &  &  & 0.448 &  &  \\ 
+  & (0.324) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index` &  & 0.355 &  &  & 0.159 &  \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Min H-index` &  &  & 0.582 &  &  & 0.562 \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Fully reproduced` & -7.130 & -8.270 & 14.200 &  &  &  \\ 
+  & (11.600) & (15.700) & (14.000) &  &  &  \\ 
+  & & & & & & \\ 
+ `Avg. H-index`:`Fully reproduced` & 1.290^{**} &  &  &  &  &  \\ 
+  & (0.576) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index`:`Fully reproduced` &  & 0.940 &  &  &  &  \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Min H-index`:`Fully reproduced` &  &  & 0.192 &  &  &  \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Full or Partial` &  &  &  & -13.200 & -11.400 & 3.260 \\ 
+  &  &  &  &  & (10.200) & (8.690) \\ 
+  & & & & & & \\ 
+ `Avg. H-index`:`Full or Partial` &  &  &  & 1.050 &  &  \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index`:`Full or Partial` &  &  &  &  & 0.597 &  \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Min H-index`:`Full or Partial` &  &  &  &  &  & 0.133 \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ Constant & 23.100^{***} & 26.700^{***} & 30.100^{***} & 31.100^{***} & 34.800^{***} & 32.900^{***} \\ 
+  & (6.520) & (3.580) & (3.350) & (3.500) & (6.970) & (6.290) \\ 
+  & & & & & & \\ 
+Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{7}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{7}{l}{Notes: } \\ 
+\multicolumn{7}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{7}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{7}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{7}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{7}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> ##### Same but with log: table 14
+> 
+> # Run Regression: citations on h-indices and replication success
+> avgh <- lm(`Log(YTD citations)`~`Avg. H-index`* `Fully reproduced`,mainOA.4yr)
+> toph <- lm(`Log(YTD citations)`~`Max H-index`* `Fully reproduced`,mainOA.4yr)
+> lowh <- lm(`Log(YTD citations)`~`Min H-index`* `Fully reproduced`,mainOA.4yr)
+> 
+> avghp <- lm(`Log(YTD citations)`~`Avg. H-index`* `Full or Partial`,mainOA.4yr)
+> tophp <- lm(`Log(YTD citations)`~`Max H-index`* `Full or Partial`,mainOA.4yr)
+> lowhp <- lm(`Log(YTD citations)`~`Min H-index`* `Full or Partial`,mainOA.4yr)
+> 
+> covavgh <- vcovHC(avgh, type = "HC")
+> robust.seavgh <- sqrt(diag(covavgh))
+> covtoph <- vcovHC(toph, type = "HC")
+> robust.setoph <- sqrt(diag(covtoph))
+> covlowh <- vcovHC(lowh, type = "HC")
+> robust.selowh <- sqrt(diag(covlowh))
+> covavghp <- vcovHC(avghp, type = "HC")
+> robust.seavghp <- sqrt(diag(covavghp))
+> covtophp <- vcovHC(tophp, type = "HC")
+> robust.setophp <- sqrt(diag(covtophp))
+> covlowhp <- vcovHC(lowhp, type = "HC")
+> robust.selowhp <- sqrt(diag(covlowhp))
+> 
+> # Print table
+> stargazer(avgh,toph, lowh, avghp, tophp, lowhp,
++           title="OLS: Log Citations on Reproducibility (OA)", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="logreg3alt:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,
++                     "Log(YTD citations) is computed as log(YTD Citations + 1).",
++                     footnote.lag.hindex, footnote.full.partial,
++                     footnote.sample.attempted),
++           out=file.path(Outputs,"table_logreg3OA_rob.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 05:33:04 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Log Citations on Reproducibility (OA)} 
+  \label{logreg3alt:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{6}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.026^{***} &  &  & 0.019^{*} &  &  \\ 
+  & (0.006) &  &  & (0.010) &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index` &  & 0.012^{***} &  &  & 0.008 &  \\ 
+  &  & (0.003) &  &  & (0.005) &  \\ 
+  & & & & & & \\ 
+ `Min H-index` &  &  & 0.021^{**} &  &  & 0.024 \\ 
+  &  &  & (0.010) &  &  & (0.016) \\ 
+  & & & & & & \\ 
+ `Fully reproduced` & 0.235 & 0.166 & 0.292 &  &  &  \\ 
+  & (0.225) & (0.203) & (0.202) &  &  &  \\ 
+  & & & & & & \\ 
+ `Avg. H-index`:`Fully reproduced` & 0.000 &  &  &  &  &  \\ 
+  & (0.011) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index`:`Fully reproduced` &  & 0.004 &  &  &  &  \\ 
+  &  & (0.006) &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Min H-index`:`Fully reproduced` &  &  & -0.002 &  &  &  \\ 
+  &  &  & (0.016) &  &  &  \\ 
+  & & & & & & \\ 
+ `Full or Partial` &  &  &  & -0.086 & -0.109 & 0.134 \\ 
+  &  &  &  & (0.245) & (0.214) & (0.241) \\ 
+  & & & & & & \\ 
+ `Avg. H-index`:`Full or Partial` &  &  &  & 0.010 &  &  \\ 
+  &  &  &  & (0.012) &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index`:`Full or Partial` &  &  &  &  & 0.007 &  \\ 
+  &  &  &  &  & (0.006) &  \\ 
+  & & & & & & \\ 
+ `Min H-index`:`Full or Partial` &  &  &  &  &  & -0.005 \\ 
+  &  &  &  &  &  & (0.018) \\ 
+  & & & & & & \\ 
+ Constant & 2.900^{***} & 3.010^{***} & 3.110^{***} & 3.040^{***} & 3.160^{***} & 3.110^{***} \\ 
+  & (0.127) & (0.110) & (0.124) & (0.212) & (0.185) & (0.214) \\ 
+  & & & & & & \\ 
+Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{7}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{7}{l}{Notes: } \\ 
+\multicolumn{7}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{7}{l}{Log(YTD citations) is computed as log(YTD Citations + 1).} \\ 
+\multicolumn{7}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{7}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{7}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{7}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> ##### Same but with arcsin table  13 and 14 alt
+> 
+> 
+> 
+> # Run Regression: citations on h-indices and replication success
+> avgh <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Fully reproduced`,mainOA.4yr)
+> toph <- lm(`AsinH(YTD citations)`~`Max H-index`* `Fully reproduced`,mainOA.4yr)
+> lowh <- lm(`AsinH(YTD citations)`~`Min H-index`* `Fully reproduced`,mainOA.4yr)
+> 
+> avghp <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Full or Partial`,mainOA.4yr)
+> tophp <- lm(`AsinH(YTD citations)`~`Max H-index`* `Full or Partial`,mainOA.4yr)
+> lowhp <- lm(`AsinH(YTD citations)`~`Min H-index`* `Full or Partial`,mainOA.4yr)
+> 
+> covavgh <- vcovHC(avgh, type = "HC")
+> robust.seavgh <- sqrt(diag(covavgh))
+> covtoph <- vcovHC(toph, type = "HC")
+> robust.setoph <- sqrt(diag(covtoph))
+> covlowh <- vcovHC(lowh, type = "HC")
+> robust.selowh <- sqrt(diag(covlowh))
+> covavghp <- vcovHC(avghp, type = "HC")
+> robust.seavghp <- sqrt(diag(covavghp))
+> covtophp <- vcovHC(tophp, type = "HC")
+> robust.setophp <- sqrt(diag(covtophp))
+> covlowhp <- vcovHC(lowhp, type = "HC")
+> robust.selowhp <- sqrt(diag(covlowhp))
+> # Print table
+> stargazer(avgh,toph, lowh, avghp, tophp, lowhp,
++           title="OLS: Arcsin Citations on Reproducibility (OA)", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcreg3alt:OA",se=list(NULL, robust.seavgh, robust.setoph,  robust.selowh, robust.seavghp, robust.setophp,  robust.selowhp),
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     footnote.full.partial,footnote.sample.attempted),
++           out=file.path(Outputs,"table_arcreg3OA_rob.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 05:33:04 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations on Reproducibility (OA)} 
+  \label{arcreg3alt:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{6}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.027^{***} &  &  & 0.021 &  &  \\ 
+  & (0.007) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index` &  & 0.013 &  &  & 0.009 &  \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Min H-index` &  &  & 0.023 &  &  & 0.026 \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Fully reproduced` & 0.263 & 0.189 & 0.314 &  &  &  \\ 
+  & (0.237) & (0.258) & (0.229) &  &  &  \\ 
+  & & & & & & \\ 
+ `Avg. H-index`:`Fully reproduced` & -0.000 &  &  &  &  &  \\ 
+  & (0.012) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index`:`Fully reproduced` &  & 0.003 &  &  &  &  \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Min H-index`:`Fully reproduced` &  &  & -0.003 &  &  &  \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Full or Partial` &  &  &  & -0.074 & -0.100 & 0.152 \\ 
+  &  &  &  &  & (0.296) & (0.260) \\ 
+  & & & & & & \\ 
+ `Avg. H-index`:`Full or Partial` &  &  &  & 0.009 &  &  \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index`:`Full or Partial` &  &  &  &  & 0.007 &  \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Min H-index`:`Full or Partial` &  &  &  &  &  & -0.006 \\ 
+  &  &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ Constant & 3.510^{***} & 3.630^{***} & 3.730^{***} & 3.650^{***} & 3.780^{***} & 3.730^{***} \\ 
+  & (0.134) & (0.144) & (0.126) & (0.128) & (0.263) & (0.230) \\ 
+  & & & & & & \\ 
+Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{7}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{7}{l}{Notes: } \\ 
+\multicolumn{7}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{7}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{7}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{7}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{7}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> ##### Now, bring in new information we have
+> # Run Regression: citations on h-indices and replication success, control for US region
+> avgh2 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Fully reproduced` + `Author at US university`,mainOA.4yr)
+> toph2 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Fully reproduced` + `Author at US university`,mainOA.4yr)
+> lowh2 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Fully reproduced` + `Author at US university`,mainOA.4yr)
+> 
+> avghp2 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Full or Partial` + `Author at US university`,mainOA.4yr)
+> tophp2 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Full or Partial` + `Author at US university`,mainOA.4yr)
+> lowhp2 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Full or Partial` + `Author at US university`,mainOA.4yr)
+> 
+> covavgh2 <- vcovHC(avgh2, type = "HC")
+> robust.seavgh2 <- sqrt(diag(covavgh2))
+> covtoph2 <- vcovHC(toph2, type = "HC")
+> robust.setoph2 <- sqrt(diag(covtoph2))
+> covlowh2 <- vcovHC(lowh2, type = "HC")
+> robust.selowh <- sqrt(diag(covlowh))
+> covavghp <- vcovHC(avghp, type = "HC")
+> robust.seavghp <- sqrt(diag(covavghp))
+> covtophp <- vcovHC(tophp, type = "HC")
+> robust.setophp <- sqrt(diag(covtophp))
+> covlowhp <- vcovHC(lowhp, type = "HC")
+> robust.selowhp <- sqrt(diag(covlowhp))
+> 
+> stargazer(avgh2,toph2, lowh2,avghp2, tophp2, lowhp2,
++           title="OLS: Arcsin Citations on Reproducibility, control for region (OA)", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcreg3cont:a:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     footnote.full.partial,
++                     footnote.region.us,
++                     footnote.sample.attempted),
++           out=file.path(Outputs,"table_arcreg3OA2.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 05:33:06 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations on Reproducibility, control for region (OA)} 
+  \label{arcreg3cont:a:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{6}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.027^{***} &  &  & 0.020^{*} &  &  \\ 
+  & (0.007) &  &  & (0.011) &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index` &  & 0.012^{***} &  &  & 0.009 &  \\ 
+  &  & (0.003) &  &  & (0.006) &  \\ 
+  & & & & & & \\ 
+ `Min H-index` &  &  & 0.022^{**} &  &  & 0.023 \\ 
+  &  &  & (0.011) &  &  & (0.017) \\ 
+  & & & & & & \\ 
+ `Fully reproduced` & 0.250 & 0.177 & 0.292 &  &  &  \\ 
+  & (0.239) & (0.215) & (0.214) &  &  &  \\ 
+  & & & & & & \\ 
+ `Full or Partial` &  &  &  & -0.078 & -0.100 & 0.119 \\ 
+  &  &  &  & (0.259) & (0.226) & (0.255) \\ 
+  & & & & & & \\ 
+ `Author at US university` & 0.102 & 0.110 & 0.180 & 0.129 & 0.136 & 0.209 \\ 
+  & (0.151) & (0.151) & (0.156) & (0.151) & (0.152) & (0.157) \\ 
+  & & & & & & \\ 
+ `Avg. H-index`:`Fully reproduced` & -0.000 &  &  &  &  &  \\ 
+  & (0.012) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index`:`Fully reproduced` &  & 0.003 &  &  &  &  \\ 
+  &  & (0.007) &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Min H-index`:`Fully reproduced` &  &  & -0.003 &  &  &  \\ 
+  &  &  & (0.017) &  &  &  \\ 
+  & & & & & & \\ 
+ `Avg. H-index`:`Full or Partial` &  &  &  & 0.009 &  &  \\ 
+  &  &  &  & (0.012) &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index`:`Full or Partial` &  &  &  &  & 0.006 &  \\ 
+  &  &  &  &  & (0.007) &  \\ 
+  & & & & & & \\ 
+ `Min H-index`:`Full or Partial` &  &  &  &  &  & -0.003 \\ 
+  &  &  &  &  &  & (0.020) \\ 
+  & & & & & & \\ 
+ Constant & 3.440^{***} & 3.560^{***} & 3.610^{***} & 3.560^{***} & 3.690^{***} & 3.600^{***} \\ 
+  & (0.165) & (0.154) & (0.170) & (0.246) & (0.223) & (0.246) \\ 
+  & & & & & & \\ 
+Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{7}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{7}{l}{Notes: } \\ 
+\multicolumn{7}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{7}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{7}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{7}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{7}{l}{`Author at US university' indicates that at least one of the authors was affiliated} \\ 
+\multicolumn{7}{l}{with a US university at the time the article was published. } \\ 
+\multicolumn{7}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> 
+> # Run Regression: citations on h-indices and replication success, control for US region
+> avgh3 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Fully reproduced` * `Author at US university`*
++               `Highest Institution Publications` ,mainOA.4yr)
+> toph3 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Fully reproduced` *  `Author at US university` *
++               `Highest Institution Publications`,mainOA.4yr)
+> lowh3 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Fully reproduced` * `Author at US university` *
++               `Highest Institution Publications`,mainOA.4yr)
+> 
+> avghp3 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Fully reproduced` * `Author at US university` *
++                `Highest Institution Publications` * `Highest Co-author Experience`,mainOA.4yr)
+> tophp3 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Fully reproduced` * `Author at US university` *
++                `Highest Institution Publications` * `Highest Co-author Experience`,mainOA.4yr)
+> lowhp3 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Fully reproduced` * `Author at US university` *
++                `Highest Institution Publications` * `Highest Co-author Experience`,mainOA.4yr)
+> 
+> stargazer(avgh3,avghp3,
++           title="OLS: Arcsin Citations on Reproducibility, control for institution productivity (OA)",
++           align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcreg3prod:a:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           notes.label = "",
++           omit = c(
++ 
++             "`Avg. H-index`:`Fully reproduced`:`Author at US university`:`Highest Institution Publications`",
++             "`Avg. H-index`:`Fully reproduced`:`Author at US university`:`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Avg. H-index`:`Author at US university`:`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Fully reproduced`:`Author at US university`:`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Min H-index`:`Fully reproduced`:`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Max H-index`:`Fully reproduced`:`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Avg. H-index`:`Fully reproduced`:`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Min H-index`:`Fully reproduced`:`Author at US university`:`Highest Co-author Experience`",
++             "`Max H-index`:`Fully reproduced`:`Author at US university`:`Highest Co-author Experience`",
++             "`Avg. H-index`:`Fully reproduced`:`Author at US university`:`Highest Co-author Experience`",
++             "`Author at US university`:`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Fully reproduced`:`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Min H-index`:`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Max H-index`:`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Avg. H-index`:`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Fully reproduced`:`Author at US university`:`Highest Co-author Experience`",
++             "`Min H-index`:`Author at US university`:`Highest Co-author Experience`",
++             " `Min H-index`:`Fully reproduced`:`Highest Co-author Experience`",
++             "`Max H-index`:`Author at US university`:`Highest Co-author Experience`",
++             "`Max H-index`:`Fully reproduced`:`Highest Co-author Experience`",
++             "`Avg. H-index`:`Author at US university`:`Highest Co-author Experience`",
++             "`Avg. H-index`:`Fully reproduced`:`Highest Co-author Experience`",
++             "`Fully reproduced`:`Author at US university`:`Highest Institution Publications`",
++             "`Min H-index`:`Author at US university`:`Highest Institution Publications`",
++             "`Min H-index`:`Fully reproduced`:`Highest Institution Publications`",
++             "`Author at US university`:`Highest Co-author Experience`",
++             "`Author at US university`:`Highest Institution Publications`",
++             "`Highest Institution Publications`:`Highest Co-author Experience`",
++             "`Avg. H-index`:`Fully reproduced`:`Highest Institution Publications`"
++           ),
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     footnote.full.partial,
++                     footnote.region.us,footnote.productivity,footnote.experience,
++                     footnote.sample.attempted),
++           out=file.path(Outputs,"table_arcreg3OA3.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 05:33:06 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations on Reproducibility, control for institution productivity (OA)} 
+  \label{arcreg3prod:a:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{2}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.089^{**} & 0.083 \\ 
+  & (0.039) & (0.133) \\ 
+  & & \\ 
+ `Fully reproduced` & 1.920^{*} & 3.000 \\ 
+  & (1.150) & (3.100) \\ 
+  & & \\ 
+ `Author at US university` & 0.923^{*} & -0.291 \\ 
+  & (0.501) & (1.130) \\ 
+  & & \\ 
+ `Highest Institution Publications` & 0.083^{*} & -0.051 \\ 
+  & (0.042) & (0.112) \\ 
+  & & \\ 
+ `Highest Co-author Experience` &  & -0.037 \\ 
+  &  & (0.061) \\ 
+  & & \\ 
+ `Avg. H-index`:`Fully reproduced` & -0.128^{*} & -0.199 \\ 
+  & (0.071) & (0.311) \\ 
+  & & \\ 
+ `Avg. H-index`:`Author at US university` & -0.064 & 0.019 \\ 
+  & (0.041) & (0.138) \\ 
+  & & \\ 
+ `Fully reproduced`:`Author at US university` & -1.980 & -1.700 \\ 
+  & (1.220) & (3.230) \\ 
+  & & \\ 
+ `Avg. H-index`:`Highest Institution Publications` & -0.005 & 0.000 \\ 
+  & (0.004) & (0.012) \\ 
+  & & \\ 
+ `Fully reproduced`:`Highest Institution Publications` & -0.147 & -0.057 \\ 
+  & (0.130) & (0.406) \\ 
+  & & \\ 
+ `Avg. H-index`:`Highest Co-author Experience` &  & 0.001 \\ 
+  &  & (0.006) \\ 
+  & & \\ 
+ `Fully reproduced`:`Highest Co-author Experience` &  & -0.040 \\ 
+  &  & (0.157) \\ 
+  & & \\ 
+ `Avg. H-index`:`Fully reproduced`:`Author at US university` & 0.138^{*} & 0.127 \\ 
+  & (0.074) & (0.317) \\ 
+  & & \\ 
+ Constant & 2.600^{***} & 3.150^{***} \\ 
+  & (0.446) & (1.030) \\ 
+  & & \\ 
+Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{3}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{3}{l}{Notes: } \\ 
+\multicolumn{3}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{3}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{3}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{3}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{3}{l}{`Author at US university' indicates that at least one of the authors was affiliated} \\ 
+\multicolumn{3}{l}{with a US university at the time the article was published. } \\ 
+\multicolumn{3}{l}{`Institution Publications' is measured as number of works produced by that} \\ 
+\multicolumn{3}{l}{institution's authors in particular year. We use the maximum across the authors'} \\ 
+\multicolumn{3}{l}{institutions. } \\ 
+\multicolumn{3}{l}{Author experience is computed as years since first publication.} \\ 
+\multicolumn{3}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> # Do year since publication, allow for several years
+> 
+> # RHS reproducible confidential dummy for "2019 or later" (année où des data editor ont été nommés)
+> avgh <- lm(`AsinH(new citations)`~`Avg. H-index`*`Fully reproduced`,mainOA.allyears)
+> avghY <- lm(`AsinH(new citations)`~`Avg. H-index`* `Fully reproduced`*`Years since publication`,mainOA.allyears)
+> avghD2019 <- lm(`AsinH(new citations)`~`Avg. H-index`* `Fully reproduced`*`Year >= 2019` ,mainOA.allyears)
+> avghD2019Y <- lm(`AsinH(new citations)`~`Avg. H-index`* `Fully reproduced`*`Year >= 2019` *
++                    `Years since publication`,mainOA.allyears)
+> 
+> 
+> stargazer(avgh, avghY,avghD2019, avghD2019Y,
++           title="OLS: Arcsin Citations - Dynamic Effect (OA)", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcregdum:OA",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           notes.label = "",
++           dep.var.labels = "New Citations",
++           omit = c("`Years since publication`:`Year >= 2019`",
++                    "`Avg. H-index`:`Fully reproduced`:`Year >= 2019`TRUE:`Years since publication`",
++                    "`Fully reproduced`:`Year >= 2019`TRUE:`Years since publication`",
++                    "`Avg. H-index`:`Year >= 2019`TRUE:`Years since publication`"),
++           notes = c(footnote.base,"Notes: ",footnote.new.all,footnote.lag.hindex,
++                     footnote.full.partial,footnote.sample.attempted),
++           out=file.path(Outputs,"table_arcreg3OA4.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 05:33:07 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations - Dynamic Effect (OA)} 
+  \label{arcregdum:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{4}{c}{New Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.028^{***} & 0.035^{***} & 0.030^{***} & 0.040^{***} \\ 
+  & (0.004) & (0.010) & (0.004) & (0.010) \\ 
+  & & & & \\ 
+ `Fully reproduced` & 0.280^{**} & -0.166 & 0.361^{**} & -0.262 \\ 
+  & (0.123) & (0.299) & (0.153) & (0.334) \\ 
+  & & & & \\ 
+ `Years since publication` &  & 0.064 &  & 0.112^{*} \\ 
+  &  & (0.049) &  & (0.058) \\ 
+  & & & & \\ 
+ `Year \textgreater = 2019` &  &  & 0.158 & 1.260^{**} \\ 
+  &  &  & (0.161) & (0.556) \\ 
+  & & & & \\ 
+ `Avg. H-index`:`Fully reproduced` & -0.000 & 0.020 & -0.000 & 0.033^{*} \\ 
+  & (0.006) & (0.017) & (0.008) & (0.019) \\ 
+  & & & & \\ 
+ `Avg. H-index`:`Years since publication` &  & -0.002 &  & -0.004 \\ 
+  &  & (0.003) &  & (0.003) \\ 
+  & & & & \\ 
+ `Fully reproduced`:`Years since publication` &  & 0.145 &  & 0.234^{**} \\ 
+  &  & (0.089) &  & (0.111) \\ 
+  & & & & \\ 
+ `Year \textgreater = 2019`TRUE:`Years since publication` &  &  &  & -0.317^{**} \\ 
+  &  &  &  & (0.141) \\ 
+  & & & & \\ 
+ `Avg. H-index`:`Fully reproduced`:`Years since publication` &  & -0.006 &  & -0.012^{**} \\ 
+  &  & (0.005) &  & (0.006) \\ 
+  & & & & \\ 
+ `Avg. H-index`:`Year \textgreater = 2019` &  &  & -0.008 & -0.055^{*} \\ 
+  &  &  & (0.009) & (0.030) \\ 
+  & & & & \\ 
+ `Fully reproduced`:`Year \textgreater = 2019` &  &  & -0.281 & -0.445 \\ 
+  &  &  & (0.264) & (0.851) \\ 
+  & & & & \\ 
+ `Avg. H-index`:`Fully reproduced`:`Year \textgreater = 2019` &  &  & 0.003 & -0.036 \\ 
+  &  &  & (0.014) & (0.048) \\ 
+  & & & & \\ 
+ Constant & 1.830^{***} & 1.640^{***} & 1.790^{***} & 1.500^{***} \\ 
+  & (0.069) & (0.164) & (0.079) & (0.177) \\ 
+  & & & & \\ 
+Observations & \multicolumn{1}{c}{808} & \multicolumn{1}{c}{808} & \multicolumn{1}{c}{808} & \multicolumn{1}{c}{808} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{5}{l}{Notes: } \\ 
+\multicolumn{5}{l}{New citations are the new citations to the article in each year 1 to 5.} \\ 
+\multicolumn{5}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{5}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{5}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{5}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> ###  Robustness regression:
+> avgh12 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Fully reproduced`,mainOA.4yrpost2012)
+> toph12 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Fully reproduced`,mainOA.4yrpost2012)
+> lowh12 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Fully reproduced`,mainOA.4yrpost2012)
+> 
+> avghp12 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Full or Partial`,mainOA.4yrpost2012)
+> tophp12 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Full or Partial`,mainOA.4yrpost2012)
+> lowhp12 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Full or Partial`,mainOA.4yrpost2012)
+> 
+> # Print table
+> stargazer(avgh12,toph12, lowh12, avghp12, tophp12, lowhp12,
++           title="OLS: Arcsin Citations on Reproducibility (OA), post-2012", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="arcregp2012:OA",
++           dep.var.labels = "Total Citations",
++           style="aer", type="latex",
++           column.sep.width = "-20pt",
++           keep.stat = c("n"),
++           notes.label = "",
++           notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
++                     footnote.full.partial,footnote.sample.attempted,footnote.post2012),
++           out=file.path(Outputs,"table_arcregpost12OA.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 05:33:08 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{OLS: Arcsin Citations on Reproducibility (OA), post-2012} 
+  \label{arcregp2012:OA} 
+\begin{tabular}{@{\extracolsep{-20pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+\\[-1.8ex] & \multicolumn{6}{c}{Total Citations} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\hline \\[-1.8ex] 
+ `Avg. H-index` & 0.031^{***} &  &  & 0.025 &  &  \\ 
+  & (0.009) &  &  & (0.018) &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index` &  & 0.015^{***} &  &  & 0.013 &  \\ 
+  &  & (0.004) &  &  & (0.010) &  \\ 
+  & & & & & & \\ 
+ `Min H-index` &  &  & 0.025 &  &  & 0.029 \\ 
+  &  &  & (0.018) &  &  & (0.030) \\ 
+  & & & & & & \\ 
+ `Fully reproduced` & 0.054 & 0.018 & 0.234 &  &  &  \\ 
+  & (0.258) & (0.237) & (0.240) &  &  &  \\ 
+  & & & & & & \\ 
+ `Avg. H-index`:`Fully reproduced` & 0.016 &  &  &  &  &  \\ 
+  & (0.016) &  &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index`:`Fully reproduced` &  & 0.014 &  &  &  &  \\ 
+  &  & (0.009) &  &  &  &  \\ 
+  & & & & & & \\ 
+ `Min H-index`:`Fully reproduced` &  &  & 0.011 &  &  &  \\ 
+  &  &  & (0.026) &  &  &  \\ 
+  & & & & & & \\ 
+ `Full or Partial` &  &  &  & -0.015 & 0.023 & 0.159 \\ 
+  &  &  &  & (0.313) & (0.291) & (0.311) \\ 
+  & & & & & & \\ 
+ `Avg. H-index`:`Full or Partial` &  &  &  & 0.016 &  &  \\ 
+  &  &  &  & (0.019) &  &  \\ 
+  & & & & & & \\ 
+ `Max H-index`:`Full or Partial` &  &  &  &  & 0.008 &  \\ 
+  &  &  &  &  & (0.011) &  \\ 
+  & & & & & & \\ 
+ `Min H-index`:`Full or Partial` &  &  &  &  &  & 0.005 \\ 
+  &  &  &  &  &  & (0.034) \\ 
+  & & & & & & \\ 
+ Constant & 3.460^{***} & 3.530^{***} & 3.660^{***} & 3.480^{***} & 3.540^{***} & 3.590^{***} \\ 
+  & (0.139) & (0.123) & (0.149) & (0.285) & (0.267) & (0.283) \\ 
+  & & & & & & \\ 
+Observations & \multicolumn{1}{c}{129} & \multicolumn{1}{c}{129} & \multicolumn{1}{c}{129} & \multicolumn{1}{c}{129} & \multicolumn{1}{c}{129} & \multicolumn{1}{c}{129} \\ 
+\hline \\[-1.8ex] 
+\multicolumn{7}{l}{$^{***} p< 0.01$, $^{**} p< 0.05$, $^{*} p < 0.1$} \\ 
+\multicolumn{7}{l}{Notes: } \\ 
+\multicolumn{7}{l}{YTD citations are cumulative citations to the article in Year 4.} \\ 
+\multicolumn{7}{l}{H-index measures are computed across all authors of an article, in the previous year.} \\ 
+\multicolumn{7}{l}{An author without citations has an h-index of 0. } \\ 
+\multicolumn{7}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{7}{l}{Results for all articles with attempted reproduction.} \\ 
+\multicolumn{7}{l}{Sample restricted to articles published in 2012 and later, with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> mainOAnoconf  <- readRDS(file=file.path(interwrk,"47_mainOA_noconf.Rds"))
+> 
+> 
+> 
+> 
+> # table of summary stats
+> st1 <- mainOA.4yr %>% select(`Fully reproduced`, `Full or Partial`, `AsinH(YTD citations)`,  `Avg. H-index`,`Max H-index`, `Min H-index`)
+> st2 <- mainOA.4yr %>% filter(!is.na(Reproduced)) %>% select(`Fully reproduced`, `Full or Partial`, `AsinH(YTD citations)`,  `Avg. H-index`,`Max H-index`, `Min H-index`)
+> 
+> stargazer(st1,
++           title="Summary statistics", align=TRUE,no.space=FALSE,
++           notes.align = "l", notes.append = FALSE,
++           label="tab:statdesc:assessed",
++           style="aer",
++           flip=FALSE,
++           font.size = fs,column.sep.width = cw,
++           notes = c("Notes: ", footnote.full.partial, footnote.sample.assessed),
++           out=file.path(Outputs,"table_stassessed.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 05:33:08 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Summary statistics} 
+  \label{tab:statdesc:assessed} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+Fully reproduced & 180 & 0.378 & 0.486 & 0 & 1 \\ 
+Full or Partial & 180 & 0.761 & 0.428 & 0 & 1 \\ 
+AsinH(YTD citations) & 273 & 4.040 & 0.886 & 0.000 & 6.540 \\ 
+Avg. H-index & 273 & 16.400 & 11.000 & 1.000 & 63.000 \\ 
+Max H-index & 273 & 24.800 & 20.400 & 1 & 133 \\ 
+Min H-index & 273 & 9.360 & 7.340 & 1 & 52 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{6}{l}{Notes: } \\ 
+\multicolumn{6}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{6}{l}{Results for all articles with complete assessment.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> stargazer(st2,
++           title="Summary statistics", align=TRUE,no.space=FALSE,rownames=TRUE,
++           notes.align = "l", notes.append = FALSE,
++           label="tab:statdesc:attemped",
++           style="aer",
++           flip=FALSE,
++           font.size = fs,column.sep.width = cw,
++           notes = c("Notes: ", footnote.full.partial, footnote.sample.attempted),
++           out=file.path(Outputs,"table_stattempted.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 05:33:08 AM
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Summary statistics} 
+  \label{tab:statdesc:attemped} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+Fully reproduced & 180 & 0.378 & 0.486 & 0 & 1 \\ 
+Full or Partial & 180 & 0.761 & 0.428 & 0 & 1 \\ 
+AsinH(YTD citations) & 180 & 4.060 & 0.875 & 0.881 & 6.540 \\ 
+Avg. H-index & 180 & 16.800 & 11.100 & 1.000 & 63.000 \\ 
+Max H-index & 180 & 25.500 & 20.900 & 1 & 133 \\ 
+Min H-index & 180 & 9.710 & 7.630 & 1 & 52 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{6}{l}{Notes: } \\ 
+\multicolumn{6}{l}{Full or partial reproduction are defined in the text.} \\ 
+\multicolumn{6}{l}{Results for all articles with attempted reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  18.30    3.58   18.70 

@@ -50,7 +50,6 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -106,7 +105,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
@@ -216,8 +215,8 @@ Loading file from previous version.
 Author-article-year: 5236235
 > gc()
             used (Mb) gc trigger (Mb)  max used (Mb)
-Ncells   7277622  389   15736558  840  15736558  840
-Vcells 124130759  947  195174134 1489 162524888 1240
+Ncells   7350893  393   17968987  960  17968987  960
+Vcells 145382055 1109  240944578 1838 200611102 1531
 > TMP %>%
 +   # We only want the data for the authors in our sample.
 +   right_join(authors.in.sample %>% select(au_id),
@@ -230,8 +229,8 @@ Vcells 124130759  947  195174134 1489 162524888 1240
 > 
 > gc()
            used (Mb) gc trigger (Mb)  max used (Mb)
-Ncells  7248861  387   15736558  840  15736558  840
-Vcells 63657112  486  195174134 1489 195150557 1489
+Ncells  7322129  391   17968987  960  17968987  960
+Vcells 84908403  648  240944578 1838 230281358 1757
 > TMP %>%
 +   # But this gets us all the data for ALL the co-authors on papers that are out of scope.
 +   # Kenneth J Arrow rule...
@@ -267,8 +266,8 @@ Joining with `by = join_by(au_id)`
 > rm(TMP)
 > gc()
            used (Mb) gc trigger (Mb)  max used (Mb)
-Ncells  7139846  381   15736558  840  15736558  840
-Vcells 50296417  384  156139308 1191 195150557 1489
+Ncells  7213095  385   17968987  960  17968987  960
+Vcells 63648965  486  192755663 1471 230281358 1757
 > 
 > 
 > nrow(citations.df)
@@ -476,4 +475,4 @@ Group variables            None
 > 
 > proc.time()
    user  system elapsed 
-  56.53    2.62   57.87 
+  56.59    2.33   57.64 

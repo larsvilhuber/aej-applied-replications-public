@@ -19,17 +19,12 @@ Type 'q()' to quit R.
 
 [Previously saved workspace restored]
 
-> ### R code from vignette source 'conclusion.Rnw'
-> 
-> ###################################################
-> ### code chunk number 1: conclusion.Rnw:7-10
-> ###################################################
-> PctDeWald1986 <- round(7/54*100,2)
-> PctMcCullough2006 <- round(14/186*100,2)
-> PctChangLi2015 <- round(22/67*100,2)
+> # write out the numbers collected
 > 
 > 
-> 
-> proc.time()
-   user  system elapsed 
- 10.690   1.736  10.794 
+> ### Load libraries 
+> ### Requirements: have library *here*
+> source(here::here("global-libraries.R"),echo=TRUE)
+Error in loadNamespace(x) : there is no package called ‘here’
+Calls: source ... loadNamespace -> withRestarts -> withOneRestart -> doWithOneRestart
+Execution halted

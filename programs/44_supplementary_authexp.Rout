@@ -49,7 +49,6 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -105,7 +104,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
@@ -136,5 +135,112 @@ Loading file from previous version.
 + } else {
 +   stop(paste0("File should have been present: ",citations.df.rds))
 + }
-Error: File should have been present: /home/rstudio/data/interwrk/citations.df.Rds
-Execution halted
+File already exists: /home/rstudio/data/interwrk/citations.df.Rds
+Loading file from previous version.
+> 
+> ## load the file from disk
+> citations.df <- readRDS(citations.df.rds)
+> 
+> # there are citations that are wrong
+> message(paste0(" Unique authors in citations.df: ",nrow(citations.df %>% distinct(au_id))))
+ Unique authors in citations.df: 1114
+> 
+> 
+> # names(citations.df)
+> citations.df %>%
++   # Kenneth J Arrow rule...
++   filter(publication_year > 1950) %>%
++   select(starts_with("au"),article_id,publication_year) %>%
++   distinct(au_id,article_id,.keep_all = TRUE) %>%
++   group_by(au_id) %>%
++   mutate(earliest_pub = min(publication_year),
++          latest_pub = max(publication_year)) %>%
++   select(starts_with("au"),earliest_pub,latest_pub) %>%
++   distinct(au_id,.keep_all = TRUE) -> author_exp.early
+> 
+> message(paste0(" Unique authors in author_exp.early: ",nrow(author_exp.early %>% distinct(au_id))))
+ Unique authors in author_exp.early: 1114
+> 
+> # Verify plausibility
+> 
+> author_exp.early %>%
++   mutate(exp=latest_pub-earliest_pub) %>%
++   filter(exp > 50 | earliest_pub < 1950) -> audit
+> 
+> audit <- left_join(audit %>% select(au_id,au_display_name,earliest_pub) %>% distinct(),
++                    authors.df %>% select(article_id,au_id,publication_year,doi.url),
++                    by=c("au_id","earliest_pub"="publication_year"),multiple="all")
+> 
+> 
+> write_excel_csv(audit,file=file.path(interwrk,"audit-exp.csv"))
+> 
+> # Edit instructions
+> # - Open the CSV
+> # - Search for information on the named author. The spreadsheet has the early publications.
+> #   These MIGHT be legit (Kenneth J Arrow is legit!) but mostly not.
+> # - Find the year of Ph.D., or if not available, via Google Scholar, the observed earliest year of publication.
+> # - Save the CSV-imported file with the SAME name, but as XLSX in crossrefloc!
+> 
+> # Read them back in.
+> 
+> exp_audit <- read_excel(file.path(crossrefloc,"audit-exp.xlsx")) %>%
++   select(au_id,verified_first) %>%
++   filter(!is.na(verified_first)) %>%
++   group_by(au_id) %>%
++   mutate(verified_first=min(verified_first,na.rm=TRUE)) %>%
++   distinct()
+> 
+> nrow(exp_audit)
+[1] 112
+> # merge the audited data back on. Also apply conditions.
+> 
+> citations.df %>%
++   # Kenneth J Arrow rule...
++   filter(publication_year > 1950) %>%
++   select(starts_with("au"),article_id,publication_year) %>%
++   distinct(au_id,article_id,.keep_all = TRUE) %>%
++   group_by(au_id) %>%
++   mutate(earliest_pub = min(publication_year),
++          latest_pub = max(publication_year)) %>%
++   # bring in audited file
++   left_join(exp_audit,by=c("au_id")) %>%
++   mutate(earliest_pub = max(earliest_pub,verified_first,na.rm=TRUE)) %>%
++   select(starts_with("au"),earliest_pub,latest_pub) %>%
++   distinct(au_id,.keep_all = TRUE) %>%
++   ungroup() -> author_exp.final
+> 
+> message(paste0(" Unique authors in author_exp.final: ",nrow(author_exp.final %>% distinct(au_id))))
+ Unique authors in author_exp.final: 1114
+> 
+> saveRDS(author_exp.final,file=authors.exp.df.rds)
+> nrow(author_exp.final %>% distinct(au_id))
+[1] 1114
+> skim(author_exp.final)
+── Data Summary ────────────────────────
+                           Values          
+Name                       author_exp.final
+Number of rows             1114            
+Number of columns          4               
+_______________________                    
+Column type frequency:                     
+  character                2               
+  numeric                  2               
+________________________                   
+Group variables            None            
+
+── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable   n_missing complete_rate min max empty n_unique whitespace
+1 au_id                   0             1  32  32     0     1114          0
+2 au_display_name         0             1   5  29     0     1110          0
+
+── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable n_missing complete_rate  mean     sd   p0   p25  p50  p75 p100 hist 
+1 earliest_pub          0             1 2001. 11.1   1951 1994. 2003 2009 2021 ▁▁▃▇▅
+2 latest_pub            0             1 2021.  0.758 2011 2021  2021 2021 2021 ▁▁▁▁▇
+> 
+> # merge the h-index data by year of publication, do aggregations across authors
+> # Run the same regressions as with WoS data
+> 
+> proc.time()
+   user  system elapsed 
+  15.96    1.94   16.83 

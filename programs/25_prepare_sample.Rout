@@ -25,7 +25,7 @@ Type 'q()' to quit R.
 > ### code chunk number 1: setparent
 > ###################################################
 > #knitr::set_parent('Replication_aejae.Rnw')
-> 
+> #load("../data/interwrk/my_work_space.RData")
 > source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
 > source(file.path(basepath,"global-libraries.R"),echo=FALSE)
 Loading required package: dplyr
@@ -47,7 +47,6 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -103,20 +102,9 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Loading required package: reshape2
-
-Attaching package: ‘reshape2’
-
-The following objects are masked from ‘package:data.table’:
-
-    dcast, melt
-
-The following object is masked from ‘package:tidyr’:
-
-    smiths
-
-Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
   Use `force = TRUE` to force installation
+> #source(file.path(TexBase,"libraries.R"), echo=FALSE)
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
 > # Read analysis data
@@ -126,12 +114,12 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 
 > d <- repllist4 %>% mutate(replicated_clean = replicated1_clean)
 
-> exit <- readRDS(file = file.path(dataloc, "exitQ_pub.Rds"))
+> exit <- readRDS(file = file.path(dataloc, "exitQ.Rds"))
 
-> entry <- readRDS(file = file.path(dataloc, "entryQ_pub.Rds"))
+> entry <- readRDS(file = file.path(dataloc, "entryQ.Rds"))
 
-> bibinfo.df <- readRDS(file = file.path(crossrefloc, 
-+     "crossref_info.Rds")) %>% select(DOI, year, journal)
+> bibinfo.df <- readRDS(file = file.path(interwrk, "crossref_info.Rds")) %>% 
++     select(DOI, year, journal)
 
 > bibinfo.df$journal <- gsub("American Economic Journal: Applied Economics", 
 +     "AEJ:AE", bibinfo.df$journal)
@@ -233,8 +221,8 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 > cat2 <- c("complete. provided all information required to run the programs.")
 > cat3 <- c("incomplete. was ambiguous or left out crucial steps.")
 > exit_d <- exit_d %>%
-+   mutate(README_Quality = if_else(DOI=="10.1257/app.3.2.1","No Info", README_Quality))  %>%
-+   mutate(README_Quality = if_else(DOI=="10.1257/app.20160089","Complete. Provided all information required to run the programs.",README_Quality))
++   mutate(X18 = if_else(DOI=="10.1257/app.3.2.1","No Info", X18))  %>%
++   mutate(X18 = if_else(DOI=="10.1257/app.20160089","Complete. Provided all information required to run the programs.",X18))
 > 
 > exit_merge <- exit_d %>%
 +   mutate(dup = paste(DOI,Replication_Success)) %>%
@@ -250,9 +238,9 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 +          lab = ifelse(grepl("No", lab) & grepl("NA", lab),"No",lab),
 +          replicated = lab) %>%
 +   distinct(DOI, .keep_all = TRUE) %>%
-+   mutate(clarity = ifelse(tolower(README_Quality) %in% cat1,"No ReadMe Provided","No Info"),
-+          clarity = ifelse(tolower(README_Quality) %in% cat2,"Complete",clarity),
-+          clarity = ifelse(tolower(README_Quality) %in% cat3,"Incomplete",clarity))
++   mutate(clarity = ifelse(tolower(X18) %in% cat1,"No ReadMe Provided","No Info"),
++          clarity = ifelse(tolower(X18) %in% cat2,"Complete",clarity),
++          clarity = ifelse(tolower(X18) %in% cat3,"Incomplete",clarity))
 > # some code moved to FRAGMENTS.RNW
 > # Correct two Noreadme provided to correct categories
 > 
@@ -396,4 +384,4 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 > 
 > proc.time()
    user  system elapsed 
-   25.0     1.9    25.5 
+  22.46    1.85   23.09 

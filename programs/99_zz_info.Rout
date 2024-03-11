@@ -99,6 +99,18 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
+Loading required package: reshape2
+
+Attaching package: ‘reshape2’
+
+The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
 Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
@@ -110,4 +122,4 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 > 
 > proc.time()
    user  system elapsed 
-  14.75    1.81   15.10 
+   13.1     1.9    13.6 

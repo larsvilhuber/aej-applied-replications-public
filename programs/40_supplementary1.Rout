@@ -45,7 +45,6 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -101,7 +100,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
@@ -155,7 +154,7 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 > # clean read-back
 > aejdois <- readRDS(file= doi.file.Rds)
 > nrow(aejdois)
-[1] 647
+[1] 630
 > 
 > # subset to the years in-scope: 2009-2018.
 > aejdois %>%
@@ -169,7 +168,7 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 # A tibble: 10 × 2
    year  Published
    <chr>     <int>
- 1 2009         35
+ 1 2009         34
  2 2010         40
  3 2011         37
  4 2012         40
@@ -186,7 +185,7 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 # A tibble: 1 × 1
       n
   <int>
-1   364
+1   363
 > 
 > #  Some nnumbers for the text
 > cat(as.numeric(aejdois.total),
@@ -202,9 +201,94 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 > # This redoes Table 1, after R&R
 > 
 > complete_sample <- readRDS(file=file.path(dataloc,"00_complete_sample.Rds"))
-Error in gzfile(file, "rb") : cannot open the connection
-Calls: readRDS -> gzfile
-In addition: Warning message:
-In gzfile(file, "rb") :
-  cannot open compressed file '/home/rstudio/data/replication_data/00_complete_sample.Rds', probable reason 'No such file or directory'
-Execution halted
+> nrow(complete_sample)
+[1] 274
+> 
+> # test: match to complete sample by DOI, should be no missing (complete_rate = 1)
+> 
+> left_join(complete_sample,aejdois %>% mutate(match=TRUE),by=c("DOI"="doi")) %>% select(match) %>% skim()
+── Data Summary ────────────────────────
+                           Values    
+Name                       Piped data
+Number of rows             274       
+Number of columns          1         
+_______________________              
+Column type frequency:               
+  logical                  1         
+________________________             
+Group variables            None      
+
+── Variable type: logical ──────────────────────────────────────────────────────────────────────────────────────────────
+  skim_variable n_missing complete_rate mean count   
+1 match                 0             1    1 TRU: 274
+> 
+> # create the table
+> 
+> complete_sample %>%
++   group_by(year) %>%
++   summarize(Selected=n()) %>%
++   right_join(aejdois.by.year) -> t_entry
+Joining with `by = join_by(year)`
+> 
+> 
+> 
+> # Add sum row
+> t_entry[11,1] = c("Total")
+> t_entry[11,2] = colSums(t_entry[,2],na.rm=TRUE)
+> t_entry[11,3] = colSums(t_entry[,3],na.rm=TRUE)
+> 
+> t_entry %>%
++   select(year,Published,Selected) %>%
++   mutate(`Percent` = round(Selected/Published*100,2)) %>%
++   pivot_longer(cols = -1 ) %>%
++   pivot_wider(names_from = "year",values_from = "value") %>%
++   rename(` `=name) -> t_entry_t
+> 
+> print(t_entry_t)
+# A tibble: 3 × 12
+  ` `       `2009` `2010` `2011` `2012` `2013` `2014` `2015` `2016` `2017` `2018` Total
+  <chr>      <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl> <dbl>
+1 Published   34     40     37     40     38       40     35   37     42       20 363  
+2 Selected    21     23     32     39      8       40     21   33     39       18 274  
+3 Percent     61.8   57.5   86.5   97.5   21.0    100     60   89.2   92.9     90  75.5
+> 
+> # Transpose table
+> #t_entry_t <- transpose(t_entry)
+> #colnames(t_entry_t) <- t_entry_t[1, ] # the first row will be the header
+> #t_entry_t = t_entry_t[-1, ]
+> 
+> 
+> stargazer(t_entry_t,
++           type="latex",title = "Articles Published and Selected by Year",label="tab:Selection",
++           style="aer",
++           flip=FALSE,summary=FALSE, rownames = FALSE,
++           font.size = fs,column.sep.width = cw,
++           out=file.path(TexIncludes,"table_article_selection.tex"),
++           notes=c("Notes: Assessments made using the entry questionnaire by replicators,",
++                   "prior to attempting to reproduce any tables or figures. The sample of assessed",
++                   "papers comprises those for which we had complete assessment questionnaires."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 05:24:22 AM
+\begin{table}[!htbp] \centering 
+  \caption{Articles Published and Selected by Year} 
+  \label{tab:Selection} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} cccccccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+  & 2009 & 2010 & 2011 & 2012 & 2013 & 2014 & 2015 & 2016 & 2017 & 2018 & Total \\ 
+\hline \\[-1.8ex] 
+Published & 34 & 40 & 37 & 40 & 38 & 40 & 35 & 37 & 42 & 20 & 363 \\ 
+Selected & 21 & 23 & 32 & 39 & 8 & 40 & 21 & 33 & 39 & 18 & 274 \\ 
+Percent & 61.76 & 57.5 & 86.49 & 97.5 & 21.05 & 100 & 60 & 89.19 & 92.86 & 90 & 75.48 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{12}{l}{Notes: Assessments made using the entry questionnaire by replicators,} \\ 
+\multicolumn{12}{l}{prior to attempting to reproduce any tables or figures. The sample of assessed} \\ 
+\multicolumn{12}{l}{papers comprises those for which we had complete assessment questionnaires.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> proc.time()
+   user  system elapsed 
+  13.32    1.91   13.88 

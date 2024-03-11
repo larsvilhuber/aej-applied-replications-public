@@ -48,7 +48,6 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -104,7 +103,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
@@ -300,7 +299,7 @@ Group variables            None
 +     ))
 +   saveRDS(imputations.rds,affiliation.impute.Rds)
 + }
-Query to openAlex: 1.358 sec elapsed
+Query to openAlex: 1.768 sec elapsed
 Joining with `by = join_by(institution_id)`
 > 
 > affiliation.impute <- readRDS(affiliation.impute.Rds) %>%
@@ -338,9 +337,9 @@ Group variables            None
 1 imputed               0             1    1 TRU: 126
 
 ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
-  skim_variable              n_missing complete_rate      mean        sd   p0     p25     p50      p75     p100 hist 
-1 institution_works_count           31         0.754   250238.   225983.   56   51301  219219   311346   859973 ▇▇▁▃▁
-2 institution_cited_by_count        31         0.754 11154973. 11104785. 1072 1285821 8334070 15431094 34148087 ▇▅▃▁▃
+  skim_variable              n_missing complete_rate      mean        sd  p0      p25     p50      p75     p100 hist 
+1 institution_works_count           31         0.754   236554.   216861.  51   48051   210822   291037   839824 ▇▇▁▃▁
+2 institution_cited_by_count        31         0.754 10573473. 10594128. 966 1217234. 7820342 14867024 32504902 ▇▅▃▁▃
 > 
 > # get the completment as well
 > 
@@ -362,14 +361,14 @@ Group variables            None
 +     saveRDS(file=affiliation.aej.Rds)
 + 
 + }
-Query to openAlex: 46.491 sec elapsed
+Query to openAlex: 38.769 sec elapsed
 > 
 > affiliation_complete <- readRDS(file=affiliation.aej.Rds)
 > skim(affiliation_complete)
 ── Data Summary ────────────────────────
                            Values              
 Name                       affiliation_complete
-Number of rows             3197                
+Number of rows             3213                
 Number of columns          7                   
 _______________________                        
 Column type frequency:                         
@@ -380,16 +379,16 @@ Group variables            None
 
 ── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
   skim_variable            n_missing complete_rate min max empty n_unique whitespace
-1 institution_id                   0             1  27  32     0     3197          0
-2 institution_display_name         0             1   3 106     0     3176          0
-3 institution_ror                  0             1  25  25     0     3197          0
+1 institution_id                   0             1  27  32     0     3213          0
+2 institution_display_name         0             1   3 106     0     3183          0
+3 institution_ror                  0             1  25  25     0     3207          0
 4 institution_country_code         0             1   2   2     0      100          0
 5 institution_type                 0             1   5  10     0        8          0
 
 ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
   skim_variable              n_missing complete_rate    mean       sd p0   p25   p50    p75     p100 hist 
-1 institution_works_count            0             1  25429.   55993.  2  1502  5431  22654  1041051 ▇▁▁▁▁
-2 institution_cited_by_count         0             1 680896. 1864671.  1 17843 90452 466610 34148087 ▇▁▁▁▁
+1 institution_works_count            0             1  23881.   51937.  1  1470  5186  21453   908953 ▇▁▁▁▁
+2 institution_cited_by_count         0             1 642086. 1750565.  2 17402 86273 447141 32504902 ▇▁▁▁▁
 > 
 > # Now combine it with the rest
 > 
@@ -442,19 +441,19 @@ Group variables            None
 3 au_display_name                  0      1          5  29     0     1110          0
 4 au_orcid                    111882      0.000590   2  37     0       22          0
 5 institution_id                7377      0.934      2  32     0     3219          0
-6 institution_display_name      7427      0.934      3 106     0     3176          0
-7 institution_ror               7427      0.934     25  25     0     3197          0
-8 institution_country_code      7427      0.934      2   2     0      100          0
-9 institution_type              7416      0.934      5  10     0        8          0
+6 institution_display_name      7386      0.934      3 106     0     3183          0
+7 institution_ror               7386      0.934     25  25     0     3207          0
+8 institution_country_code      7386      0.934      2   2     0      100          0
+9 institution_type              7375      0.934      5  10     0        8          0
 
 ── Variable type: logical ──────────────────────────────────────────────────────────────────────────────────────────────
   skim_variable n_missing complete_rate mean count  
 1 imputed          111882      0.000590    1 TRU: 66
 
 ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
-  skim_variable           n_missing complete_rate    mean        sd   p0   p25   p50    p75    p100 hist 
-1 publication_year                0         1       2008.      9.85 1788  2005  2011   2015    2018 ▁▁▁▁▇
-2 institution_works_count      7427         0.934 130713. 156690.      2 15136 56762 219219 1041051 ▇▂▁▁▁
+  skim_variable           n_missing complete_rate    mean        sd   p0   p25   p50    p75   p100 hist 
+1 publication_year                0         1       2008.      9.85 1788  2005  2011   2015   2018 ▁▁▁▁▇
+2 institution_works_count      7386         0.934 123416. 148111.      1 15035 53953 210822 908953 ▇▂▁▁▁
 > nrow(author_year_institutions %>% distinct(institution_id))
 [1] 3220
 > message(paste0(" Unique authors: ",nrow(author_year_institutions %>% distinct(au_id))))
@@ -474,7 +473,7 @@ Group variables            None
 +   select(-article_id) %>%
 +   rename(year_observation = publication_year) -> author_first_institution.step1
 > nrow(author_first_institution.step1 %>% distinct(au_id))
-[1] 1090
+[1] 1093
 > # [1] 1093 - we are missing a few authors
 > author_first_institution.step1 %>%
 +   right_join(authors.df %>% distinct(au_id),by="au_id") %>%
@@ -499,11 +498,11 @@ Group variables            None
 ── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
   skim_variable            n_missing complete_rate min max empty n_unique whitespace
 1 au_id                            0      1         32  32     0     1114          0
-2 au_display_name                 24      0.978      5  29     0     1086          0
+2 au_display_name                 21      0.981      5  29     0     1089          0
 3 au_orcid                      1113      0.000898   2   2     0        1          0
-4 institution_id                  24      0.978     28  32     0      502          0
-5 institution_display_name        24      0.978      4 106     0      501          0
-6 institution_ror                 24      0.978     25  25     0      502          0
+4 institution_id                  21      0.981     28  32     0      505          0
+5 institution_display_name        21      0.981      4 106     0      504          0
+6 institution_ror                 21      0.981     25  25     0      505          0
 7 institution_country_code         0      1          2   2     0       55          0
 8 institution_type                 0      1          5  10     0        8          0
 
@@ -512,21 +511,21 @@ Group variables            None
 1 imputed            1113      0.000898    1 TRU: 1
 
 ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
-  skim_variable           n_missing complete_rate    mean       sd   p0   p25   p50    p75   p100 hist 
-1 year_observation               24         0.978   2001.     15.4 1858 1997   2005   2010   2018 ▁▁▁▁▇
-2 institution_works_count         0         1     128316. 167404.     0 7549. 56762 216482 859973 ▇▂▁▁▁
+  skim_variable           n_missing complete_rate    mean       sd   p0  p25   p50    p75   p100 hist 
+1 year_observation               21         0.981   2001.     15.4 1858 1997  2005   2010   2018 ▁▁▁▁▇
+2 institution_works_count         0         1     122521. 160166.     0 7934 53953 205453 839824 ▇▂▁▁▁
 > table(author_first_institution$institution_country_code,useNA="always")
 
   AR   AT   AU   BD   BE   BG   BR   CA   CH   CL   CN   CO   DE   DK   ES   FI   FR   GB   GR   HU   ID   IE   IL   IN 
-   4    6   13    2   12    1   10   33   10    6   16    8   34   15   20    3   28   63    1    3    1    4    9    9 
+   4    6   13    2   12    1   10   33   10    6   16    8   34   15   20    3   30   63    1    3    1    4    9    9 
   IT   JP   KR   LK   LR   LU   MA   MW   MX   NG   NL   NO   PE   PH   PK   PL   PT   RU   SE   SG   SS   TR   TT   TW 
-  35    7    1    1    1    1    1    1    3    1   15    5    2    5    3    1    3    8   33    2    1    1    1    4 
+  35    7    1    1    1    1    1    1    3    1   15    5    2    5    3    1    3    8   33    3    1    1    1    4 
   UA   US   UY   VE   VN   ZA   ZZ <NA> 
-   1  633    2    1    2    4   24    0 
+   1  633    2    1    2    4   21    0 
 > table(author_first_institution$institution_type,useNA="always")
 
    archive    company  education   facility government healthcare  nonprofit      other       <NA> 
-         1         20        764         60         26         39         90        114          0 
+         1         20        766         61         26         39         90        111          0 
 > message(paste0(" Unique authors: ",nrow(author_first_institution %>% distinct(au_id))))
  Unique authors: 1114
 > 
@@ -571,7 +570,7 @@ chr (11): name, alpha-2, alpha-3, country-code, iso_3166-2, region, sub-region, 
 > table(tmp2$metaregion,useNA="always")
 
 Europe RestNA    ROW     SA     US   <NA> 
-   302     36    110     33    633      0 
+   304     36    108     33    633      0 
 > skim(tmp2)
 ── Data Summary ────────────────────────
                            Values
@@ -589,11 +588,11 @@ Group variables            None
 ── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
   skim_variable            n_missing complete_rate min max empty n_unique whitespace
 1 au_id                            0      1         32  32     0     1114          0
-2 au_display_name                 24      0.978      5  29     0     1086          0
+2 au_display_name                 21      0.981      5  29     0     1089          0
 3 au_orcid                      1113      0.000898   2   2     0        1          0
-4 institution_id                  24      0.978     28  32     0      502          0
-5 institution_display_name        24      0.978      4 106     0      501          0
-6 institution_ror                 24      0.978     25  25     0      502          0
+4 institution_id                  21      0.981     28  32     0      505          0
+5 institution_display_name        21      0.981      4 106     0      504          0
+6 institution_ror                 21      0.981     25  25     0      505          0
 7 institution_country_code         0      1          2   2     0       55          0
 8 institution_type                 0      1          5  10     0        8          0
 9 metaregion                       0      1          2   6     0        5          0
@@ -603,9 +602,9 @@ Group variables            None
 1 imputed            1113      0.000898    1 TRU: 1
 
 ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
-  skim_variable           n_missing complete_rate    mean       sd   p0   p25   p50    p75   p100 hist 
-1 year_observation               24         0.978   2001.     15.4 1858 1997   2005   2010   2018 ▁▁▁▁▇
-2 institution_works_count         0         1     128316. 167404.     0 7549. 56762 216482 859973 ▇▂▁▁▁
+  skim_variable           n_missing complete_rate    mean       sd   p0  p25   p50    p75   p100 hist 
+1 year_observation               21         0.981   2001.     15.4 1858 1997  2005   2010   2018 ▁▁▁▁▇
+2 institution_works_count         0         1     122521. 160166.     0 7934 53953 205453 839824 ▇▂▁▁▁
 > 
 > ###### Add other information on institutions
 > 
@@ -642,11 +641,11 @@ Group variables            None
 ── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────
   skim_variable            n_missing complete_rate min max empty n_unique whitespace
 1 au_id                            0      1         32  32     0     1114          0
-2 au_display_name                 24      0.978      5  29     0     1086          0
+2 au_display_name                 21      0.981      5  29     0     1089          0
 3 au_orcid                      1113      0.000898   2   2     0        1          0
-4 institution_id                  24      0.978     28  32     0      502          0
-5 institution_display_name        24      0.978      4 106     0      501          0
-6 institution_ror                 24      0.978     25  25     0      502          0
+4 institution_id                  21      0.981     28  32     0      505          0
+5 institution_display_name        21      0.981      4 106     0      504          0
+6 institution_ror                 21      0.981     25  25     0      505          0
 7 institution_country_code         0      1          2   2     0       55          0
 8 institution_type                 0      1          5  10     0        8          0
 9 metaregion                       0      1          2   6     0        5          0
@@ -656,9 +655,9 @@ Group variables            None
 1 imputed            1113      0.000898    1 TRU: 1
 
 ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────
-  skim_variable           n_missing complete_rate    mean       sd   p0   p25   p50    p75   p100 hist 
-1 year_observation               24         0.978   2001.     15.4 1858 1997   2005   2010   2018 ▁▁▁▁▇
-2 institution_works_count         0         1     128316. 167404.     0 7549. 56762 216482 859973 ▇▂▁▁▁
+  skim_variable           n_missing complete_rate    mean       sd   p0  p25   p50    p75   p100 hist 
+1 year_observation               21         0.981   2001.     15.4 1858 1997  2005   2010   2018 ▁▁▁▁▇
+2 institution_works_count         0         1     122521. 160166.     0 7934 53953 205453 839824 ▇▂▁▁▁
 > message(paste0(" Unique authors: ",nrow(authors.completed.df %>% distinct(au_id))))
  Unique authors: 1114
 > 
@@ -667,7 +666,7 @@ Group variables            None
 > totalauthors  <- nrow(authors.completed.df %>% distinct(au_id))
 > 
 > message(paste0(" Unique institutions: ",ninstitutions))
- Unique institutions: 503
+ Unique institutions: 506
 > message(paste0(" Unique countries.  : ",ncountries))
  Unique countries.  : 55
 > message(paste0(" Unique authors     : ",totalauthors))
@@ -719,4 +718,4 @@ Joining with `by = join_by(institution_id)`
 > 
 > proc.time()
    user  system elapsed 
-  26.13    2.46   64.53 
+   29.5     2.3    61.3 

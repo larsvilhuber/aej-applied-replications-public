@@ -47,7 +47,6 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -103,7 +102,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
+Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
   Use `force = TRUE` to force installation
 > #source(file.path(TexBase,"libraries.R"), echo=FALSE)
 > source(file.path(programs,"config.R"), echo=FALSE)
@@ -116,9 +115,562 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 > # Summarize number of articles by year
 > 
 > complete_sample <- readRDS(file=file.path(dataloc,"00_complete_sample.Rds"))
-Error in gzfile(file, "rb") : cannot open the connection
-Calls: readRDS -> gzfile
-In addition: Warning message:
-In gzfile(file, "rb") :
-  cannot open compressed file '/home/rstudio/data/replication_data/00_complete_sample.Rds', probable reason 'No such file or directory'
-Execution halted
+> 
+> 
+> # raw info on absence when no justification
+> 
+> complete_sample %>% filter(absence=="No Data or Reason") %>% select(DataAbsence)
+                                                                                                                                                                                                                                                  DataAbsence
+1                                                                                                                                                                                                                             Missing data (no justification)
+2                                                                                                                                                                                                                             Missing data (no justification)
+3                                                                                                                                                                                                                             Missing data (no justification)
+4                                                                                                                                                                                                                             Missing data (no justification)
+5 The data is from the National Incident-Based Reporting System, and while the information is available online, the authors never specify what parts of the data they are using, they just say "panel data from the National Incident Based Reporting System"
+6                                                                                                                                                                                                                             Missing data (no justification)
+7                                                                                                                                                                                                                                            No data provided
+8                                                                                                                                                                                                                             Missing data (no justification)
+> 
+> 
+> ###################################################
+> ### code chunk number 4: tababs table 3: decomposion missing per year
+> ###################################################
+> #unique(entry_merge$DataAbsence)
+> trial <- complete_sample[,c("year","absence")]
+> # Here need to change eligible for sth else
+> # should be 180 + 80 + 14 so 274
+> 
+> # Summarize number of articles by data presence
+> tab_absence <- complete_sample %>%
++   group_by(absence,year) %>%
++   summarize(n = n()) %>% spread(year,n) %>%
++   rename(Reason = absence)
+`summarise()` has grouped output by 'absence'. You can override using the `.groups` argument.
+> 
+> # Add sum col/row
+> tab_absence$Total <- rowSums(tab_absence[,2:ncol(tab_absence)],na.rm = T)
+> tab_absence$Percent<- round(tab_absence$Total*100/sum(tab_absence$Total),2)
+> 
+> 
+> row_sum <- colSums(tab_absence[,2:13],na.rm=TRUE)
+> 
+> tab_absence <- bind_rows(tab_absence,row_sum)
+> tab_absence[4,1] = c("Total")
+> tab_absence[is.na(tab_absence)] <- 0
+> 
+> # save tab_absence to be used in 31
+> saveRDS(tab_absence,file=file.path(interwrk,"00_tab_absence.Rds"))
+> 
+> # some raw output for absence of data reasons
+> 
+> 
+> 
+> 
+> ###################################################
+> ### code chunk number 6: tab4_1
+> ###################################################
+> # Print table
+> stargazer(tab_absence,
++           type="latex",title = "Assessment of Data Availability, By Year",label="tab:absence",
++           style="aer",
++           flip=FALSE,summary=FALSE, rownames = FALSE,#font.size = fs,
++           column.sep.width = cw,out=file.path(TexIncludes,"table_absence.tex"),
++           notes=c("\\footnotesize Notes: Assessments made  by replicators using the entry questionnaire, prior to attempting reproduction."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 09:20:35 PM
+\begin{table}[!htbp] \centering 
+  \caption{Assessment of Data Availability, By Year} 
+  \label{tab:absence} 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccccccccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Reason & 2009 & 2010 & 2011 & 2012 & 2013 & 2014 & 2015 & 2016 & 2017 & 2018 & Total & Percent \\ 
+\hline \\[-1.8ex] 
+Confidential Data & 5 & 10 & 8 & 11 & 1 & 17 & 2 & 12 & 12 & 8 & 86 & 31.39 \\ 
+Data was Provided & 14 & 13 & 24 & 26 & 7 & 23 & 18 & 20 & 26 & 9 & 180 & 65.69 \\ 
+No Data or Reason & 2 & 0 & 0 & 2 & 0 & 0 & 1 & 1 & 1 & 1 & 8 & 2.92 \\ 
+Total & 21 & 23 & 32 & 39 & 8 & 40 & 21 & 33 & 39 & 18 & 274 & 100 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{13}{l}{\footnotesize Notes: Assessments made  by replicators using the entry questionnaire, prior to attempting reproduction.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> ## Compute presence of confidential data at initial assessment
+> 
+> tab_absence.raw <- tab_absence %>%
++   select(Reason,Total) %>% filter(! Reason %in% c("Percent")) %>%
++   mutate(Reason = if_else(Reason == "Data was Provided","Some Data Provided",Reason)) %>%
++   arrange(Reason) %>% rename(Assessment = Reason, Articles = Total)
+> 
+> 
+> # Print table: assessments
+> 
+> stargazer(tab_absence.raw, digits=2,
++           out=file.path(TexIncludes,"table_data_availability.tex"),
++           type="latex",title = "Assessment of Data Availability",
++           label="tab:data_availability",
++           style="aer",
++           flip=FALSE, summary=FALSE, rownames = FALSE,
++           # font.size = fs,
++           column.sep.width = cw,
++           notes=c("\\footnotesize Notes: Assessments made using the entry questionnaire by replicators,",
++                   "\\footnotesize prior to attempting reproduction. Entry Q14, Q15."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 09:20:35 PM
+\begin{table}[!htbp] \centering 
+  \caption{Assessment of Data Availability} 
+  \label{tab:data_availability} 
+\begin{tabular}{@{\extracolsep{0.4pt}} cc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Assessment & Articles \\ 
+\hline \\[-1.8ex] 
+Confidential Data & 86 \\ 
+No Data or Reason & 8 \\ 
+Some Data Provided & 180 \\ 
+Total & 274 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{2}{l}{\footnotesize Notes: Assessments made using the entry questionnaire by replicators,} \\ 
+\multicolumn{2}{l}{\footnotesize prior to attempting reproduction. Entry Q14, Q15.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> ###################################################
+> ### code chunk number 7: t_difficult table 4
+> ###################################################
+> 
+> # Summarize number of articles by difficulty
+> t_difficult <- complete_sample %>% group_by(difficult) %>%
++   summarize(n = n()) %>%
++   mutate(n = as.numeric(n), difficult = ifelse(is.na(difficult),"No Rating Assigned",difficult)) %>%
++   mutate(`Percent` = round(n/sum(n)*100,2),
++          difficult = as.character(difficult)) %>%
++   rename(`Difficulty Rating` = difficult, `Number of Articles` = n)
+> median_difficulty <- t_difficult %>%
++   ungroup() %>%
++   mutate(cumpct=cumsum(Percent)) %>%
++   filter(cumpct>=50) %>%
++   summarize(median=min(as.numeric(`Difficulty Rating`))) %>%
++   pull()
+> 
+> # replace NA
+> t_difficult[is.na(t_difficult)] <- 0
+> 
+> # Add sum row
+> t_difficult[nrow(t_difficult)+1,1] = c("Total")
+> t_difficult[nrow(t_difficult),2] = colSums(t_difficult[,2],na.rm=TRUE)
+> t_difficult[nrow(t_difficult),3] = colSums(t_difficult[,3],na.rm=TRUE)
+> 
+> t_difficult_attempted <- complete_sample %>%
++   filter(!is.na(replicated)) %>%
++   group_by(difficult) %>%
++   summarize(n = n()) %>%
++   mutate(n = as.numeric(n), difficult = ifelse(is.na(difficult),"No Rating Assigned",difficult)) %>%
++   mutate(`Percent` = round(n/sum(n)*100,2),
++          difficult = as.character(difficult)) %>%
++   rename(`Difficulty Rating` = difficult, `Number of Articles` = n)
+> median_difficulty_attempted <- t_difficult_attempted %>%
++   ungroup() %>%
++   mutate(cumpct=cumsum(Percent)) %>%
++   filter(cumpct>=50) %>%
++   summarize(median=min(as.numeric(`Difficulty Rating`))) %>%
++   pull()
+> # replace NA
+> 
+> t_difficult_attempted[is.na(t_difficult_attempted)] <- 0
+> 
+> # Add sum row
+> t_difficult_attempted[nrow(t_difficult_attempted)+1,1] = c("Total")
+> t_difficult_attempted[nrow(t_difficult_attempted),2] = colSums(t_difficult_attempted[,2],na.rm=TRUE)
+> t_difficult_attempted[nrow(t_difficult_attempted),3] = colSums(t_difficult_attempted[,3],na.rm=TRUE)
+> 
+> # joint
+> 
+> t_difficult_joint <- left_join(t_difficult,t_difficult_attempted,by=c("Difficulty Rating")) %>%
++   rename(`Assessed articles` = `Number of Articles.x`,
++          `Percent ` = `Percent.x`,
++          `Attempted articles` = `Number of Articles.y`,
++          `Percent`  = `Percent.y`)
+> 
+> 
+> ###################################################
+> ### code chunk number 8: tab2_1
+> ###################################################
+> # Print article count by difficulty table
+> stargazer(t_difficult_attempted,
++           type="latex",title = "Difficulty of Reproduction",
++           label="tab:difficult:attempted",style="aer",
++           flip=FALSE,summary=FALSE, rownames = FALSE,
++           #font.size = fs,
++           column.sep.width = cw,
++           out=file.path(TexIncludes,"table_difficult_attempted.tex"),
++           notes=c("\\footnotesize Notes: Assessments made using the entry questionnaire by replicators,",
++                   "\\footnotesize prior to attempting to reproduce any tables or figures. Assessments",
++                   "\\footnotesize reported only for articles for which reproduction was attempted."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 09:20:35 PM
+\begin{table}[!htbp] \centering 
+  \caption{Difficulty of Reproduction} 
+  \label{tab:difficult:attempted} 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Difficulty Rating & Number of Articles & Percent \\ 
+\hline \\[-1.8ex] 
+1 & 49 & 27.22 \\ 
+2 & 56 & 31.11 \\ 
+3 & 43 & 23.89 \\ 
+4 & 20 & 11.11 \\ 
+5 & 12 & 6.67 \\ 
+Total & 180 & 100 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{3}{l}{\footnotesize Notes: Assessments made using the entry questionnaire by replicators,} \\ 
+\multicolumn{3}{l}{\footnotesize prior to attempting to reproduce any tables or figures. Assessments} \\ 
+\multicolumn{3}{l}{\footnotesize reported only for articles for which reproduction was attempted.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> stargazer(t_difficult_joint,
++           type="latex",title = "Difficulty of Reproduction",
++           label="tab:difficult:joint",style="aer",
++           flip=FALSE,summary=FALSE, rownames = FALSE,
++           font.size = fs,column.sep.width = cw,
++           out=file.path(TexIncludes,"table_difficult.tex"),
++           notes=c("Notes: Entry Q60. Assessments made prior",
++                   " to attempting to reproduce any tables or figures. "))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 09:20:36 PM
+\begin{table}[!htbp] \centering 
+  \caption{Difficulty of Reproduction} 
+  \label{tab:difficult:joint} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Difficulty Rating & Assessed articles & Percent  & Attempted articles & Percent \\ 
+\hline \\[-1.8ex] 
+1 & 57 & 20.8 & 49 & 27.22 \\ 
+2 & 56 & 20.44 & 56 & 31.11 \\ 
+3 & 56 & 20.44 & 43 & 23.89 \\ 
+4 & 35 & 12.77 & 20 & 11.11 \\ 
+5 & 70 & 25.55 & 12 & 6.67 \\ 
+Total & 274 & 100 & 180 & 100 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{5}{l}{Notes: Entry Q60. Assessments made prior} \\ 
+\multicolumn{5}{l}{ to attempting to reproduce any tables or figures. } \\ 
+\end{tabular} 
+\end{table} 
+> 
+> stargazer(t_difficult,
++           type="latex",title = "Difficulty of Reproduction (all)",
++           label="tab:difficult:all",style="aer",
++           flip=FALSE,summary=FALSE, rownames = FALSE,
++           #font.size = fs,
++           column.sep.width = cw,
++           out=file.path(TexIncludes,"table_difficult_assessed.tex"),
++           notes=c("\\footnotesize Notes: Assessments made using the entry questionnaire by replicators,",
++                   "\\footnotesize prior to attempting to reproduce any tables or figures. Assessments",
++                   "\\footnotesize reported for all articles with complete assessments."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 09:20:36 PM
+\begin{table}[!htbp] \centering 
+  \caption{Difficulty of Reproduction (all)} 
+  \label{tab:difficult:all} 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Difficulty Rating & Number of Articles & Percent \\ 
+\hline \\[-1.8ex] 
+1 & 57 & 20.8 \\ 
+2 & 56 & 20.44 \\ 
+3 & 56 & 20.44 \\ 
+4 & 35 & 12.77 \\ 
+5 & 70 & 25.55 \\ 
+Total & 274 & 100 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{3}{l}{\footnotesize Notes: Assessments made using the entry questionnaire by replicators,} \\ 
+\multicolumn{3}{l}{\footnotesize prior to attempting to reproduce any tables or figures. Assessments} \\ 
+\multicolumn{3}{l}{\footnotesize reported for all articles with complete assessments.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> cat(median_difficulty, 					file=file.path(TexIncludes,"median.difficulty.all.tex"))
+> cat(median_difficulty_attempted,file=file.path(TexIncludes,"median.difficulty.attempted.tex"))
+> 
+> 
+> ###################################################
+> ### code chunk number 9: data_prog
+> ###################################################
+> # Define program format variable
+> entry_merge_prog <- complete_sample %>%
++   select(journal,ProgramFormat,year) %>%
++   mutate(Stata = grepl("stata", tolower(ProgramFormat)),
++          Matlab = grepl("matlab", tolower(ProgramFormat)),
++          R = grepl(", r", tolower(ProgramFormat)) | tolower(ProgramFormat) %in% c("r"),
++          SAS = grepl("sas", tolower(ProgramFormat)),
++          Fortran = grepl("fortran", tolower(ProgramFormat)),
++          Mathematica = grepl("mathematica", tolower(ProgramFormat)),
++          SPSS = grepl("spss", tolower(ProgramFormat)),
++          Eviews = grepl("eviews", tolower(ProgramFormat)),
++          Excel = grepl("excel", tolower(ProgramFormat)),
++          `Not Reported` = is.na(ProgramFormat))
+> 
+> 
+> # Make program format table
+> tab_prog <- entry_merge_prog %>%
++   summarize(Stata = sum(Stata),
++             Matlab = sum(Matlab),
++             R = sum(R),
++             SAS = sum(SAS),
++             Fortran = sum(Fortran),
++             Mathematica = sum(Mathematica),
++             SPSS = sum(SPSS),
++             Eviews = sum(Eviews),
++             Excel = sum(Excel),
++             `Not Reported` = sum(`Not Reported`)) %>%
++ 
++   gather(Software,Count)
+> 
+> # Define data format variable
+> entry_merge_data <- complete_sample %>%
++   select(journal,OnlineDataFormat1,ProgramFormat,year) %>%
++   mutate(Stata = grepl("stata", tolower(OnlineDataFormat1)),
++          Matlab = grepl("matlab", tolower(OnlineDataFormat1)),
++          R = grepl(", r", tolower(OnlineDataFormat1)) | tolower(ProgramFormat) %in% c("r"),
++          Fortran = grepl("fortran", tolower(OnlineDataFormat1)),
++          SPSS = grepl("spss", tolower(OnlineDataFormat1)),
++          Excel = grepl("excel", tolower(OnlineDataFormat1)),
++          CSV = grepl("csv", tolower(OnlineDataFormat1)),
++          txt = grepl("txt", tolower(OnlineDataFormat1)),
++          `Not Reported` = is.na(OnlineDataFormat1))
+> 
+> # Make data format table
+> tab_data <- entry_merge_data %>%
++   summarize(Stata = sum(Stata),
++             Matlab = sum(Matlab),
++             R = sum(R),
++             Fortran = sum(Fortran),
++             SPSS = sum(SPSS),
++             Excel = sum(Excel),
++             CSV = sum(CSV),
++             txt = sum(txt),
++             `Not Reported` = sum(`Not Reported`)) %>%
++   gather(Software,Count)
+> 
+> # Combine the two tables
+> tab_prog_data <- merge(tab_prog,tab_data,by = c("Software"),all = TRUE) %>%
++   rename(`Programming Language` = Count.x,`Data Format` = Count.y) %>%
++   arrange(desc(`Programming Language`)) %>%
++   mutate(`Programming Language`=replace_na(`Programming Language`,0),
++          `Data Format` = replace_na(`Data Format`,0),
++          sum=`Programming Language` + `Data Format`) %>%
++   # filter
++   filter(sum>0) %>%
++   select(-sum)
+> 
+> 
+> ###################################################
+> ### code chunk number 10: tab3_1
+> ###################################################
+> # Print table
+> stargazer(tab_prog_data,
++           type="latex",title = "Programming Languages and Data Formats",label="tab:prog",style="aer",
++           flip=FALSE, summary=FALSE, rownames = F,
++           #font.size = fs,
++           column.sep.width = cw,
++           notes = c("\\footnotesize Notes: Combination of answers from Entry Q8, Q21, Q28, Q36, Q44." ,
++                     "\\footnotesize Column sums are greater than the number of articles",
++                     "\\footnotesize because articles can use more than one  programming",
++                     "\\footnotesize language or data format. Sample of assessments made",
++                     "\\footnotesize using the entry questionnaire by replicators prior to ",
++                       "\\footnotesize attempting to reproduce any tables or figures."),
++           out=file.path(TexIncludes,"table_data_prog.tex"))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 09:20:36 PM
+\begin{table}[!htbp] \centering 
+  \caption{Programming Languages and Data Formats} 
+  \label{tab:prog} 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Software & Programming Language & Data Format \\ 
+\hline \\[-1.8ex] 
+Stata & $252$ & $174$ \\ 
+Not Reported & $14$ & $76$ \\ 
+Matlab & $11$ & $3$ \\ 
+SAS & $8$ & $0$ \\ 
+R & $6$ & $2$ \\ 
+SPSS & $2$ & $1$ \\ 
+Excel & $1$ & $7$ \\ 
+CSV & $0$ & $10$ \\ 
+txt & $0$ & $2$ \\ 
+\hline \\[-1.8ex] 
+\multicolumn{3}{l}{\footnotesize Notes: Combination of answers from Entry Q8, Q21, Q28, Q36, Q44.} \\ 
+\multicolumn{3}{l}{\footnotesize Column sums are greater than the number of articles} \\ 
+\multicolumn{3}{l}{\footnotesize because articles can use more than one  programming} \\ 
+\multicolumn{3}{l}{\footnotesize language or data format. Sample of assessments made} \\ 
+\multicolumn{3}{l}{\footnotesize using the entry questionnaire by replicators prior to } \\ 
+\multicolumn{3}{l}{\footnotesize attempting to reproduce any tables or figures.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> ###################################################
+> ### code chunk number 11: clarity
+> ###################################################
+> # Make table
+> 
+> exit_all <- readRDS(file=file.path(dataloc,"00_exit_all.Rds"))
+> nrow(exit_all)
+[1] 180
+> 
+> tab_doc <- exit_all %>%
++   group_by(clarity,year) %>% summarize(n=n()) %>% spread(year,n) %>%
++   rename(` ` = clarity)
+`summarise()` has grouped output by 'clarity'. You can override using the `.groups` argument.
+> 
+> 
+> # Add sum col/row
+> tab_doc$Total <- rowSums(tab_doc[,2:11],na.rm = T)
+> tab_doc$Percent<- round(tab_doc$Total*100/sum(tab_doc$Total),2)
+> 
+> row_sum <- colSums(tab_doc[,2:13],na.rm=TRUE)
+> 
+> tab_doc <- bind_rows(tab_doc,row_sum)
+> tab_doc[4,1] = c("Total")
+> 
+> 
+> 
+> ###################################################
+> ### code chunk number 14: convenience
+> ###################################################
+> td.total <- tab_doc$Total[tab_doc$` `=="Total"]
+> td.complete <- tab_doc$Total[tab_doc$` `=="Complete"]
+> td.incomplete <- tab_doc$Total[tab_doc$` `=="Incomplete"]
+> td.noinfo <- tab_doc$Total[tab_doc$` `=="No Info"]
+> cat(td.total, 					file=file.path(TexIncludes,"tdtotal.tex"))
+> cat(td.complete, 					file=file.path(TexIncludes,"tdcomplete.tex"))
+> cat(td.incomplete, 					file=file.path(TexIncludes,"tdincomplete.tex"))
+> cat(td.noinfo , 					file=file.path(TexIncludes,"tdnoinfo.tex"))
+> td.completepct<-td.complete*100/td.total
+> td.incompletepct<-td.incomplete*100/td.total
+> cat(td.completepct, 					file=file.path(TexIncludes,"tdcompletepct.tex"))
+> cat(td.incompletepct, 					file=file.path(TexIncludes,"tdincompletepct.tex"))
+> 
+> 
+> 
+> ###################################################
+> ### code chunk number 16: tab5_1
+> ###################################################
+> # Print documentation clarity table
+> 
+> tab_doc[is.na(tab_doc)] <- 0
+> 
+> stargazer(tab_doc,
++           type="latex",title = "Ex-Post Assessment of Documentation Clarity",label="tab:doc:yearly",
++           style="aer",flip=FALSE,
++           summary=FALSE, rownames = FALSE, font.size = fs,
++           column.sep.width = cw,
++           out=file.path(TexIncludes,"table_doc_clarity_by_year.tex"),
++           notes=c("\\footnotesize Notes: Articles with attempted reproduction. Exit Q22.",
++                   "\\footnotesize Complete = Provided all information required to run the programs.",
++                   "\\footnotesize Incomplete = Was ambiguous or left out crucial steps."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 09:20:36 PM
+\begin{table}[!htbp] \centering 
+  \caption{Ex-Post Assessment of Documentation Clarity} 
+  \label{tab:doc:yearly} 
+\footnotesize 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccccccccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+  & 2009 & 2010 & 2011 & 2012 & 2013 & 2014 & 2015 & 2016 & 2017 & 2018 & Total & Percent \\ 
+\hline \\[-1.8ex] 
+Complete & 10 & 8 & 17 & 21 & 4 & 18 & 15 & 15 & 19 & 6 & 133 & 73.89 \\ 
+Incomplete & 4 & 5 & 6 & 5 & 3 & 5 & 3 & 5 & 7 & 2 & 45 & 25 \\ 
+No Info & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 2 & 1.11 \\ 
+Total & 14 & 13 & 24 & 26 & 7 & 23 & 18 & 20 & 26 & 9 & 180 & 100 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{13}{l}{\footnotesize Notes: Articles with attempted reproduction. Exit Q22.} \\ 
+\multicolumn{13}{l}{\footnotesize Complete = Provided all information required to run the programs.} \\ 
+\multicolumn{13}{l}{\footnotesize Incomplete = Was ambiguous or left out crucial steps.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> 
+> ## Compute presence of confidential data at initial assessment
+> 
+> 
+> tab_doc.raw <- exit_all %>%
++   group_by(clarity) %>%
++   summarize(n=n()) %>%
++   ungroup() %>%
++   mutate(Percent = round(100*n/sum(n),2)) %>%
++   rename(` ` = clarity)
+> 
+> 
+> # Print table: assessments
+> 
+> stargazer(tab_doc.raw, digits=2,
++           out=file.path(TexIncludes,"table_doc.tex"),
++           type="latex",title = "Ex-Post Assessment of Documentation Clarity",
++           label="tab:doc",
++           style="aer",
++           flip=FALSE, summary=FALSE, rownames = FALSE,
++           column.sep.width = cw,
++           notes=c("\\footnotesize Notes: Articles with attempted reproduction. Exit Q22. ",
++                   "\\footnotesize Complete = Provided all information required to run the programs.",
++                   "\\footnotesize Incomplete = Was ambiguous or left out crucial steps."))
+
+% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
+% Date and time: Mon, Oct 30, 2023 - 09:20:36 PM
+\begin{table}[!htbp] \centering 
+  \caption{Ex-Post Assessment of Documentation Clarity} 
+  \label{tab:doc} 
+\begin{tabular}{@{\extracolsep{0.4pt}} ccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+  & n & Percent \\ 
+\hline \\[-1.8ex] 
+Complete & 133 & 73.89 \\ 
+Incomplete & 45 & 25 \\ 
+No Info & 2 & 1.11 \\ 
+\hline \\[-1.8ex] 
+\multicolumn{3}{l}{\footnotesize Notes: Articles with attempted reproduction. Exit Q22. } \\ 
+\multicolumn{3}{l}{\footnotesize Complete = Provided all information required to run the programs.} \\ 
+\multicolumn{3}{l}{\footnotesize Incomplete = Was ambiguous or left out crucial steps.} \\ 
+\end{tabular} 
+\end{table} 
+> 
+> 
+> 
+> # how to add notes
+> # table <- stargazer(...,notes="This will be replaced")
+> # table[grepl("Note",table)] <- "replacement note"
+> # write(table,file.path(TexIncludes,"doc.tex"))
+> 
+> 
+> ###################################################
+> ### code chunk number 15: conveniencecleanup
+> ###################################################
+> rm(td.total)
+> rm(td.complete)
+> rm(td.incomplete)
+> rm(td.noinfo)
+> rm(td.completepct)
+> rm(td.incompletepct)
+> 
+> proc.time()
+   user  system elapsed 
+  14.05    1.92   14.63 
