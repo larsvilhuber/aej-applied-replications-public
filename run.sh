@@ -15,9 +15,6 @@ R CMD BATCH 07_readclean_hindex_list.R
 R CMD BATCH 25_prepare_sample.R
 R CMD BATCH 30_results1.R
 R CMD BATCH 31_results2.R
-R CMD BATCH 32_conclusion.R
-R CMD BATCH 35_appendix.R
-R CMD BATCH 36_list-articles.R
 R CMD BATCH 40_supplementary1.R
 R CMD BATCH 41_supplementary2.R
 R CMD BATCH 42_prepare_authors.R
@@ -31,5 +28,4 @@ R CMD BATCH 49_assignments.R
 R CMD BATCH 50_analysis_openAlex.R
 R CMD BATCH 51_analysis_Poisson.R
 R CMD BATCH 52_robustess_standarderrors.R
-R CMD BATCH 99_write_nums.R
 R CMD BATCH 99_zz_info.R
