@@ -18,9 +18,13 @@ d_entry <- entry %>% filter(!is.na(DOI))
 uniquedoi <- length(unique(d_entry$DOI))
 # TODO: this needs to provide a bit of an assessment how reliable assessor are
 
+         
+
+
 # this unique doi will be used in a later code
 saveRDS(uniquedoi,file=file.path(dataloc,"00_uniquedoi.Rds"))
 
+         
 
 ###################################################
 ### code chunk number 2: entry_merge
@@ -215,20 +219,25 @@ exit_merge <- exit_merge %>% filter(replicated != "NA") %>%
     TRUE ~ NA))
 
 
-
 # bring in info entry
-exit_all <- merge(x = entry_merge, y = exit_merge, by = "DOI") %>%
-  rename(year=year.x)
 
+exit_all <- merge(x = entry_merge, 
+                  y = exit_merge %>% select(-year,-journal), 
+                  by = "DOI",
+                  suffixes=c("",".exit"))
 
 # This is the sample for the statistics we use
+
 complete_sample <- bind_rows(exit_all, sample_confdata, sample_nodata)
 
 # save it
 
-saveRDS(complete_sample,file=file.path(dataloc,"00_complete_sample.Rds"))
-saveRDS(exit_all,file=file.path(dataloc,"00_exit_all.Rds"))
-saveRDS(entry_merge,file=file.path(dataloc,"00_entry_merge.Rds"))
+saveRDS(complete_sample,
+        file=file.path(dataloc,"00_complete_sample.Rds"))
+saveRDS(exit_all,
+        file=file.path(dataloc,"00_exit_all.Rds"))
+saveRDS(entry_merge,
+        file=file.path(dataloc,"00_entry_merge.Rds"))
 
 ### Now, can do stats on effective sample
 

@@ -15,7 +15,7 @@ library(openalexR)
 
 # If you want to overwrite files, set the following to TRUE
 
-override = TRUE
+override = FALSE
 
 # Unpack the citations data for the authors field -> au_id
 # These files come from 42

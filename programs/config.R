@@ -22,7 +22,7 @@ readRenviron(file.path(basepath,".Renviron"))
 
 issns.file <- file.path(crossrefloc,paste0("issns.Rds"))
 
-doi.file <- file.path(dataloc,"crossref_aejdois")
+doi.file <- file.path(crossrefloc,"crossref_aejdois")
 doi.file.Rds <- paste(doi.file,"Rds",sep=".")
 doi.file.csv <- paste(doi.file,"csv",sep=".")
 

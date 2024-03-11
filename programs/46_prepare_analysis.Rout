@@ -51,6 +51,7 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
+Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -106,7 +107,19 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
+Loading required package: reshape2
+
+Attaching package: ‘reshape2’
+
+The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
@@ -507,4 +520,4 @@ Group variables            None
 > 
 > proc.time()
    user  system elapsed 
-  16.37    1.84   17.13 
+  17.44    1.82   17.88 

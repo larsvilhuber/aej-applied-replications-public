@@ -45,6 +45,7 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
+Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -100,7 +101,19 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
+Loading required package: reshape2
+
+Attaching package: ‘reshape2’
+
+The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
@@ -143,18 +156,24 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has no
 +     filter(title!="Front Matter") %>%
 +     filter(!str_detect(title,"Volume")) %>%
 +     filter(!str_detect(title,"Forthcoming")) %>%
++     filter(doi != "10.1257/app.2009.0001") %>% # this is a duplicate of 10.1257/app.1.4.1 !
 +     # filter(title!="Editor's Note") %>%
 +     # More robust
 +     filter(str_sub(doi, start= -1)!="i")-> filtered.df
++   message(paste0("Saving new file: ",doi.file.Rds))
 +   saveRDS(filtered.df, file=  doi.file.Rds)
 +   rm(new)
++ } else {
++   message(paste0("File already exists: ",doi.file.Rds))
++   message("Loading file from previous version.")
 + }
+Saving new file: /home/rstudio/data/crossref/crossref_aejdois.Rds
 > 
 > 
 > # clean read-back
 > aejdois <- readRDS(file= doi.file.Rds)
 > nrow(aejdois)
-[1] 630
+[1] 646
 > 
 > # subset to the years in-scope: 2009-2018.
 > aejdois %>%
@@ -269,7 +288,7 @@ Joining with `by = join_by(year)`
 +                   "papers comprises those for which we had complete assessment questionnaires."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Oct 30, 2023 - 05:24:22 AM
+% Date and time: Mon, Mar 11, 2024 - 12:57:41 AM
 \begin{table}[!htbp] \centering 
   \caption{Articles Published and Selected by Year} 
   \label{tab:Selection} 
@@ -291,4 +310,4 @@ Percent & 61.76 & 57.5 & 86.49 & 97.5 & 21.05 & 100 & 60 & 89.19 & 92.86 & 90 & 
 > 
 > proc.time()
    user  system elapsed 
-  13.32    1.91   13.88 
+  17.30    1.89  122.71 

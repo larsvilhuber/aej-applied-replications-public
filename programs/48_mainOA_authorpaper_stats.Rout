@@ -46,6 +46,7 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
+Loading required package: markdown
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -101,7 +102,19 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
-Skipping install of 'openalexR' from a github remote, the SHA1 (056e55cb) has not changed since last install.
+Loading required package: reshape2
+
+Attaching package: ‘reshape2’
+
+The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has not changed since last install.
   Use `force = TRUE` to force installation
 > source(file.path(programs,"config.R"), echo=FALSE)
 > 
@@ -218,7 +231,7 @@ In left_join(., biblio.derived %>% filter(!is.na(avghindex)) %>%  :
 +                   footnote.prod1k))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Tue, Oct 31, 2023 - 12:03:29 AM
+% Date and time: Mon, Mar 11, 2024 - 01:13:00 AM
 \begin{table}[!htbp] \centering 
   \caption{Publication and Author Metrics} 
   \label{tab:metrics:OA} 
@@ -256,7 +269,7 @@ N & 121 & 18 & 66 & 68 \\
 +                   footnote.prod1k))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Tue, Oct 31, 2023 - 12:03:29 AM
+% Date and time: Mon, Mar 11, 2024 - 01:13:00 AM
 \begin{table}[!htbp] \centering 
   \caption{Publication and Author Metrics (2012+)} 
   \label{tab:metrics:OA:zero} 
@@ -362,7 +375,7 @@ In left_join(pub_author_stats.doi.wos %>% distinct(DOI) %>% mutate(src = "wos"),
 +                   footnote.prod1k))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Tue, Oct 31, 2023 - 12:03:30 AM
+% Date and time: Mon, Mar 11, 2024 - 01:13:01 AM
 \begin{table}[!htbp] \centering 
   \caption{Publication and Author Metrics for WoS sample} 
   \label{tab:metrics:OA:WoS} 
@@ -452,7 +465,7 @@ N & 14 & 52 & 45 \\
 +           out=file.path(Outputs,"table_ratios.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Tue, Oct 31, 2023 - 12:03:30 AM
+% Date and time: Mon, Mar 11, 2024 - 01:13:01 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Reproduction Rates} 
@@ -668,7 +681,7 @@ Joining with `by = join_by(names)`
 Number of obs in regression data: 113
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Tue, Oct 31, 2023 - 12:03:30 AM
+% Date and time: Mon, Mar 11, 2024 - 01:13:01 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Probit: Determinants of Reproducibility, Year 0} 
@@ -710,7 +723,7 @@ Number of obs in regression data: 113
 \end{table} 
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Tue, Oct 31, 2023 - 12:03:30 AM
+% Date and time: Mon, Mar 11, 2024 - 01:13:02 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Probit: Determinants of Reproducibility, Year 0} 
@@ -755,7 +768,7 @@ Joining with `by = join_by(names)`
 Number of obs in regression data: 152
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Tue, Oct 31, 2023 - 12:03:31 AM
+% Date and time: Mon, Mar 11, 2024 - 01:13:02 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Probit: Determinants of Reproducibility, Year 4} 
@@ -796,7 +809,7 @@ Number of obs in regression data: 152
 \end{table} 
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Tue, Oct 31, 2023 - 12:03:32 AM
+% Date and time: Mon, Mar 11, 2024 - 01:13:02 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Probit: Determinants of Reproducibility, Year 4} 
@@ -838,4 +851,4 @@ Number of obs in regression data: 152
 > 
 > proc.time()
    user  system elapsed 
-  15.72    1.92   16.39 
+   15.9     1.9    16.4 

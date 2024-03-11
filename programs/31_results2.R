@@ -300,7 +300,10 @@ stargazer(tab_reason.summary,
 tab_reason2 <- exit_all %>%
   filter(replicated %in% c("No","Partial") & confdata == "Other") %>%
   group_by(year,reason) %>%
-  summarise(n=n()) %>% spread(reason,n) %>%
+  summarise(n=n()) %>% 
+  spread(reason,n) %>%
+  ungroup() %>%
+  mutate_all(replace_na, replace = 0) %>%
   select(Year=year,`Missing Data`,`Corrupted Data`,`Code Error`,`Software Unavailable`,Other)
 
 
@@ -308,10 +311,10 @@ tab_reason2 <- exit_all %>%
 tab_reason2$Total <- rowSums(tab_reason2[,2:6],na.rm = T)
 
 
-row_sum <- colSums(tab_reason2[,2:6],na.rm=TRUE)
+row_sum <- colSums(tab_reason2[,2:7],na.rm=TRUE)
 
 tab_reason2 <- bind_rows(tab_reason2,row_sum)
-tab_reason2[11,1] = c("Total")
+tab_reason2[nrow(tab_reason2),1] = c("Total")
 
 tab_reason2[is.na(tab_reason2)] <- 0
 # Print table
@@ -562,9 +565,9 @@ cat2 <- c("complete. provided all information required to run the programs.")
 cat3 <- c("incomplete. was ambiguous or left out crucial steps.")
 
 main2 <- main %>%
-  mutate(clarity = ifelse(tolower(X18) %in% cat1,"No ReadMe Provided","No Info"),
-         clarity = ifelse(tolower(X18) %in% cat2,"Complete",clarity),
-         clarity = ifelse(tolower(X18) %in% cat3,"Incomplete",clarity))
+  mutate(clarity = ifelse(tolower(README_Quality) %in% cat1,"No ReadMe Provided","No Info"),
+         clarity = ifelse(tolower(README_Quality) %in% cat2,"Complete",clarity),
+         clarity = ifelse(tolower(README_Quality) %in% cat3,"Incomplete",clarity))
 
 #author2 <- main2 %>% filter(!is.na(avghindex)) %>% filter(replicated != "NA")
 author2 <- main2 %>% filter((replicated != "NA"))   %>%

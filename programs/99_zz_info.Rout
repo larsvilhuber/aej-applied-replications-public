@@ -122,4 +122,4 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 > 
 > proc.time()
    user  system elapsed 
-   13.1     1.9    13.6 
+  13.26    1.97   13.73 

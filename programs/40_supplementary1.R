@@ -47,11 +47,16 @@ if (!file.exists(doi.file.Rds) ) {
     filter(title!="Front Matter") %>%
     filter(!str_detect(title,"Volume")) %>%
     filter(!str_detect(title,"Forthcoming")) %>%
+    filter(doi != "10.1257/app.2009.0001") %>% # this is a duplicate of 10.1257/app.1.4.1 !
     # filter(title!="Editor's Note") %>%
     # More robust
     filter(str_sub(doi, start= -1)!="i")-> filtered.df
+  message(paste0("Saving new file: ",doi.file.Rds))
   saveRDS(filtered.df, file=  doi.file.Rds)
   rm(new)
+} else {
+  message(paste0("File already exists: ",doi.file.Rds))
+  message("Loading file from previous version.")
 }
 
 
