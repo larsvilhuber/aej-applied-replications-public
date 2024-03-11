@@ -2,9 +2,10 @@
 
 
 ### Load libraries 
-### Requirements: have library *here*
-source(here::here("global-libraries.R"),echo=TRUE)
-source(here::here("programs","config.R"),echo=TRUE)
+source(file.path(rprojroot::find_rstudio_root_file(),"pathconfig.R"),echo=FALSE)
+source(file.path(basepath,"global-libraries.R"),echo=FALSE)
+source(file.path(programs,"libraries.R"), echo=FALSE)
+source(file.path(programs,"config.R"), echo=FALSE)
 
 
 # Make available the latexnums dataset
