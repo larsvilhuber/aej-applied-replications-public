@@ -19,8 +19,8 @@ R CMD BATCH 40_supplementary1.R
 R CMD BATCH 41_supplementary2.R
 R CMD BATCH 42_prepare_authors.R
 R CMD BATCH 43_supplementary4.R
-R CMD BATCH 44_supplementary_authexp.R
-R CMD BATCH 45_supplementary_hindex.R
+R CMD BATCH 44_supplementary_hindex.R
+R CMD BATCH 45_supplementary_authexp.R
 R CMD BATCH 46_prepare_analysis.R
 R CMD BATCH 47_prepare_mainOA.R
 R CMD BATCH 48_mainOA_authorpaper_stats.R
