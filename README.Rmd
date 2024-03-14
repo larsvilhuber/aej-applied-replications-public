@@ -1,27 +1,28 @@
 ---
 title: "Code and Data for: Reproduce to Validate: a Comprehensive Study on the Reproducibility of Economics Research"
 author:
-  '1':
-    name: Sylverie Herbert
-  '2':
-    name: Flavio Stanchi
-  '3':
-    name: Hautahi Kingi
-  '4':
-    name: Lars Vilhuber
+  - Sylverie Herbert
+  - Hautahi Kingi
+  - Flavio Stanchi
+  - Lars Vilhuber
 date: "`r Sys.Date()`"
 output:
   html_document: 
     keep_md: yes
     number_sections: yes
     toc: yes
+    toc_depth: 1
   word_document: default
-  pdf_document: default
+  pdf_document: 
+    toc: true
+    number_sections: true
+    toc_depth: 1
 editor_options: 
   chunk_output_type: console
 bibliography: 
   - text/data.bib
   - text/includes/paper.bib
+  - grateful-refs.bib
 csl: _readme/chicago-author-date.csl
 ---
 
@@ -36,6 +37,10 @@ we.are.README <- TRUE
 source(file.path(basepath,"global-libraries.R"),echo=FALSE)
 #source(file.path(programs,"libraries.R"), echo=FALSE)
 source(file.path(programs,"config.R"), echo=FALSE)
+
+# we need two packages just for the Readme
+source(file.path(basepath,"readme-libraries.R"), echo=FALSE)
+
 
 library(knitr)
 library(readr)
@@ -84,19 +89,34 @@ datafiles <- read_excel("_readme/datafiles.xlsx") %>%
 # find files present
   mutate(Provided.real = file.exists(Filename),
          Provided.norm = (Provided == "Yes"),
-         congruence   = Provided.real != Provided.norm)
+         congruence   = Provided.real == Provided.norm)
 
 table(datafiles$congruence) %>% as.data.frame() -> check.files
 
-check.files.failure <- check.files %>% filter(Var1=="FALSE") %>% pull(Freq)
+check.files.true <- check.files %>% filter(Var1=="TRUE") %>% pull(Freq)
+check.files.failure <- nrow(datafiles) - check.files.true
 if ( is.numeric(check.files.failure) & check.files.failure > 0 ) {
   warning(paste0(check.files.failure," files fail check - are present but should be absent"))
 }
 
 
 ```
+```{r print_check,echo=FALSE,results='asis',eval=TRUE}
+
+
+if ( is.numeric(check.files.failure) & check.files.failure > 0 ) {
+   cat('### Files failing check')
+   cat(' ')
+   datafiles %>% 
+    filter(!congruence) %>%
+    select(`Data Source`,Filename,Provided.real,Provided.norm) %>%
+  kable()
+}
+
+```
 
 ```{r show_table,echo=FALSE,results='asis',eval=TRUE}
+
 
 datafiles %>% select(`Data Source`,Filename,Provided = Provided.real) %>%
   kable()
@@ -121,7 +141,7 @@ datafiles %>%
 
 ### Crossref data
 
-Crossref were extracted as needed to obtain bibliographic information (author names, article titles, publication dates) [@crossref-data]. The database itself is free to access. More information about it can be read about in @crossref-paper .
+Crossref were extracted as needed to obtain bibliographic information (author names, article titles, publication dates) [@crossref-data], using the `rcrossref` package to query the API `. The database itself is free to access. More information about it can be read in @crossref-paper . Note that data can and is updated, so running the query again 
 
 ```{r crossref_data,echo=FALSE,eval=TRUE,results='asis'}
 
@@ -195,9 +215,12 @@ names(library.files) <- "file"
 ```{r list_libs,echo=FALSE}
 library.files %>% filter(str_detect(file,"librar")) %>% kable()
 
-
 ```
 
+```{r create_r_cites,echo=FALSE,results='asis',eval=TRUE}
+# This needs to be run once by hand, and will be fine in the second round.
+cite_packages(output = "paragraph", out.dir = ".")
+```
 
 
 ## Controlled Randomness
@@ -206,6 +229,8 @@ library.files %>% filter(str_detect(file,"librar")) %>% kable()
 
 - [ ] Random seed is set at line _____ of program ______
 - [x] No Pseudo random generator is used in the analysis described here.
+
+Note that re-running the API queries (turned off by default) **will** generate different data, which is likely to affect the regression output.
 
 ## Memory, Runtime, Storage Requirements
 
@@ -243,6 +268,7 @@ The code was last run on
 - Processor:  AMD Ryzen 9 3900X 12-Core Processor, 24 cores
 - Memory available: 31GB memory
 - Docker version 24.0.7-ce, build 311b9ff0aa93
+- `r version$version.string` on `r version$system`
 
 as well as a Macbook with 16GB of memory. At least one program failed when run with less than 16GB of memory.
 
@@ -260,12 +286,16 @@ Of note, several programs leverage APIs, which can yield different results, and 
 - `r openalex.authors.Rds` - bibliometric information from openAlex on all the authors of articles analyzed
 - `r doi.file.Rds` - bibliographic information from Crossref for later analysis
 
-Internet access is required to run the programs, unless the key input files [@raw-data-2019] are manually downloaded from [https://doi.org/10.5281/zenodo.`r zenodo.id`](https://doi.org/10.5281/zenodo.`r zenodo.id`).
+Internet access is required to run the programs, 
+- to download the key input files [@raw-data-2019]
+- when re-running queries to the APIs
+
+The programs can be run without internet access if manually downloaded files from [https://doi.org/10.5281/zenodo.`r zenodo.id`](https://doi.org/10.5281/zenodo.`r zenodo.id`) are placed into `dataloc`.
 
 ##  License for Code
 
 
-The code is licensed under a BSD license. See [LICENSE.txt](LICENSE.txt) for details.
+The code (all files ending in `.R`, `.Rmd`, and `.sh`) is licensed under a BSD license. See [LICENSE.txt](LICENSE.txt) for details.
 
 # Instructions to Replicators
 
@@ -298,9 +328,29 @@ The provided code reproduces:
 - [ ] Selected tables and figures in the paper, as explained and justified below.
 
 
-```{r table_details, echo=FALSE,eval=TRUE,results='asis'}
-table_info <- read_excel("_readme/table-mapping.xlsx")
-kable(table_info)
+```{r table_details, echo=FALSE,eval=TRUE,results='asis',warning=FALSE,message=FALSE}
+# we constructed this in two takes
+# - parse all Latex files for their label and filename
+# - parse all R code for the word "table", to get the filename
+#  'grep table_ */*.R | sed 's+out=file.path(Outputs,"+text/analysis/+' | sed 's+=file.path(TexIncludes,"+text/includes/+' | sed 's+"))++' | sed 's+")++' | sed 's+:+,+' | sed 's+outtext+text+' > _readme/tables_programs.csv'
+# - some hand-cleaning
+
+tables_programs <- read_csv("_readme/tables_programs.csv", 
+    col_names = FALSE) %>% select(-X3)
+names(tables_programs) <- c("Program","LaTeX file")
+
+table_info <- read_excel("_readme/table-mapping.xlsx") %>%
+  mutate(number = as.numeric(str_remove(`Table number`,"A")),
+         appendix = str_detect(`Table number`,"A")) %>%
+  filter(!is.na(`Table number`)) %>%
+  group_by(appendix)%>%
+  arrange(number,.by_group = TRUE) %>%
+  ungroup()
+
+programs_table_info <- left_join(table_info,tables_programs,by="LaTeX file") %>%
+  select(`Table number`,Program,`LaTeX file`)
+
+kable(programs_table_info )
 ```
 
 ---
@@ -314,7 +364,7 @@ This README based on the template created by @template-readme.
 
 <div id="refs"></div>
 
-# (APPENDIX) Appendix {-} 
+#  Appendix {-} 
 
 ## Appendix: System and package info
 

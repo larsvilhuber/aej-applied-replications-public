@@ -9,8 +9,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Sylverie Herbert" />
+<meta name="author" content="Hautahi Kingi" />
+<meta name="author" content="Flavio Stanchi" />
+<meta name="author" content="Lars Vilhuber" />
 
-<meta name="date" content="2024-03-05" />
+<meta name="date" content="2024-03-14" />
 
 <title>Code and Data for: Reproduce to Validate: a Comprehensive Study on the Reproducibility of Economics Research</title>
 
@@ -373,8 +377,11 @@ display: none;
 
 <h1 class="title toc-ignore">Code and Data for: Reproduce to Validate: a
 Comprehensive Study on the Reproducibility of Economics Research</h1>
-<h4 class="author">true</h4>
-<h4 class="date">2024-03-05</h4>
+<h4 class="author">Sylverie Herbert</h4>
+<h4 class="author">Hautahi Kingi</h4>
+<h4 class="author">Flavio Stanchi</h4>
+<h4 class="author">Lars Vilhuber</h4>
+<h4 class="date">2024-03-14</h4>
 
 </div>
 
@@ -382,49 +389,15 @@ Comprehensive Study on the Reproducibility of Economics Research</h1>
 <ul>
 <li><a href="#overview" id="toc-overview"><span class="toc-section-number">1</span> Overview</a></li>
 <li><a href="#data-availability-and-provenance-statements" id="toc-data-availability-and-provenance-statements"><span class="toc-section-number">2</span> Data Availability and Provenance
-Statements</a>
-<ul>
-<li><a href="#statement-about-rights" id="toc-statement-about-rights"><span class="toc-section-number">2.1</span> Statement about Rights</a></li>
-<li><a href="#license-for-data" id="toc-license-for-data"><span class="toc-section-number">2.2</span> License for Data</a></li>
-<li><a href="#summary-of-availability" id="toc-summary-of-availability"><span class="toc-section-number">2.3</span> Summary of Availability</a></li>
-<li><a href="#details-on-each-data-source" id="toc-details-on-each-data-source"><span class="toc-section-number">2.4</span> Details on each Data Source</a>
-<ul>
-<li><a href="#raw-data-2019" id="toc-raw-data-2019"><span class="toc-section-number">2.4.1</span> <span class="citation">Kingi et
-al. (2019)</span></a></li>
-<li><a href="#crossref-data" id="toc-crossref-data"><span class="toc-section-number">2.4.2</span> Crossref data</a></li>
-<li><a href="#openalex-data" id="toc-openalex-data"><span class="toc-section-number">2.4.3</span> openAlex data</a></li>
-<li><a href="#web-of-science-data" id="toc-web-of-science-data"><span class="toc-section-number">2.4.4</span> Web of Science data</a></li>
-</ul></li>
-</ul></li>
-<li><a href="#computational-requirements" id="toc-computational-requirements"><span class="toc-section-number">3</span> Computational requirements</a>
-<ul>
-<li><a href="#software-requirements" id="toc-software-requirements"><span class="toc-section-number">3.1</span> Software Requirements</a></li>
-<li><a href="#controlled-randomness" id="toc-controlled-randomness"><span class="toc-section-number">3.2</span> Controlled Randomness</a></li>
-<li><a href="#memory-runtime-storage-requirements" id="toc-memory-runtime-storage-requirements"><span class="toc-section-number">3.3</span> Memory, Runtime, Storage
-Requirements</a>
-<ul>
-<li><a href="#summary" id="toc-summary"><span class="toc-section-number">3.3.1</span> Summary</a></li>
-<li><a href="#details" id="toc-details"><span class="toc-section-number">3.3.2</span> Details</a></li>
-</ul></li>
-</ul></li>
-<li><a href="#description-of-programscode" id="toc-description-of-programscode"><span class="toc-section-number">4</span> Description of programs/code</a>
-<ul>
-<li><a href="#license-for-code" id="toc-license-for-code"><span class="toc-section-number">4.1</span> License for Code</a></li>
-</ul></li>
-<li><a href="#instructions-to-replicators" id="toc-instructions-to-replicators"><span class="toc-section-number">5</span> Instructions to Replicators</a>
-<ul>
-<li><a href="#details-1" id="toc-details-1"><span class="toc-section-number">5.1</span> Details</a></li>
-</ul></li>
+Statements</a></li>
+<li><a href="#computational-requirements" id="toc-computational-requirements"><span class="toc-section-number">3</span> Computational requirements</a></li>
+<li><a href="#description-of-programscode" id="toc-description-of-programscode"><span class="toc-section-number">4</span> Description of
+programs/code</a></li>
+<li><a href="#instructions-to-replicators" id="toc-instructions-to-replicators"><span class="toc-section-number">5</span> Instructions to Replicators</a></li>
 <li><a href="#list-of-tables-and-programs" id="toc-list-of-tables-and-programs"><span class="toc-section-number">6</span> List of tables and programs</a></li>
 <li><a href="#acknowledgements" id="toc-acknowledgements"><span class="toc-section-number">7</span> Acknowledgements</a></li>
 <li><a href="#references" id="toc-references"><span class="toc-section-number">8</span> References</a></li>
-<li><a href="#appendix-appendix" id="toc-appendix-appendix">(APPENDIX)
-Appendix</a>
-<ul>
-<li><a href="#appendix-system-and-package-info" id="toc-appendix-system-and-package-info"><span class="toc-section-number">8.1</span> Appendix: System and package
-info</a></li>
-<li><a href="#appendix-dockerfile" id="toc-appendix-dockerfile"><span class="toc-section-number">8.2</span> Appendix: Dockerfile</a></li>
-</ul></li>
+<li><a href="#appendix" id="toc-appendix">Appendix</a></li>
 </ul>
 </div>
 
@@ -488,11 +461,10 @@ made</strong> publicly available.</li>
 <li><input type="checkbox" disabled></input><strong>No data can be
 made</strong> publicly available.</li>
 </ul>
-<pre><code>## Warning: 18 files fail check - are present but should be absent</code></pre>
-<table style="width:100%;">
+<table>
 <colgroup>
-<col width="49%" />
-<col width="43%" />
+<col width="52%" />
+<col width="40%" />
 <col width="7%" />
 </colgroup>
 <thead>
@@ -506,17 +478,17 @@ made</strong> publicly available.</li>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/entryQ_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="even">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/exitQ_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/replication_list_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="even">
 <td align="left">Crossref (2023)</td>
@@ -529,76 +501,87 @@ made</strong> publicly available.</li>
 <td align="left">TRUE</td>
 </tr>
 <tr class="even">
+<td align="left">Crossref (2023)</td>
+<td align="left">./data/crossref/crossref_aejdois.Rds</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
 <td align="left">Hand-generated by authors based on AEA websites</td>
 <td align="left">./data/crossref/issns.Rds</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">OurResearch (2023)</td>
 <td align="left">./data/openalex/citations-per-paper.Rds</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">OurResearch (2023)</td>
 <td align="left">./data/openalex/openalex-aejae-authors.Rds</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">OurResearch (2023)</td>
 <td align="left">./data/openalex/openalex-aejae.Rds</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">OurResearch (2023)</td>
 <td align="left">./data/openalex/openalex-hindex.Rds</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">OurResearch (2023)</td>
 <td align="left">./data/openalex/openalex-institutions-aejae.Rds</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Reuters (2016), Clarivate (2018) and manual edits</td>
 <td align="left">./data/h_index_data/h-index-assignment1.2019.csv</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Reuters (2016), Clarivate (2018) and manual edits</td>
 <td align="left">./data/h_index_data/h-index-assignment1.2019.xlsx</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Generated during acquisition of Crossref data</td>
 <td align="left">./data/crossref/crossref_timing.Rds</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Generated for data quality audit purposes</td>
 <td align="left">./data/crossref/audit-exp.xlsx</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Generated from openAlex data</td>
 <td align="left">./data/openalex/affiliations.csv</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Hand-edited data to override or complement openAlex
 data</td>
 <td align="left">./data/openalex/affiliation-impute.csv</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Hand-edited data to override or complement openAlex
 data</td>
 <td align="left">./data/openalex/affiliation-impute.xlsx</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
-<td align="left">Hand-edited data to override or complement openAlex
-data</td>
+<tr class="even">
+<td align="left">Machine-imputed institutions using auxiliary openAlex
+information</td>
 <td align="left">./data/openalex/affiliations-imputed.Rds</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">Records on institutions when available, pulled from
+openAlex API</td>
+<td align="left">./data/openalex/openalex-institutions-aejae.Rds</td>
 <td align="left">TRUE</td>
 </tr>
 <tr class="even">
@@ -607,33 +590,9 @@ data</td>
 <td align="left">TRUE</td>
 </tr>
 <tr class="odd">
-<td align="left">NA</td>
+<td align="left">Procedural file to map short names to long variable
+names</td>
 <td align="left">./data/auxiliary/mainOA-mapping.xlsx</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="even">
-<td align="left">NA</td>
-<td align="left">./data/interwrk/crossref.diagnostics.Rds</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="odd">
-<td align="left">NA</td>
-<td align="left">./data/interwrk/hindex_request.csv</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="even">
-<td align="left">NA</td>
-<td align="left">./data/interwrk/hindex_request.Rds</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="odd">
-<td align="left">NA</td>
-<td align="left">./data/interwrk/replication_list_3.Rds</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="even">
-<td align="left">NA</td>
-<td align="left">./data/interwrk/replication_list_clean.Rds</td>
 <td align="left">TRUE</td>
 </tr>
 </tbody>
@@ -664,17 +623,17 @@ names replaced by random identifiers.</p>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/entryQ_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="even">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/exitQ_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/replication_list_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 </tbody>
 </table>
@@ -682,12 +641,14 @@ names replaced by random identifiers.</p>
 <div id="crossref-data" class="section level3" number="2.4.2">
 <h3><span class="header-section-number">2.4.2</span> Crossref data</h3>
 <p>Crossref were extracted as needed to obtain bibliographic information
-(author names, article titles, publication dates) <span class="citation">(Crossref 2023)</span>. The database itself is free to
-access. More information about it can be read about in <span class="citation">Hendricks et al. (2020)</span> .</p>
+(author names, article titles, publication dates) <span class="citation">(Crossref 2023)</span>, using the
+<code>rcrossref</code> package to query the API `. The database itself
+is free to access. More information about it can be read in <span class="citation">Hendricks et al. (2020)</span> . Note that data can and
+is updated, so running the query again</p>
 <table>
 <colgroup>
 <col width="51%" />
-<col width="38%" />
+<col width="39%" />
 <col width="9%" />
 </colgroup>
 <thead>
@@ -709,16 +670,21 @@ access. More information about it can be read about in <span class="citation">He
 <td align="left">TRUE</td>
 </tr>
 <tr class="odd">
+<td align="left">Crossref (2023)</td>
+<td align="left">./data/crossref/crossref_aejdois.Rds</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
 <td align="left">Hand-generated by authors based on AEA websites</td>
 <td align="left">./data/crossref/issns.Rds</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Generated during acquisition of Crossref data</td>
 <td align="left">./data/crossref/crossref_timing.Rds</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Generated for data quality audit purposes</td>
 <td align="left">./data/crossref/audit-exp.xlsx</td>
 <td align="left">TRUE</td>
@@ -746,8 +712,8 @@ problematic data, as output for manual review (c) the edited/imputed
 data as used to complement the downloaded data.</p>
 <table>
 <colgroup>
-<col width="50%" />
-<col width="42%" />
+<col width="53%" />
+<col width="39%" />
 <col width="7%" />
 </colgroup>
 <thead>
@@ -801,12 +767,18 @@ data</td>
 <td align="left">TRUE</td>
 </tr>
 <tr class="odd">
-<td align="left">Hand-edited data to override or complement openAlex
-data</td>
+<td align="left">Machine-imputed institutions using auxiliary openAlex
+information</td>
 <td align="left">./data/openalex/affiliations-imputed.Rds</td>
 <td align="left">TRUE</td>
 </tr>
 <tr class="even">
+<td align="left">Records on institutions when available, pulled from
+openAlex API</td>
+<td align="left">./data/openalex/openalex-institutions-aejae.Rds</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
 <td align="left">Records to remove from extracted openAlex data</td>
 <td align="left">./data/openalex/blacklist.xlsx</td>
 <td align="left">TRUE</td>
@@ -831,9 +803,9 @@ following guidance on what data to extract (see <a href="data/h_index_data/READM
 The collated data is provided in XLSX and CSV formats.</p>
 <table>
 <colgroup>
-<col width="45%" />
-<col width="45%" />
-<col width="8%" />
+<col width="49%" />
+<col width="42%" />
+<col width="7%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -851,6 +823,12 @@ The collated data is provided in XLSX and CSV formats.</p>
 <tr class="even">
 <td align="left">Reuters (2016), Clarivate (2018) and manual edits</td>
 <td align="left">./data/h_index_data/h-index-assignment1.2019.xlsx</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">Procedural file to map short names to long variable
+names</td>
+<td align="left">./data/auxiliary/mainOA-mapping.xlsx</td>
 <td align="left">TRUE</td>
 </tr>
 </tbody>
@@ -877,6 +855,16 @@ installed from that repository.</li>
 <li>Libraries are defined in</li>
 </ul></li>
 </ul>
+<pre><code>## Warning in utils::citation(pkg_name): no date field in DESCRIPTION file of package &#39;openalexR&#39;</code></pre>
+<p>We used R version 4.2.2 <span class="citation">(R Core Team
+2022)</span> and the following R packages: devtools v. 2.4.5 <span class="citation">(Wickham et al. 2022)</span>, fastDummies v. 1.6.3
+<span class="citation">(Kaplan 2020)</span>, knitr v. 1.42 <span class="citation">(Xie 2014, 2015, 2023)</span>, openalexR v. 1.2.2.9999
+<span class="citation">(Aria and Le 2024)</span>, rcrossref v. 1.2.0
+<span class="citation">(Chamberlain et al. 2022)</span>, remotes v.
+2.4.2 <span class="citation">(Csárdi et al. 2021)</span>, reshape2 v.
+1.4.4 <span class="citation">(Wickham 2007)</span>, rmarkdown v. 2.20
+<span class="citation">(Xie, Allaire, and Grolemund 2018; Xie, Dervieux,
+and Riederer 2020; Allaire et al. 2023)</span>, rprojroot v. 2.0.3 <span class="citation">(Müller 2022)</span>, tidyverse v. 2.0.0 <span class="citation">(Wickham et al. 2019)</span>.</p>
 </div>
 <div id="controlled-randomness" class="section level2" number="3.2">
 <h2><span class="header-section-number">3.2</span> Controlled
@@ -887,6 +875,9 @@ _____ of program ______</li>
 <li><input type="checkbox" disabled checked></input>No Pseudo random
 generator is used in the analysis described here.</li>
 </ul>
+<p>Note that re-running the API queries (turned off by default)
+<strong>will</strong> generate different data, which is likely to affect
+the regression output.</p>
 </div>
 <div id="memory-runtime-storage-requirements" class="section level2" number="3.3">
 <h2><span class="header-section-number">3.3</span> Memory, Runtime,
@@ -894,7 +885,7 @@ Storage Requirements</h2>
 <div id="summary" class="section level3" number="3.3.1">
 <h3><span class="header-section-number">3.3.1</span> Summary</h3>
 <p>Approximate time needed to reproduce the analyses on a standard
-(CURRENT YEAR) desktop machine:</p>
+(CURRENT YEAR) desktop machine (when not running API queries):</p>
 <ul class="task-list">
 <li><input type="checkbox" disabled></input>&lt;10 minutes</li>
 <li><input type="checkbox" disabled checked></input>10-60 minutes</li>
@@ -905,6 +896,9 @@ Storage Requirements</h2>
 <li><input type="checkbox" disabled></input>3-14 days</li>
 <li><input type="checkbox" disabled></input>&gt; 14 days</li>
 </ul>
+<p>API queries can take a long time, are not guaranteed to work, and are
+not guaranteed to return the same results. All API queries are stored as
+of the last run, and made available in the replication package.</p>
 <p>Approximate storage space needed:</p>
 <ul class="task-list">
 <li><p><input type="checkbox" disabled></input>&lt; 25 MBytes</p></li>
@@ -926,8 +920,10 @@ desktop machine, as described below.</p></li>
 <li>Processor: AMD Ryzen 9 3900X 12-Core Processor, 24 cores</li>
 <li>Memory available: 31GB memory</li>
 <li>Docker version 24.0.7-ce, build 311b9ff0aa93</li>
+<li>R version 4.2.2 (2022-10-31) on x86_64, linux-gnu</li>
 </ul>
-<p>as well as a Macbook with 16GB of memory.</p>
+<p>as well as a Macbook with 16GB of memory. At least one program failed
+when run with less than 16GB of memory.</p>
 </div>
 </div>
 </div>
@@ -952,15 +948,19 @@ analyzed from openAlex</li>
 <li>/home/rstudio/data/openalex/openalex-aejae-authors.Rds -
 bibliometric information from openAlex on all the authors of articles
 analyzed</li>
-<li>/home/rstudio/data/replication_data/crossref_aejdois.Rds -
-bibliographic information from Crossref for later analysis</li>
+<li>/home/rstudio/data/crossref/crossref_aejdois.Rds - bibliographic
+information from Crossref for later analysis</li>
 </ul>
-<p>Internet access is required to run the programs, unless the key input
-files <span class="citation">(Kingi et al. 2019)</span> are manually
-downloaded from <a href="https://doi.org/10.5281/zenodo.2639920">https://doi.org/10.5281/zenodo.2639920</a>.</p>
+<p>Internet access is required to run the programs, - to download the
+key input files <span class="citation">(Kingi et al. 2019)</span> - when
+re-running queries to the APIs</p>
+<p>The programs can be run without internet access if manually
+downloaded files from <a href="https://doi.org/10.5281/zenodo.2639920">https://doi.org/10.5281/zenodo.2639920</a>
+are placed into <code>dataloc</code>.</p>
 <div id="license-for-code" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> License for Code</h2>
-<p>The code is licensed under a BSD license. See <a href="LICENSE.txt">LICENSE.txt</a> for details.</p>
+<p>The code (all files ending in <code>.R</code>, <code>.Rmd</code>, and
+<code>.sh</code>) is licensed under a BSD license. See <a href="LICENSE.txt">LICENSE.txt</a> for details.</p>
 </div>
 </div>
 <div id="instructions-to-replicators" class="section level1" number="5">
@@ -972,7 +972,7 @@ Replicators</h1>
 <li>in the “Terminal” of the RStudio app, run
 <code>bash ./run.sh</code></li>
 </ul>
-<p>Alternative ways to run this, with untested results:</p>
+<p>Alternative ways to run this (these were not tested):</p>
 <ul>
 <li>optionally, before running project code, run
 <code>Rscript -e &quot;renv::init()&quot;</code> (on Windows,
@@ -988,8 +988,8 @@ individually as desired, in the order indicated above.</li>
 <h2><span class="header-section-number">5.1</span> Details</h2>
 <table>
 <colgroup>
-<col width="23%" />
-<col width="76%" />
+<col width="30%" />
+<col width="70%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1000,11 +1000,12 @@ individually as desired, in the order indicated above.</li>
 <tbody>
 <tr class="odd">
 <td align="left">./global-libraries.R</td>
-<td align="left">NA</td>
+<td align="left">Defines libraries used globally in various pieces
+(text, analysis, and documentation)</td>
 </tr>
 <tr class="even">
 <td align="left">./pathconfig.R</td>
-<td align="left">NA</td>
+<td align="left">Defines various relative paths</td>
 </tr>
 <tr class="odd">
 <td align="left">./programs/_footnotes.R</td>
@@ -1045,34 +1046,19 @@ Science.</td>
 the articles. May no longer be functional.</td>
 </tr>
 <tr class="odd">
-<td align="left">./programs/20_analytics.R</td>
-<td align="left">Old program, consolidates datasources into the main
-dataset, then conducts simple analyses. Most output appears only in the
-appendix.</td>
-</tr>
-<tr class="even">
 <td align="left">./programs/25_prepare_sample.R</td>
-<td align="left">NA</td>
+<td align="left">Uses downloaded data and generates the analysis
+sample</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">./programs/30_results1.R</td>
-<td align="left">NA</td>
+<td align="left">Original analysis, now only used for appendix
+tables.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">./programs/31_results2.R</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">./programs/32_conclusion.R</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">./programs/35_appendix.R</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">./programs/36_list-articles.R</td>
-<td align="left">NA</td>
+<td align="left">Original analysis, now only used for appendix
+tables.</td>
 </tr>
 <tr class="even">
 <td align="left">./programs/40_supplementary1.R</td>
@@ -1086,75 +1072,68 @@ citations.</td>
 </tr>
 <tr class="even">
 <td align="left">./programs/42_prepare_authors.R</td>
-<td align="left">NA</td>
+<td align="left">Query to openAlex for author and institution
+information</td>
 </tr>
 <tr class="odd">
 <td align="left">./programs/43_supplementary4.R</td>
-<td align="left">NA</td>
+<td align="left">Processes the author and institution information,
+completing missing information</td>
 </tr>
 <tr class="even">
-<td align="left">./programs/44_supplementary_authexp.R</td>
-<td align="left">NA</td>
+<td align="left">./programs/44_supplementary_hindex.R</td>
+<td align="left">Re-computes the h-index per author and year</td>
 </tr>
 <tr class="odd">
-<td align="left">./programs/45_supplementary_hindex.R</td>
-<td align="left">NA</td>
+<td align="left">./programs/45_supplementary_authexp.R</td>
+<td align="left">This program primarily handles computing academic age
+of author</td>
 </tr>
 <tr class="even">
 <td align="left">./programs/46_prepare_analysis.R</td>
-<td align="left">NA</td>
+<td align="left">Combine the various pieces into a single analysis file
+for the bibliometric analysis.</td>
 </tr>
 <tr class="odd">
 <td align="left">./programs/47_prepare_mainOA.R</td>
-<td align="left">NA</td>
+<td align="left">Add additional pieces to the analysis</td>
 </tr>
 <tr class="even">
 <td align="left">./programs/48_mainOA_authorpaper_stats.R</td>
-<td align="left">NA</td>
+<td align="left">Summary statistics: Papers and authors</td>
 </tr>
 <tr class="odd">
 <td align="left">./programs/49_assignments.R</td>
-<td align="left">NA</td>
+<td align="left">Summary statistics: Assignments</td>
 </tr>
 <tr class="even">
 <td align="left">./programs/50_analysis_openAlex.R</td>
-<td align="left">NA</td>
+<td align="left">Core analysis</td>
 </tr>
 <tr class="odd">
 <td align="left">./programs/51_analysis_Poisson.R</td>
-<td align="left">NA</td>
+<td align="left">Poisson models</td>
 </tr>
 <tr class="even">
 <td align="left">./programs/52_robustess_standarderrors.R</td>
-<td align="left">NA</td>
+<td align="left">Robust standard errors</td>
 </tr>
 <tr class="odd">
-<td align="left">./programs/99_write_nums.R</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
 <td align="left">./programs/99_zz_info.R</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">./programs/config-private.R</td>
-<td align="left">NA</td>
+<td align="left">System information</td>
 </tr>
 <tr class="even">
 <td align="left">./programs/config.R</td>
-<td align="left">NA</td>
+<td align="left">Basic configuration</td>
 </tr>
 <tr class="odd">
-<td align="left">./programs/function_latexnums.R</td>
-<td align="left">NA</td>
+<td align="left">./programs/libraries.R</td>
+<td align="left">All libraries used</td>
 </tr>
 <tr class="even">
-<td align="left">./programs/libraries.R</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
 <td align="left">./text/libraries.R</td>
-<td align="left">NA</td>
+<td align="left">Additional libraries (possibly no longer relevant, kept
+for robustness)</td>
 </tr>
 </tbody>
 </table>
@@ -1172,7 +1151,213 @@ figures in the paper</li>
 <li><input type="checkbox" disabled></input>Selected tables and figures in
 the paper, as explained and justified below.</li>
 </ul>
-<p>MISING TABLE OF PROGRAMS AND TABLES/FIGURES</p>
+<table>
+<colgroup>
+<col width="11%" />
+<col width="45%" />
+<col width="42%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Table number</th>
+<th align="left">Program</th>
+<th align="left">LaTeX file</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">programs/40_supplementary1.R</td>
+<td align="left">text/includes/table_article_selection.tex</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">NA</td>
+<td align="left">No code</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">programs/30_results1.R</td>
+<td align="left">text/includes/table_data_availability.tex</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">programs/30_results1.R</td>
+<td align="left">text/includes/table_data_prog.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">programs/30_results1.R</td>
+<td align="left">text/includes/table_difficult.tex</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">programs/30_results1.R</td>
+<td align="left">text/includes/table_doc.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">7</td>
+<td align="left">programs/31_results2.R</td>
+<td align="left">text/includes/table_results_both.tex</td>
+</tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="left">programs/31_results2.R</td>
+<td align="left">text/includes/table_reason.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">programs/31_results2.R</td>
+<td align="left">text/analysis/table_code.tex</td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left">programs/31_results2.R</td>
+<td align="left">text/analysis/table_reg1.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">11</td>
+<td align="left">programs/48_mainOA_authorpaper_stats.R</td>
+<td align="left">text/analysis/table_metrics_OA.tex</td>
+</tr>
+<tr class="even">
+<td align="left">12</td>
+<td align="left">programs/48_mainOA_authorpaper_stats.R</td>
+<td align="left">text/analysis/table_reg_probit_0_full.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">13</td>
+<td align="left">programs/48_mainOA_authorpaper_stats.R +
+formatting</td>
+<td align="left">text/analysis/table_ratios_edited.tex</td>
+</tr>
+<tr class="even">
+<td align="left">14</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_reg2OA.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">15</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_arcreg3OA.tex</td>
+</tr>
+<tr class="even">
+<td align="left">16</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_arcregpost12OA.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">16</td>
+<td align="left">programs/52_robustess_standarderrors.R</td>
+<td align="left">text/analysis/table_arcregpost12OA.tex</td>
+</tr>
+<tr class="even">
+<td align="left">17</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_arcreg3OA4.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">17</td>
+<td align="left">programs/52_robustess_standarderrors.R</td>
+<td align="left">text/analysis/table_arcreg3OA4.tex</td>
+</tr>
+<tr class="even">
+<td align="left">A1</td>
+<td align="left">programs/49_assignments.R</td>
+<td align="left">text/includes/table_assignments.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">A2</td>
+<td align="left">programs/30_results1.R</td>
+<td align="left">text/includes/table_absence.tex</td>
+</tr>
+<tr class="even">
+<td align="left">A3</td>
+<td align="left">programs/31_results2.R</td>
+<td align="left">text/includes/table_results_by_year.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">A4</td>
+<td align="left">programs/48_mainOA_authorpaper_stats.R</td>
+<td align="left">text/analysis/table_reg_probit_0_fullpartial.tex</td>
+</tr>
+<tr class="even">
+<td align="left">A5</td>
+<td align="left">programs/48_mainOA_authorpaper_stats.R</td>
+<td align="left">text/analysis/table_metrics_OA_app0.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">A6</td>
+<td align="left">programs/31_results2.R</td>
+<td align="left">text/analysis/table_metrics.tex</td>
+</tr>
+<tr class="even">
+<td align="left">A7</td>
+<td align="left">programs/48_mainOA_authorpaper_stats.R</td>
+<td align="left">text/analysis/table_metrics_OA_wos.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">A8</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_stassessed.tex</td>
+</tr>
+<tr class="even">
+<td align="left">A8</td>
+<td align="left">programs/52_robustess_standarderrors.R</td>
+<td align="left">text/analysis/table_stassessed.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">A9</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_stattempted.tex</td>
+</tr>
+<tr class="even">
+<td align="left">A9</td>
+<td align="left">programs/52_robustess_standarderrors.R</td>
+<td align="left">text/analysis/table_stattempted.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">A10</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_reg3OA.tex</td>
+</tr>
+<tr class="even">
+<td align="left">A11</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_logreg3OA.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">A12</td>
+<td align="left">programs/51_analysis_Poisson.R</td>
+<td align="left">text/analysis/table_poissonreg.tex</td>
+</tr>
+<tr class="even">
+<td align="left">A13</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_arcreg3OA_partial.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">A14</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_reg3OA_partial.tex</td>
+</tr>
+<tr class="even">
+<td align="left">A15</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_logreg3OA_partial.tex</td>
+</tr>
+<tr class="odd">
+<td align="left">A16</td>
+<td align="left">programs/51_analysis_Poisson.R</td>
+<td align="left">text/analysis/table_poissonreg_partial.tex</td>
+</tr>
+<tr class="even">
+<td align="left">A17</td>
+<td align="left">programs/50_analysis_openAlex.R</td>
+<td align="left">text/analysis/table_arcregpost12OA_partial.tex</td>
+</tr>
+</tbody>
+</table>
 <hr />
 </div>
 <div id="acknowledgements" class="section level1" number="7">
@@ -1182,12 +1367,35 @@ the paper, as explained and justified below.</li>
 <div id="references" class="section level1" number="8">
 <h1><span class="header-section-number">8</span> References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-rmarkdown2023" class="csl-entry">
+Allaire, JJ, Yihui Xie, Jonathan McPherson, Javier Luraschi, Kevin
+Ushey, Aron Atkins, Hadley Wickham, Joe Cheng, Winston Chang, and
+Richard Iannone. 2023. <em><span class="nocase">rmarkdown</span>:
+Dynamic Documents for r</em>. <a href="https://github.com/rstudio/rmarkdown">https://github.com/rstudio/rmarkdown</a>.
+</div>
+<div id="ref-openalexR" class="csl-entry">
+Aria, Massimo, and Trang Le. 2024. <em><span class="nocase">openalexR</span>: Getting Bibliographic Records from
+<span>“<span>OpenAlex</span>”</span> Database Using
+<span>“<span>DSL</span>”</span> API</em>.
+</div>
+<div id="ref-rcrossref" class="csl-entry">
+Chamberlain, Scott, Hao Zhu, Najko Jahn, Carl Boettiger, and Karthik
+Ram. 2022. <em><span class="nocase">rcrossref</span>: Client for Various
+<span>“<span>CrossRef</span>”</span>
+<span>“<span>APIs</span>”</span></em>.
+</div>
 <div id="ref-webofscience2018" class="csl-entry">
 Clarivate. 2016-2018. <span>“Web of Science.”</span> Online resource. <a href="http://webofscience.com/">http://webofscience.com/</a>.
 </div>
 <div id="ref-crossref-data" class="csl-entry">
 Crossref. 2023. <span>“<span>Crossref API</span>.”</span> Dataset
 extracted 2023-10-12. <a href="https://www.crossref.org/documentation/retrieve-metadata/rest-api/">https://www.crossref.org/documentation/retrieve-metadata/rest-api/</a>.
+</div>
+<div id="ref-remotes" class="csl-entry">
+Csárdi, Gábor, Jim Hester, Hadley Wickham, Winston Chang, Martin Morgan,
+and Dan Tenenbaum. 2021. <em><span class="nocase">remotes</span>: R
+Package Installation from Remote Repositories, Including
+<span>“<span>GitHub</span>”</span></em>.
 </div>
 <div id="ref-crossref-paper" class="csl-entry">
 Hendricks, Ginny, Dominika Tkaczyk, Jennifer Lin, and Patricia Feeney.
@@ -1200,6 +1408,11 @@ Herbert, Sylverie, Hautahi Kingi, Flavio Stanchi, and Lars Vilhuber.
 2021. <span>“The Reproducibility of Economics Research: A Case
 Study.”</span> Working Paper. Banque de France. <a href="https://doi.org/10.2139/ssrn.4325149">https://doi.org/10.2139/ssrn.4325149</a>.
 </div>
+<div id="ref-fastDummies" class="csl-entry">
+Kaplan, Jacob. 2020. <em><span class="nocase">fastDummies</span>: Fast
+Creation of Dummy (Binary) Columns and Rows from Categorical
+Variables</em>.
+</div>
 <div id="ref-raw-data-2019" class="csl-entry">
 Kingi, Hautahi, Sylverie Herbert, Flavio Stanchi, and Lars Vilhuber.
 2019. <span>“Data from the Cornell LDI Replication Lab.”</span> Dataset
@@ -1209,6 +1422,10 @@ v20190414. Labor Dynamics Institute. <a href="https://doi.org/10.5281/zenodo.263
 Kingi, Hautahi, Lars Vilhuber, Sylverie Herbert, and Flavio Stanchi.
 2018. <span>“The Reproducibility of Economics Research: A Case
 Study.”</span> Mimeo. BITSS. <a href="https://osf.io/srg57">https://osf.io/srg57</a>.
+</div>
+<div id="ref-rprojroot" class="csl-entry">
+Müller, Kirill. 2022. <em><span class="nocase">rprojroot</span>: Finding
+Files in Project Subdirectories</em>.
 </div>
 <div id="ref-openalex-data" class="csl-entry">
 OurResearch. 2023. <span>“<span>OpenAlex</span>.”</span> Dataset
@@ -1220,6 +1437,11 @@ Priem, Jason, Heather Piwowar, and Richard Orr. 2022.
 Scholarly Works, Authors, Venues, Institutions, and Concepts,”</span>
 no. arXiv:2205.01833 (June). <a href="https://doi.org/10.48550/arXiv.2205.01833">https://doi.org/10.48550/arXiv.2205.01833</a>.
 </div>
+<div id="ref-base" class="csl-entry">
+R Core Team. 2022. <em><span>R</span>: A Language and Environment for
+Statistical Computing</em>. Vienna, Austria: R Foundation for
+Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
 <div id="ref-WebofScience" class="csl-entry">
 Thomson-Reuters. 2016. <span>“Web of Science.”</span> <a href="http://apps.webofknowledge.com">http://apps.webofknowledge.com</a>.
 </div>
@@ -1228,10 +1450,48 @@ Vilhuber, Lars, Marie Connolly, Miklós Koren, Joan Llull, and Peter
 Morrow. 2022. <span>“<span class="nocase">A template README for social
 science replication packages</span>.”</span> Document v1.1. Zenodo. <a href="https://doi.org/10.5281/zenodo.7293838">https://doi.org/10.5281/zenodo.7293838</a>.
 </div>
+<div id="ref-reshape2" class="csl-entry">
+Wickham, Hadley. 2007. <span>“Reshaping Data with the <span class="nocase">reshape</span> Package.”</span> <em>Journal of
+Statistical Software</em> 21 (12): 1–20. <a href="http://www.jstatsoft.org/v21/i12/">http://www.jstatsoft.org/v21/i12/</a>.
+</div>
+<div id="ref-tidyverse" class="csl-entry">
+Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy
+D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019.
+<span>“Welcome to the <span class="nocase">tidyverse</span>.”</span>
+<em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.
+</div>
+<div id="ref-devtools" class="csl-entry">
+Wickham, Hadley, Jim Hester, Winston Chang, and Jennifer Bryan. 2022.
+<em><span class="nocase">devtools</span>: Tools to Make Developing r
+Packages Easier</em>.
+</div>
+<div id="ref-knitr2014" class="csl-entry">
+Xie, Yihui. 2014. <span>“<span class="nocase">knitr</span>: A
+Comprehensive Tool for Reproducible Research in <span>R</span>.”</span>
+In <em>Implementing Reproducible Computational Research</em>, edited by
+Victoria Stodden, Friedrich Leisch, and Roger D. Peng. Chapman;
+Hall/CRC.
+</div>
+<div id="ref-knitr2015" class="csl-entry">
+———. 2015. <em>Dynamic Documents with <span>R</span> and Knitr</em>. 2nd
+ed. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://yihui.org/knitr/">https://yihui.org/knitr/</a>.
+</div>
+<div id="ref-knitr2023" class="csl-entry">
+———. 2023. <em><span class="nocase">knitr</span>: A General-Purpose
+Package for Dynamic Report Generation in r</em>. <a href="https://yihui.org/knitr/">https://yihui.org/knitr/</a>.
+</div>
+<div id="ref-rmarkdown2018" class="csl-entry">
+Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. <em>R Markdown:
+The Definitive Guide</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://bookdown.org/yihui/rmarkdown">https://bookdown.org/yihui/rmarkdown</a>.
+</div>
+<div id="ref-rmarkdown2020" class="csl-entry">
+Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. <em>R
+Markdown Cookbook</em>. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://bookdown.org/yihui/rmarkdown-cookbook">https://bookdown.org/yihui/rmarkdown-cookbook</a>.
 </div>
 </div>
-<div id="appendix-appendix" class="section level1 unnumbered">
-<h1 class="unnumbered">(APPENDIX) Appendix</h1>
+</div>
+<div id="appendix" class="section level1 unnumbered">
+<h1 class="unnumbered">Appendix</h1>
 <div id="appendix-system-and-package-info" class="section level2" number="8.1">
 <h2><span class="header-section-number">8.1</span> Appendix: System and
 package info</h2>
@@ -1245,7 +1505,7 @@ package info</h2>
 ##  collate  en_US.UTF-8
 ##  ctype    en_US.UTF-8
 ##  tz       Etc/UTC
-##  date     2024-03-05
+##  date     2024-03-14
 ##  pandoc   2.19.2 @ /usr/lib/rstudio-server/bin/quarto/bin/tools/ (via rmarkdown)
 ## 
 ## ─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -1277,6 +1537,7 @@ package info</h2>
 ##  generics      0.1.3   2022-07-05 [1] RSPM (R 4.2.0)
 ##  ggplot2     * 3.4.1   2023-02-10 [1] RSPM (R 4.2.0)
 ##  glue          1.6.2   2022-02-24 [1] RSPM (R 4.2.0)
+##  grateful    * 0.2.6   2024-03-14 [1] Github (Pakillo/grateful@cdaaa90)
 ##  gtable        0.3.1   2022-09-01 [1] RSPM (R 4.2.0)
 ##  hms           1.1.2   2022-08-19 [1] RSPM (R 4.2.0)
 ##  htmltools     0.5.4   2022-12-07 [1] RSPM (R 4.2.0)
@@ -1313,6 +1574,7 @@ package info</h2>
 ##  readxl      * 1.4.2   2023-02-09 [1] RSPM (R 4.2.0)
 ##  remotes       2.4.2   2021-11-30 [1] RSPM (R 4.2.0)
 ##  repr          1.1.4   2022-01-04 [1] RSPM (R 4.2.0)
+##  reshape2    * 1.4.4   2020-04-09 [1] RSPM (R 4.2.0)
 ##  rjson       * 0.2.21  2022-01-09 [1] RSPM (R 4.2.0)
 ##  rlang         1.0.6   2022-09-24 [1] RSPM (R 4.2.0)
 ##  rmarkdown     2.20    2023-01-19 [1] RSPM (R 4.2.0)
@@ -1390,6 +1652,8 @@ Dockerfile</h2>
 ## COPY global-libraries.R install1.R
 ## COPY programs/libraries.R install2.R
 ## COPY text/libraries.R install3.R
+## COPY readme-libraries.R install4.R
+## 
 ## RUN cat install?.R &gt; install.R &amp;&amp; Rscript install.R</code></pre>
 </div>
 </div>
