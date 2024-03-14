@@ -24,6 +24,8 @@ RUN apt-get update \
 COPY global-libraries.R install1.R
 COPY programs/libraries.R install2.R
 COPY text/libraries.R install3.R
+COPY readme-libraries.R install4.R
+
 RUN cat install?.R > install.R && Rscript install.R
 
 
