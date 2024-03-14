@@ -43,6 +43,12 @@ pkgTest <- function(x)
 	return("OK")
 }
 
-global.libraries <- c("dplyr","devtools","rprojroot","tictoc","ggplot2","bindrcpp","Rcpp","markdown")
+global.libraries <- c("dplyr","devtools","rprojroot","tictoc","ggplot2","bindrcpp","Rcpp")
 
 results <- sapply(as.list(global.libraries), pkgTest)
+
+if (!require("grateful",character.only = TRUE)) {
+  # install.packages("remotes")
+  remotes::install_github("Pakillo/grateful")
+  if(!require("grateful",character.only = TRUE)) stop("Package not found")
+}
