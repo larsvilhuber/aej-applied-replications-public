@@ -940,4 +940,4 @@ Group variables            None
 > 
 > proc.time()
    user  system elapsed 
-  20.12    1.85   20.65 
+  19.62    1.97   20.18 

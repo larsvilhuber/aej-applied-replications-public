@@ -733,4 +733,4 @@ Joining with `by = join_by(institution_id)`
 > 
 > proc.time()
    user  system elapsed 
-  19.60    2.29   20.84 
+  19.63    2.23   20.57 

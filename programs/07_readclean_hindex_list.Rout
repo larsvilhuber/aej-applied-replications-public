@@ -202,4 +202,4 @@ Median   Mean   Max.
 > 
 > proc.time()
    user  system elapsed 
-  13.22    1.85   13.69 
+  13.67    1.82   14.16 

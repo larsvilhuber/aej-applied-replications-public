@@ -290,7 +290,7 @@ Joining with `by = join_by(year)`
 +                   "papers comprises those for which we had complete assessment questionnaires."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 12:52:20 AM
+% Date and time: Sat, Mar 16, 2024 - 03:26:05 AM
 \begin{table}[!htbp] \centering 
   \caption{Articles Published and Selected by Year} 
   \label{tab:Selection} 
@@ -312,4 +312,4 @@ Percent & 61.76 & 57.5 & 86.49 & 97.5 & 21.05 & 100 & 60 & 89.19 & 92.86 & 90 & 
 > 
 > proc.time()
    user  system elapsed 
-  13.89    1.83   15.90 
+  13.55    1.92   13.99 

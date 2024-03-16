@@ -219,4 +219,4 @@ Joining with `by = join_by(DOI)`
 > 
 > proc.time()
    user  system elapsed 
-  13.73    1.82   14.21 
+  13.53    1.84   13.90 

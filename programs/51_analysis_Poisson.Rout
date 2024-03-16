@@ -372,4 +372,4 @@ Heteroskedasticity-robust standard errors.
 > 
 > proc.time()
    user  system elapsed 
-  15.44    1.81   15.88 
+  15.11    1.98   15.60 

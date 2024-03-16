@@ -229,8 +229,8 @@ Loading file from previous version.
 Author-article-year: 5236235
 > gc()
             used (Mb) gc trigger (Mb)  max used (Mb)
-Ncells   7354192  393   12701577  678  12701577  678
-Vcells 145222373 1108  213524006 1629 177870004 1357
+Ncells   7351585  393   12699527  678  12699527  678
+Vcells 145219640 1108  213519282 1629 177866061 1357
 > TMP %>%
 +   # We only want the data for the authors in our sample.
 +   right_join(authors.in.sample %>% select(au_id),
@@ -243,8 +243,8 @@ Vcells 145222373 1108  213524006 1629 177870004 1357
 > 
 > gc()
            used (Mb) gc trigger (Mb)  max used (Mb)
-Ncells  7325425  391   12701577  678  12701577  678
-Vcells 84748716  647  213524006 1629 212743006 1623
+Ncells  7322818  391   12699527  678  12699527  678
+Vcells 84745983  647  213519282 1629 212740273 1623
 > TMP %>%
 +   # But this gets us all the data for ALL the co-authors on papers that are out of scope.
 +   # Kenneth J Arrow rule...
@@ -280,8 +280,8 @@ Joining with `by = join_by(au_id)`
 > rm(TMP)
 > gc()
            used (Mb) gc trigger (Mb)  max used (Mb)
-Ncells  7216394  385   12701577  678  12701577  678
-Vcells 63489283  484  213524006 1629 212743006 1623
+Ncells  7213840  385   12699527  678  12699527  678
+Vcells 63486681  484  213519282 1629 212740273 1623
 > 
 > 
 > nrow(citations.df)
@@ -489,4 +489,4 @@ Group variables            None
 > 
 > proc.time()
    user  system elapsed 
-  60.99    2.74   63.20 
+  59.47    2.36   60.48 

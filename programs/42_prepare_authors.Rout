@@ -293,4 +293,4 @@ Joining with `by = join_by(au_id)`
 > 
 > proc.time()
    user  system elapsed 
-  23.92    2.12   24.87 
+  23.62    2.07   24.30 
