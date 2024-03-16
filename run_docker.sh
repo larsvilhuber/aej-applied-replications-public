@@ -3,16 +3,20 @@
 if [[ "$1" == "-h" ]]
 then
 cat << EOF
-$0 (tag)
+$0 (tag) (command)
 
-will start interactive shell for tag (TAG)
+will start interactive shell for tag  if command empty
+
+or
+
+will run with the command provided 
 EOF
 exit 0
 fi
 
 PWD=$(pwd)
 . config.sh
-tag=${1:-$tag}
+shift
 
 case $USER in
   *vilhuber|*herbert)
