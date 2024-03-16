@@ -461,46 +461,6 @@ made</strong> publicly available.</li>
 <li><input type="checkbox" disabled></input><strong>No data can be
 made</strong> publicly available.</li>
 </ul>
-<pre><code>## Warning: 3 files fail check - are present but should be absent</code></pre>
-<div id="files-failing-check" class="section level3" number="2.3.1">
-<h3><span class="header-section-number">2.3.1</span> Files failing
-check</h3>
-<table>
-<colgroup>
-<col width="19%" />
-<col width="51%" />
-<col width="14%" />
-<col width="14%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Data Source</th>
-<th align="left">Filename</th>
-<th align="left">Provided.real</th>
-<th align="left">Provided.norm</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Kingi et al (2019)</td>
-<td align="left">./data/replication_data/entryQ_pub.Rds</td>
-<td align="left">TRUE</td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="even">
-<td align="left">Kingi et al (2019)</td>
-<td align="left">./data/replication_data/exitQ_pub.Rds</td>
-<td align="left">TRUE</td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="odd">
-<td align="left">Kingi et al (2019)</td>
-<td align="left">./data/replication_data/replication_list_pub.Rds</td>
-<td align="left">TRUE</td>
-<td align="left">FALSE</td>
-</tr>
-</tbody>
-</table>
 <table>
 <colgroup>
 <col width="52%" />
@@ -518,17 +478,17 @@ check</h3>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/entryQ_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="even">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/exitQ_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/replication_list_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="even">
 <td align="left">Crossref (2023)</td>
@@ -638,7 +598,6 @@ names</td>
 </tbody>
 </table>
 </div>
-</div>
 <div id="details-on-each-data-source" class="section level2" number="2.4">
 <h2><span class="header-section-number">2.4</span> Details on each Data
 Source</h2>
@@ -664,17 +623,17 @@ names replaced by random identifiers.</p>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/entryQ_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="even">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/exitQ_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/replication_list_pub.Rds</td>
-<td align="left">TRUE</td>
+<td align="left">FALSE</td>
 </tr>
 </tbody>
 </table>
@@ -1120,8 +1079,6 @@ Replicators</h1>
 <code>Rscript.exe -e &quot;renv::init()&quot;</code> ) to isolate the project
 libraries from your system (assumes <code>renv</code> is installed, see
 <a href="https://rstudio.github.io/renv/articles/renv.html">renv</a>).</li>
-<li>Using the same R version as described above, open <a href="programs/README.Rmd"><code>programs/README.Rmd</code></a>, and
-knit. All necessary libraries will be installed on first run.</li>
 <li>Using the same R version as described above, run each program
 individually as desired, in the order indicated above.</li>
 </ul>

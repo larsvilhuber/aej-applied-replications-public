@@ -61,23 +61,14 @@ All derivative data contained herein, if not otherwise encumbered, is available 
 
 
 
-```
-## Warning: 3 files fail check - are present but should be absent
-```
-### Files failing check 
 
-|Data Source        |Filename                                         |Provided.real |Provided.norm |
-|:------------------|:------------------------------------------------|:-------------|:-------------|
-|Kingi et al (2019) |./data/replication_data/entryQ_pub.Rds           |TRUE          |FALSE         |
-|Kingi et al (2019) |./data/replication_data/exitQ_pub.Rds            |TRUE          |FALSE         |
-|Kingi et al (2019) |./data/replication_data/replication_list_pub.Rds |TRUE          |FALSE         |
 
 
 |Data Source                                                       |Filename                                          |Provided |
 |:-----------------------------------------------------------------|:-------------------------------------------------|:--------|
-|Kingi et al (2019)                                                |./data/replication_data/entryQ_pub.Rds            |TRUE     |
-|Kingi et al (2019)                                                |./data/replication_data/exitQ_pub.Rds             |TRUE     |
-|Kingi et al (2019)                                                |./data/replication_data/replication_list_pub.Rds  |TRUE     |
+|Kingi et al (2019)                                                |./data/replication_data/entryQ_pub.Rds            |FALSE    |
+|Kingi et al (2019)                                                |./data/replication_data/exitQ_pub.Rds             |FALSE    |
+|Kingi et al (2019)                                                |./data/replication_data/replication_list_pub.Rds  |FALSE    |
 |Crossref (2023)                                                   |./data/crossref/crossref_info.csv                 |TRUE     |
 |Crossref (2023)                                                   |./data/crossref/crossref_info.Rds                 |TRUE     |
 |Crossref (2023)                                                   |./data/crossref/crossref_aejdois.Rds              |TRUE     |
@@ -110,9 +101,9 @@ The data were collected through the methods described in the paper. Data were co
 
 |Data Source        |Filename                                         |Provided |
 |:------------------|:------------------------------------------------|:--------|
-|Kingi et al (2019) |./data/replication_data/entryQ_pub.Rds           |TRUE     |
-|Kingi et al (2019) |./data/replication_data/exitQ_pub.Rds            |TRUE     |
-|Kingi et al (2019) |./data/replication_data/replication_list_pub.Rds |TRUE     |
+|Kingi et al (2019) |./data/replication_data/entryQ_pub.Rds           |FALSE    |
+|Kingi et al (2019) |./data/replication_data/exitQ_pub.Rds            |FALSE    |
+|Kingi et al (2019) |./data/replication_data/replication_list_pub.Rds |FALSE    |
 
 
 ### Crossref data
@@ -300,7 +291,6 @@ or equivalently,
 Alternative ways to run this (these were not tested):
 
 - optionally, before running project code, run `Rscript -e "renv::init()"` (on Windows, `Rscript.exe -e "renv::init()"` ) to isolate the project libraries from your system (assumes `renv` is installed, see [renv](https://rstudio.github.io/renv/articles/renv.html)).
-- Using the same R version as described above, open [`programs/README.Rmd`](programs/README.Rmd), and knit. All necessary libraries will be installed on first run.
 - Using the same R version as described above, run each program individually as desired, in the order indicated above.
 
 ## Details
