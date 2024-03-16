@@ -47,7 +47,7 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
+Loading required package: grateful
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -103,6 +103,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
+Loading required package: markdown
 Loading required package: reshape2
 
 Attaching package: ‘reshape2’
@@ -187,7 +188,7 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 +           column.sep.width = cw)
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:27 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:40 AM
 \begin{table}[!htbp] \centering 
   \caption{Reproduction Results} 
   \label{tab:results:year} 
@@ -234,7 +235,7 @@ Percent & 37.8\% & 36.7\% & 15.6\% & 10\% & 100\% \\
 +           font.size = fs,column.sep.width = cw)
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:27 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:40 AM
 \begin{table}[!htbp] \centering 
   \caption{Reproduction Results} 
   \label{tab:results} 
@@ -281,7 +282,7 @@ Joining with `by = join_by(Outcome)`
 +           column.sep.width = cw)
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:27 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:40 AM
 \begin{table}[!htbp] \centering 
   \caption{Reproduction Results} 
   \label{tab:results} 
@@ -462,7 +463,7 @@ Total & 180 & 100 & \% & 152 & 100 & \% \\
 +                   "(see Appendix)."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:28 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:41 AM
 \begin{table}[!htbp] \centering 
   \caption{Reason for Unsuccessful Reproduction} 
   \label{tab:reason:year} 
@@ -503,7 +504,7 @@ Total & 1 & 6 & 3 & 1 & 1 & 1 & 5 & 18 \\
 +                         "with partial reproduction success."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:28 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:41 AM
 \begin{table}[!htbp] \centering 
   \caption{Reason for Unsuccessful Reproduction} 
   \label{tab:reason} 
@@ -561,7 +562,7 @@ Other & 5 \\
 +           notes=c("Note: Sample of reproduced and scored papers, i.e, assessed papers for which we attempted reproduction."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:28 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:41 AM
 \begin{table}[!htbp] \centering 
   \caption{Reason for Unsuccessful or Partial Reproduction} 
   \label{tab:reason2} 
@@ -728,7 +729,7 @@ No, I needed to make changes in the code.           Yes, no changes were necessa
 +           notes=c("Note: Articles for which reproduction was attempted."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:28 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:41 AM
 \begin{table}[!htbp] \centering 
   \caption{Manipulation of Code Required for Successful Reproductions} 
   \label{tab:code} 
@@ -794,7 +795,7 @@ Percent & 400 & 316.666666666667 & 316.666666666667 & 100 & 0 \\
 + "papers for which we attempted reproduction."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:28 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:42 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Correlation of Reproduction Success vs Documentation Quality} 
@@ -925,7 +926,7 @@ Percent & 400 & 316.666666666667 & 316.666666666667 & 100 & 0 \\
 +                   "papers for which we attempted reproduction."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:29 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:42 AM
 \begin{table}[!htbp] \centering 
   \caption{Clarity and Author Metrics} 
   \label{tab:authormetrics} 
@@ -969,7 +970,7 @@ No Info & 2 & 2 \\
 +                   "Bibliometric data manually queried from WoS."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:29 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:42 AM
 \begin{table}[!htbp] \centering 
   \caption{Publication and Author Metrics, WoS} 
   \label{tab:metrics} 
@@ -1048,7 +1049,7 @@ Joining with `by = join_by(DOI, absence)`
 + )
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:29 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:42 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Citations vs Confidential Data} 
@@ -1129,7 +1130,7 @@ Joining with `by = join_by(DOI, absence)`
 +           keep.stat = c("n"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:29 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:42 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Citations vs Confidential Data Testing} 
@@ -1218,7 +1219,7 @@ Joining with `by = join_by(DOI, absence)`
 + )
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:29 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:43 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Citations vs Reproduction Success (B)} 
@@ -1335,7 +1336,7 @@ Observations & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{
 +            keep.stat = c("n"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:30 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:43 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Log Citations vs Reproduction Success} 
@@ -1445,7 +1446,7 @@ Observations & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{
 +           keep.stat = c("n"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:31 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:44 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Log Citations vs Reproduction Success} 
@@ -1524,7 +1525,7 @@ Observations & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{
 +           font.size = fs,column.sep.width = cw)
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:33:31 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:45 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Summary of data} 
@@ -1552,4 +1553,4 @@ Observations & \multicolumn{1}{c}{111} & \multicolumn{1}{c}{111} & \multicolumn{
 > 
 > proc.time()
    user  system elapsed 
-  17.67    1.91   18.13 
+  17.86    1.84   18.80 

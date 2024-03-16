@@ -47,7 +47,7 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
+Loading required package: grateful
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -103,6 +103,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
+Loading required package: markdown
 Loading required package: reshape2
 
 Attaching package: ‘reshape2’
@@ -190,7 +191,7 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 +           notes=c("\\footnotesize Notes: Assessments made  by replicators using the entry questionnaire, prior to attempting reproduction."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:32:53 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:05 AM
 \begin{table}[!htbp] \centering 
   \caption{Assessment of Data Availability, By Year} 
   \label{tab:absence} 
@@ -231,7 +232,7 @@ Total & 21 & 23 & 32 & 39 & 8 & 40 & 21 & 33 & 39 & 18 & 274 & 100 \\
 +                   "\\footnotesize prior to attempting reproduction. Entry Q14, Q15."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:32:53 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:05 AM
 \begin{table}[!htbp] \centering 
   \caption{Assessment of Data Availability} 
   \label{tab:data_availability} 
@@ -326,7 +327,7 @@ Total & 274 \\
 +                   "\\footnotesize reported only for articles for which reproduction was attempted."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:32:53 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:06 AM
 \begin{table}[!htbp] \centering 
   \caption{Difficulty of Reproduction} 
   \label{tab:difficult:attempted} 
@@ -358,7 +359,7 @@ Total & 180 & 100 \\
 +                   " to attempting to reproduce any tables or figures. "))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:32:53 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:06 AM
 \begin{table}[!htbp] \centering 
   \caption{Difficulty of Reproduction} 
   \label{tab:difficult:joint} 
@@ -392,7 +393,7 @@ Total & 274 & 100 & 180 & 100 \\
 +                   "\\footnotesize reported for all articles with complete assessments."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:32:53 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:06 AM
 \begin{table}[!htbp] \centering 
   \caption{Difficulty of Reproduction (all)} 
   \label{tab:difficult:all} 
@@ -507,7 +508,7 @@ Total & 274 & 100 \\
 +           out=file.path(TexIncludes,"table_data_prog.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:32:53 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:06 AM
 \begin{table}[!htbp] \centering 
   \caption{Programming Languages and Data Formats} 
   \label{tab:prog} 
@@ -598,7 +599,7 @@ txt & $0$ & $2$ \\
 +                   "\\footnotesize Incomplete = Was ambiguous or left out crucial steps."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:32:54 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:06 AM
 \begin{table}[!htbp] \centering 
   \caption{Ex-Post Assessment of Documentation Clarity} 
   \label{tab:doc:yearly} 
@@ -647,7 +648,7 @@ Total & 14 & 13 & 24 & 26 & 7 & 23 & 18 & 20 & 26 & 9 & 180 & 100 \\
 +                   "\\footnotesize Incomplete = Was ambiguous or left out crucial steps."))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Mon, Mar 11, 2024 - 12:32:54 AM
+% Date and time: Sat, Mar 16, 2024 - 12:51:06 AM
 \begin{table}[!htbp] \centering 
   \caption{Ex-Post Assessment of Documentation Clarity} 
   \label{tab:doc} 
@@ -686,4 +687,4 @@ No Info & 2 & 1.11 \\
 > 
 > proc.time()
    user  system elapsed 
-  14.13    1.96   14.67 
+  14.59    1.89   15.05 

@@ -52,7 +52,7 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
+Loading required package: grateful
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -108,6 +108,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
+Loading required package: markdown
 Loading required package: reshape2
 
 Attaching package: ‘reshape2’
@@ -201,4 +202,4 @@ Median   Mean   Max.
 > 
 > proc.time()
    user  system elapsed 
-  14.30    1.88   14.78 
+  13.22    1.85   13.69 
