@@ -208,18 +208,22 @@ names(library.files) <- "file"
 - [x] The replication package contains one or more programs to install all dependencies and set up the necessary directory structure. 
 
 - `r version$version.string` on `r version$system`
-  - Docker image is used (see appendix), with system libraries defined by the relevant image (`r docker.image`)
-  - RSPM (now PPM) is used, set to `r mran.date`. All libraries are installed from that repository.
-  - Libraries are defined in
+  - Docker image is used (see appendix), with system libraries defined by the relevant image (`r docker.image`) (optional, but recommended)
+  - RSPM (now [Posit Package Manager, PPM](https://packagemanager.posit.co/client/)) is used, set to `r mran.date`. All libraries are installed from that time-stamped repository.
 
-```{r list_libs,echo=FALSE}
-library.files %>% filter(str_detect(file,"librar")) %>% kable()
+
+```{r list_libs,echo=FALSE,eval=TRUE,results='asis'}
+library.files %>% filter(str_detect(file,"librar")) %>% rename(`Libraries are defined in` = file) %>% kable()
 
 ```
 
-```{r create_r_cites,echo=FALSE,results='asis',eval=TRUE}
+### Software citations
+
+Only directly loaded libraries are cited. For all libraries used in the runtime environment, see the Appendix.
+
+```{r create_r_cites,echo=FALSE,results='asis',eval=TRUE,warning=FALSE}
 # This needs to be run once by hand, and will be fine in the second round.
-cite_packages(output = "paragraph", out.dir = ".")
+cite_packages(output = "table", out.format=c("md"), out.dir = ".") %>% kable()
 ```
 
 
@@ -304,10 +308,13 @@ If using Docker image on Linux or macOS system:
 - run `start_rstudio.sh` and connect to [https://localhost:8787](https://localhost:8787)
 - in the "Terminal" of the RStudio app, run `bash ./run.sh`
 
+or equivalently,
+
+- in the terminal of a computer with Docker installed, run `bash ./run_docker.sh ./run.sh`
+
 Alternative ways to run this (these were not tested):
 
 - optionally, before running project code, run `Rscript -e "renv::init()"` (on Windows, `Rscript.exe -e "renv::init()"` ) to isolate the project libraries from your system (assumes `renv` is installed, see [renv](https://rstudio.github.io/renv/articles/renv.html)).
-- Using the same R version as described above, open [`programs/README.Rmd`](programs/README.Rmd), and knit. All necessary libraries will be installed on first run.
 - Using the same R version as described above, run each program individually as desired, in the order indicated above.
 
 ## Details
@@ -327,6 +334,7 @@ The provided code reproduces:
 - [x] All tables and figures in the paper
 - [ ] Selected tables and figures in the paper, as explained and justified below.
 
+The code also produces numerous tables which were not included in the paper. Note that following a request from copy-editors, all tables used in the paper were subsumed into the main document. Earlier versions used `\input` statements in LaTeX.
 
 ```{r table_details, echo=FALSE,eval=TRUE,results='asis',warning=FALSE,message=FALSE}
 # we constructed this in two takes
@@ -336,7 +344,7 @@ The provided code reproduces:
 # - some hand-cleaning
 
 tables_programs <- read_csv("_readme/tables_programs.csv", 
-    col_names = FALSE) %>% select(-X3)
+    col_names = FALSE) 
 names(tables_programs) <- c("Program","LaTeX file")
 
 table_info <- read_excel("_readme/table-mapping.xlsx") %>%
@@ -371,7 +379,9 @@ This README based on the template created by @template-readme.
 
 ```{r sysinfo,eval=TRUE,echo=FALSE}
 # we don't want to capture what the Rmarkdown session is running, but rather, what the computational session is running
+if (! file.exists(file.path(programs,"99_zz_info.txt"))) {
 system("cd programs && R CMD BATCH 99_zz_info.R")
+}
 ```
 
 ```{r includetext,echo=FALSE,eval=TRUE}

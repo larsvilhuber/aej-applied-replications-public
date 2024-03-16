@@ -14,7 +14,7 @@
 <meta name="author" content="Flavio Stanchi" />
 <meta name="author" content="Lars Vilhuber" />
 
-<meta name="date" content="2024-03-14" />
+<meta name="date" content="2024-03-16" />
 
 <title>Code and Data for: Reproduce to Validate: a Comprehensive Study on the Reproducibility of Economics Research</title>
 
@@ -381,7 +381,7 @@ Comprehensive Study on the Reproducibility of Economics Research</h1>
 <h4 class="author">Hautahi Kingi</h4>
 <h4 class="author">Flavio Stanchi</h4>
 <h4 class="author">Lars Vilhuber</h4>
-<h4 class="date">2024-03-14</h4>
+<h4 class="date">2024-03-16</h4>
 
 </div>
 
@@ -461,6 +461,46 @@ made</strong> publicly available.</li>
 <li><input type="checkbox" disabled></input><strong>No data can be
 made</strong> publicly available.</li>
 </ul>
+<pre><code>## Warning: 3 files fail check - are present but should be absent</code></pre>
+<div id="files-failing-check" class="section level3" number="2.3.1">
+<h3><span class="header-section-number">2.3.1</span> Files failing
+check</h3>
+<table>
+<colgroup>
+<col width="19%" />
+<col width="51%" />
+<col width="14%" />
+<col width="14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Data Source</th>
+<th align="left">Filename</th>
+<th align="left">Provided.real</th>
+<th align="left">Provided.norm</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Kingi et al (2019)</td>
+<td align="left">./data/replication_data/entryQ_pub.Rds</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="even">
+<td align="left">Kingi et al (2019)</td>
+<td align="left">./data/replication_data/exitQ_pub.Rds</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="odd">
+<td align="left">Kingi et al (2019)</td>
+<td align="left">./data/replication_data/replication_list_pub.Rds</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+</tr>
+</tbody>
+</table>
 <table>
 <colgroup>
 <col width="52%" />
@@ -478,17 +518,17 @@ made</strong> publicly available.</li>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/entryQ_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 <tr class="even">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/exitQ_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/replication_list_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 <tr class="even">
 <td align="left">Crossref (2023)</td>
@@ -598,6 +638,7 @@ names</td>
 </tbody>
 </table>
 </div>
+</div>
 <div id="details-on-each-data-source" class="section level2" number="2.4">
 <h2><span class="header-section-number">2.4</span> Details on each Data
 Source</h2>
@@ -623,17 +664,17 @@ names replaced by random identifiers.</p>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/entryQ_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 <tr class="even">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/exitQ_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/replication_list_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 </tbody>
 </table>
@@ -849,22 +890,117 @@ set up the necessary directory structure.</p></li>
 <li><p>R version 4.2.2 (2022-10-31) on x86_64, linux-gnu</p>
 <ul>
 <li>Docker image is used (see appendix), with system libraries defined
-by the relevant image (rocker/verse:4.2.2)</li>
-<li>RSPM (now PPM) is used, set to 2022-11-22. All libraries are
-installed from that repository.</li>
-<li>Libraries are defined in</li>
+by the relevant image (rocker/verse:4.2.2) (optional, but
+recommended)</li>
+<li>RSPM (now <a href="https://packagemanager.posit.co/client/">Posit
+Package Manager, PPM</a>) is used, set to 2022-11-22. All libraries are
+installed from that time-stamped repository.</li>
 </ul></li>
 </ul>
-<pre><code>## Warning in utils::citation(pkg_name): no date field in DESCRIPTION file of package &#39;openalexR&#39;</code></pre>
-<p>We used R version 4.2.2 <span class="citation">(R Core Team
-2022)</span> and the following R packages: devtools v. 2.4.5 <span class="citation">(Wickham et al. 2022)</span>, fastDummies v. 1.6.3
-<span class="citation">(Kaplan 2020)</span>, knitr v. 1.42 <span class="citation">(Xie 2014, 2015, 2023)</span>, openalexR v. 1.2.2.9999
-<span class="citation">(Aria and Le 2024)</span>, rcrossref v. 1.2.0
-<span class="citation">(Chamberlain et al. 2022)</span>, remotes v.
-2.4.2 <span class="citation">(Csárdi et al. 2021)</span>, reshape2 v.
-1.4.4 <span class="citation">(Wickham 2007)</span>, rmarkdown v. 2.20
-<span class="citation">(Xie, Allaire, and Grolemund 2018; Xie, Dervieux,
-and Riederer 2020; Allaire et al. 2023)</span>, rprojroot v. 2.0.3 <span class="citation">(Müller 2022)</span>, tidyverse v. 2.0.0 <span class="citation">(Wickham et al. 2019)</span>.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Libraries are defined in</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">global-libraries.R</td>
+</tr>
+<tr class="even">
+<td align="left">programs/libraries.R</td>
+</tr>
+<tr class="odd">
+<td align="left">readme-libraries.R</td>
+</tr>
+<tr class="even">
+<td align="left">text/libraries.R</td>
+</tr>
+</tbody>
+</table>
+<div id="software-citations" class="section level3" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> Software
+citations</h3>
+<p>Only directly loaded libraries are cited. For all libraries used in
+the runtime environment, see the Appendix.</p>
+<table>
+<colgroup>
+<col width="17%" />
+<col width="15%" />
+<col width="67%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Package</th>
+<th align="left">Version</th>
+<th align="left">Citation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">base</td>
+<td align="left">4.2.2</td>
+<td align="left"><span class="citation">R Core Team (2022)</span></td>
+</tr>
+<tr class="even">
+<td align="left">devtools</td>
+<td align="left">2.4.5</td>
+<td align="left"><span class="citation">Wickham et al.
+(2022)</span></td>
+</tr>
+<tr class="odd">
+<td align="left">fastDummies</td>
+<td align="left">1.6.3</td>
+<td align="left"><span class="citation">Kaplan (2020)</span></td>
+</tr>
+<tr class="even">
+<td align="left">knitr</td>
+<td align="left">1.42</td>
+<td align="left"><span class="citation">Xie (2014)</span>; <span class="citation">Xie (2015)</span>; <span class="citation">Xie
+(2023)</span></td>
+</tr>
+<tr class="odd">
+<td align="left">openalexR</td>
+<td align="left">1.2.2.9999</td>
+<td align="left"><span class="citation">Aria and Le (2024)</span></td>
+</tr>
+<tr class="even">
+<td align="left">rcrossref</td>
+<td align="left">1.2.0</td>
+<td align="left"><span class="citation">Chamberlain et al.
+(2022)</span></td>
+</tr>
+<tr class="odd">
+<td align="left">remotes</td>
+<td align="left">2.4.2</td>
+<td align="left"><span class="citation">Csárdi et al. (2021)</span></td>
+</tr>
+<tr class="even">
+<td align="left">reshape2</td>
+<td align="left">1.4.4</td>
+<td align="left"><span class="citation">Wickham (2007)</span></td>
+</tr>
+<tr class="odd">
+<td align="left">rmarkdown</td>
+<td align="left">2.20</td>
+<td align="left"><span class="citation">Xie, Allaire, and Grolemund
+(2018)</span>; <span class="citation">Xie, Dervieux, and Riederer
+(2020)</span>; <span class="citation">Allaire et al. (2023)</span></td>
+</tr>
+<tr class="even">
+<td align="left">rprojroot</td>
+<td align="left">2.0.3</td>
+<td align="left"><span class="citation">Müller (2022)</span></td>
+</tr>
+<tr class="odd">
+<td align="left">tidyverse</td>
+<td align="left">2.0.0</td>
+<td align="left"><span class="citation">Wickham et al.
+(2019)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="controlled-randomness" class="section level2" number="3.2">
 <h2><span class="header-section-number">3.2</span> Controlled
@@ -971,6 +1107,11 @@ Replicators</h1>
 <li>run <code>start_rstudio.sh</code> and connect to <a href="https://localhost:8787">https://localhost:8787</a></li>
 <li>in the “Terminal” of the RStudio app, run
 <code>bash ./run.sh</code></li>
+</ul>
+<p>or equivalently,</p>
+<ul>
+<li>in the terminal of a computer with Docker installed, run
+<code>bash ./run_docker.sh ./run.sh</code></li>
 </ul>
 <p>Alternative ways to run this (these were not tested):</p>
 <ul>
@@ -1151,6 +1292,10 @@ figures in the paper</li>
 <li><input type="checkbox" disabled></input>Selected tables and figures in
 the paper, as explained and justified below.</li>
 </ul>
+<p>The code also produces numerous tables which were not included in the
+paper. Note that following a request from copy-editors, all tables used
+in the paper were subsumed into the main document. Earlier versions used
+<code>\input</code> statements in LaTeX.</p>
 <table>
 <colgroup>
 <col width="11%" />
@@ -1247,18 +1392,8 @@ formatting</td>
 <td align="left">text/analysis/table_arcregpost12OA.tex</td>
 </tr>
 <tr class="odd">
-<td align="left">16</td>
-<td align="left">programs/52_robustess_standarderrors.R</td>
-<td align="left">text/analysis/table_arcregpost12OA.tex</td>
-</tr>
-<tr class="even">
 <td align="left">17</td>
 <td align="left">programs/50_analysis_openAlex.R</td>
-<td align="left">text/analysis/table_arcreg3OA4.tex</td>
-</tr>
-<tr class="odd">
-<td align="left">17</td>
-<td align="left">programs/52_robustess_standarderrors.R</td>
 <td align="left">text/analysis/table_arcreg3OA4.tex</td>
 </tr>
 <tr class="even">
@@ -1302,18 +1437,8 @@ formatting</td>
 <td align="left">text/analysis/table_stassessed.tex</td>
 </tr>
 <tr class="even">
-<td align="left">A8</td>
-<td align="left">programs/52_robustess_standarderrors.R</td>
-<td align="left">text/analysis/table_stassessed.tex</td>
-</tr>
-<tr class="odd">
 <td align="left">A9</td>
 <td align="left">programs/50_analysis_openAlex.R</td>
-<td align="left">text/analysis/table_stattempted.tex</td>
-</tr>
-<tr class="even">
-<td align="left">A9</td>
-<td align="left">programs/52_robustess_standarderrors.R</td>
 <td align="left">text/analysis/table_stattempted.tex</td>
 </tr>
 <tr class="odd">
@@ -1505,7 +1630,7 @@ package info</h2>
 ##  collate  en_US.UTF-8
 ##  ctype    en_US.UTF-8
 ##  tz       Etc/UTC
-##  date     2024-03-14
+##  date     2024-03-16
 ##  pandoc   2.19.2 @ /usr/lib/rstudio-server/bin/quarto/bin/tools/ (via rmarkdown)
 ## 
 ## ─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────

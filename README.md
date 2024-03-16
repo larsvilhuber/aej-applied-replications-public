@@ -5,7 +5,7 @@ author:
   - Hautahi Kingi
   - Flavio Stanchi
   - Lars Vilhuber
-date: "2024-03-14"
+date: "2024-03-16"
 output:
   html_document: 
     keep_md: yes
@@ -61,14 +61,23 @@ All derivative data contained herein, if not otherwise encumbered, is available 
 
 
 
+```
+## Warning: 3 files fail check - are present but should be absent
+```
+### Files failing check 
 
+|Data Source        |Filename                                         |Provided.real |Provided.norm |
+|:------------------|:------------------------------------------------|:-------------|:-------------|
+|Kingi et al (2019) |./data/replication_data/entryQ_pub.Rds           |TRUE          |FALSE         |
+|Kingi et al (2019) |./data/replication_data/exitQ_pub.Rds            |TRUE          |FALSE         |
+|Kingi et al (2019) |./data/replication_data/replication_list_pub.Rds |TRUE          |FALSE         |
 
 
 |Data Source                                                       |Filename                                          |Provided |
 |:-----------------------------------------------------------------|:-------------------------------------------------|:--------|
-|Kingi et al (2019)                                                |./data/replication_data/entryQ_pub.Rds            |FALSE    |
-|Kingi et al (2019)                                                |./data/replication_data/exitQ_pub.Rds             |FALSE    |
-|Kingi et al (2019)                                                |./data/replication_data/replication_list_pub.Rds  |FALSE    |
+|Kingi et al (2019)                                                |./data/replication_data/entryQ_pub.Rds            |TRUE     |
+|Kingi et al (2019)                                                |./data/replication_data/exitQ_pub.Rds             |TRUE     |
+|Kingi et al (2019)                                                |./data/replication_data/replication_list_pub.Rds  |TRUE     |
 |Crossref (2023)                                                   |./data/crossref/crossref_info.csv                 |TRUE     |
 |Crossref (2023)                                                   |./data/crossref/crossref_info.Rds                 |TRUE     |
 |Crossref (2023)                                                   |./data/crossref/crossref_aejdois.Rds              |TRUE     |
@@ -101,9 +110,9 @@ The data were collected through the methods described in the paper. Data were co
 
 |Data Source        |Filename                                         |Provided |
 |:------------------|:------------------------------------------------|:--------|
-|Kingi et al (2019) |./data/replication_data/entryQ_pub.Rds           |FALSE    |
-|Kingi et al (2019) |./data/replication_data/exitQ_pub.Rds            |FALSE    |
-|Kingi et al (2019) |./data/replication_data/replication_list_pub.Rds |FALSE    |
+|Kingi et al (2019) |./data/replication_data/entryQ_pub.Rds           |TRUE     |
+|Kingi et al (2019) |./data/replication_data/exitQ_pub.Rds            |TRUE     |
+|Kingi et al (2019) |./data/replication_data/replication_list_pub.Rds |TRUE     |
 
 
 ### Crossref data
@@ -171,18 +180,36 @@ Data were manually extracted from the WoS web interface, with RAs following guid
 - [x] The replication package contains one or more programs to install all dependencies and set up the necessary directory structure. 
 
 - R version 4.2.2 (2022-10-31) on x86_64, linux-gnu
-  - Docker image is used (see appendix), with system libraries defined by the relevant image (rocker/verse:4.2.2)
-  - RSPM (now PPM) is used, set to 2022-11-22. All libraries are installed from that repository.
-  - Libraries are defined in
+  - Docker image is used (see appendix), with system libraries defined by the relevant image (rocker/verse:4.2.2) (optional, but recommended)
+  - RSPM (now [Posit Package Manager, PPM](https://packagemanager.posit.co/client/)) is used, set to 2022-11-22. All libraries are installed from that time-stamped repository.
 
 
 
+|Libraries are defined in |
+|:------------------------|
+|global-libraries.R       |
+|programs/libraries.R     |
+|readme-libraries.R       |
+|text/libraries.R         |
 
-```
-## Warning in utils::citation(pkg_name): no date field in DESCRIPTION file of package 'openalexR'
-```
+### Software citations
 
-We used R version 4.2.2 [@base] and the following R packages: devtools v. 2.4.5 [@devtools], fastDummies v. 1.6.3 [@fastDummies], knitr v. 1.42 [@knitr2014; @knitr2015; @knitr2023], openalexR v. 1.2.2.9999 [@openalexR], rcrossref v. 1.2.0 [@rcrossref], remotes v. 2.4.2 [@remotes], reshape2 v. 1.4.4 [@reshape2], rmarkdown v. 2.20 [@rmarkdown2018; @rmarkdown2020; @rmarkdown2023], rprojroot v. 2.0.3 [@rprojroot], tidyverse v. 2.0.0 [@tidyverse].
+Only directly loaded libraries are cited. For all libraries used in the runtime environment, see the Appendix.
+
+
+|Package     |Version    |Citation                                       |
+|:-----------|:----------|:----------------------------------------------|
+|base        |4.2.2      |@base                                          |
+|devtools    |2.4.5      |@devtools                                      |
+|fastDummies |1.6.3      |@fastDummies                                   |
+|knitr       |1.42       |@knitr2014; @knitr2015; @knitr2023             |
+|openalexR   |1.2.2.9999 |@openalexR                                     |
+|rcrossref   |1.2.0      |@rcrossref                                     |
+|remotes     |2.4.2      |@remotes                                       |
+|reshape2    |1.4.4      |@reshape2                                      |
+|rmarkdown   |2.20       |@rmarkdown2018; @rmarkdown2020; @rmarkdown2023 |
+|rprojroot   |2.0.3      |@rprojroot                                     |
+|tidyverse   |2.0.0      |@tidyverse                                     |
 
 
 ## Controlled Randomness
@@ -266,6 +293,10 @@ If using Docker image on Linux or macOS system:
 - run `start_rstudio.sh` and connect to [https://localhost:8787](https://localhost:8787)
 - in the "Terminal" of the RStudio app, run `bash ./run.sh`
 
+or equivalently,
+
+- in the terminal of a computer with Docker installed, run `bash ./run_docker.sh ./run.sh`
+
 Alternative ways to run this (these were not tested):
 
 - optionally, before running project code, run `Rscript -e "renv::init()"` (on Windows, `Rscript.exe -e "renv::init()"` ) to isolate the project libraries from your system (assumes `renv` is installed, see [renv](https://rstudio.github.io/renv/articles/renv.html)).
@@ -318,6 +349,7 @@ The provided code reproduces:
 - [x] All tables and figures in the paper
 - [ ] Selected tables and figures in the paper, as explained and justified below.
 
+The code also produces numerous tables which were not included in the paper. Note that following a request from copy-editors, all tables used in the paper were subsumed into the main document. Earlier versions used `\input` statements in LaTeX.
 
 
 |Table number |Program                                             |LaTeX file                                       |
@@ -338,9 +370,7 @@ The provided code reproduces:
 |14           |programs/50_analysis_openAlex.R                     |text/analysis/table_reg2OA.tex                   |
 |15           |programs/50_analysis_openAlex.R                     |text/analysis/table_arcreg3OA.tex                |
 |16           |programs/50_analysis_openAlex.R                     |text/analysis/table_arcregpost12OA.tex           |
-|16           |programs/52_robustess_standarderrors.R              |text/analysis/table_arcregpost12OA.tex           |
 |17           |programs/50_analysis_openAlex.R                     |text/analysis/table_arcreg3OA4.tex               |
-|17           |programs/52_robustess_standarderrors.R              |text/analysis/table_arcreg3OA4.tex               |
 |A1           |programs/49_assignments.R                           |text/includes/table_assignments.tex              |
 |A2           |programs/30_results1.R                              |text/includes/table_absence.tex                  |
 |A3           |programs/31_results2.R                              |text/includes/table_results_by_year.tex          |
@@ -349,9 +379,7 @@ The provided code reproduces:
 |A6           |programs/31_results2.R                              |text/analysis/table_metrics.tex                  |
 |A7           |programs/48_mainOA_authorpaper_stats.R              |text/analysis/table_metrics_OA_wos.tex           |
 |A8           |programs/50_analysis_openAlex.R                     |text/analysis/table_stassessed.tex               |
-|A8           |programs/52_robustess_standarderrors.R              |text/analysis/table_stassessed.tex               |
 |A9           |programs/50_analysis_openAlex.R                     |text/analysis/table_stattempted.tex              |
-|A9           |programs/52_robustess_standarderrors.R              |text/analysis/table_stattempted.tex              |
 |A10          |programs/50_analysis_openAlex.R                     |text/analysis/table_reg3OA.tex                   |
 |A11          |programs/50_analysis_openAlex.R                     |text/analysis/table_logreg3OA.tex                |
 |A12          |programs/51_analysis_Poisson.R                      |text/analysis/table_poissonreg.tex               |
@@ -391,7 +419,7 @@ This README based on the template created by @template-readme.
 ##  collate  en_US.UTF-8
 ##  ctype    en_US.UTF-8
 ##  tz       Etc/UTC
-##  date     2024-03-14
+##  date     2024-03-16
 ##  pandoc   2.19.2 @ /usr/lib/rstudio-server/bin/quarto/bin/tools/ (via rmarkdown)
 ## 
 ## ─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
