@@ -52,7 +52,7 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
+Loading required package: grateful
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -108,6 +108,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
+Loading required package: markdown
 Loading required package: reshape2
 
 Attaching package: ‘reshape2’
@@ -140,7 +141,7 @@ To suppress this message, add `openalexR.message = suppressed` to your .Renviron
 + } else {
 +   stop(paste0("File missing: ",doi.file.Rds))
 + }
-[1] 646
+[1] 630
 > 
 > 
 > # utility function
@@ -292,4 +293,4 @@ Joining with `by = join_by(au_id)`
 > 
 > proc.time()
    user  system elapsed 
-  23.94    2.09   24.57 
+  23.92    2.12   24.87 

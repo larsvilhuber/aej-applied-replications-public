@@ -47,7 +47,7 @@ Loading required package: tictoc
 Loading required package: ggplot2
 Loading required package: bindrcpp
 Loading required package: Rcpp
-Loading required package: markdown
+Loading required package: grateful
 > source(file.path(programs,"libraries.R"), echo=FALSE)
 Loading required package: rcrossref
 Loading required package: readr
@@ -103,6 +103,7 @@ The following object is masked from ‘package:xtable’:
 
     digits
 
+Loading required package: markdown
 Loading required package: reshape2
 
 Attaching package: ‘reshape2’
@@ -420,4 +421,4 @@ entry has 1231 rows.
 > 
 > proc.time()
    user  system elapsed 
-  22.68    1.87   23.17 
+  22.90    1.96   23.61 
