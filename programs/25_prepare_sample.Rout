@@ -421,4 +421,4 @@ entry has 1231 rows.
 > 
 > proc.time()
    user  system elapsed 
-  22.90    1.96   23.61 
+   22.9     1.9    23.3 

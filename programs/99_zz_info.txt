@@ -9,7 +9,7 @@
  ctype    en_US.UTF-8
  tz       Etc/UTC
  date     2024-03-16
- pandoc   2.19.2 @ /usr/lib/rstudio-server/bin/quarto/bin/tools/ (via rmarkdown)
+ pandoc   2.19.2 @ /usr/local/bin/ (via rmarkdown)
 
 ─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
  package     * version date (UTC) lib source
@@ -82,7 +82,6 @@
  rlang         1.0.6   2022-09-24 [1] RSPM (R 4.2.0)
  rmarkdown     2.20    2023-01-19 [1] RSPM (R 4.2.0)
  rprojroot   * 2.0.3   2022-04-02 [1] RSPM (R 4.2.0)
- rstudioapi    0.14    2022-08-22 [1] RSPM (R 4.2.0)
  sandwich    * 3.0-2   2022-06-15 [1] RSPM (R 4.2.0)
  scales        1.2.1   2022-08-20 [1] RSPM (R 4.2.0)
  sessioninfo   1.2.2   2021-12-06 [1] RSPM (R 4.2.0)

@@ -162,7 +162,7 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 + )
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:24:30 AM
+% Date and time: Sat, Mar 16, 2024 - 03:34:10 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Citations and Confidential Data} 
@@ -260,7 +260,7 @@ Skipping install of 'openalexR' from a github remote, the SHA1 (558581c6) has no
 + )
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:24:31 AM
+% Date and time: Sat, Mar 16, 2024 - 03:34:11 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Citations on Reproducibility (OA)} 
@@ -362,7 +362,7 @@ Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{
 +           out=file.path(Outputs,"table_logreg3OA_rob.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:24:32 AM
+% Date and time: Sat, Mar 16, 2024 - 03:34:11 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Log Citations on Reproducibility (OA)} 
@@ -462,7 +462,7 @@ Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{
 +           out=file.path(Outputs,"table_arcreg3OA_rob.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:24:32 AM
+% Date and time: Sat, Mar 16, 2024 - 03:34:12 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Arcsin Citations on Reproducibility (OA)} 
@@ -561,7 +561,7 @@ Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{
 +           out=file.path(Outputs,"table_arcreg3OA2_rob.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:24:33 AM
+% Date and time: Sat, Mar 16, 2024 - 03:34:13 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Arcsin Citations on Reproducibility, control for region (OA)} 
@@ -630,4 +630,4 @@ Observations & \multicolumn{1}{c}{180} & \multicolumn{1}{c}{180} & \multicolumn{
 > 
 > proc.time()
    user  system elapsed 
-  16.18    1.82   16.69 
+   16.0     1.8    16.4 

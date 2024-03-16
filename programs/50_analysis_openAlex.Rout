@@ -438,7 +438,7 @@ Joining with `by = join_by(names)`
 + )
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:01 AM
+% Date and time: Sat, Mar 16, 2024 - 03:32:57 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Citations and Confidential Data} 
@@ -570,7 +570,7 @@ Adjusted R$^{2}$ & \multicolumn{1}{c}{0.085} & \multicolumn{1}{c}{0.063} & \mult
 + )
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:02 AM
+% Date and time: Sat, Mar 16, 2024 - 03:32:58 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: YTD Citations on Reproduction Outcomes } 
@@ -643,7 +643,7 @@ Adjusted R$^{2}$ & \multicolumn{1}{c}{0.159} & \multicolumn{1}{c}{0.149} & \mult
 + )
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:03 AM
+% Date and time: Sat, Mar 16, 2024 - 03:32:58 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: YTD Citations on Reproduction Outcomes } 
@@ -768,7 +768,7 @@ Adjusted R$^{2}$ & \multicolumn{1}{c}{0.122} & \multicolumn{1}{c}{0.094} & \mult
 +           out=file.path(Outputs,"table_logreg3OA.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:03 AM
+% Date and time: Sat, Mar 16, 2024 - 03:32:59 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Log Citations on Reproduction Outcomes } 
@@ -836,7 +836,7 @@ Adjusted R$^{2}$ & \multicolumn{1}{c}{0.159} & \multicolumn{1}{c}{0.127} & \mult
 +           out=file.path(Outputs,"table_logreg3OA_partial.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:04 AM
+% Date and time: Sat, Mar 16, 2024 - 03:32:59 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Log Citations on Reproduction Outcomes } 
@@ -953,7 +953,7 @@ Adjusted R$^{2}$ & \multicolumn{1}{c}{0.148} & \multicolumn{1}{c}{0.112} & \mult
 +           out=file.path(Outputs,"table_arcreg3OA.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:04 AM
+% Date and time: Sat, Mar 16, 2024 - 03:33:00 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Arcsin Citations on Reproduction Outcomes } 
@@ -1019,7 +1019,7 @@ Adjusted R$^{2}$ & \multicolumn{1}{c}{0.158} & \multicolumn{1}{c}{0.126} & \mult
 +           out=file.path(Outputs,"table_arcreg3OA_partial.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:05 AM
+% Date and time: Sat, Mar 16, 2024 - 03:33:00 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Arcsin Citations on Reproduction Outcomes } 
@@ -1208,7 +1208,7 @@ Adjusted R$^{2}$ & \multicolumn{1}{c}{0.147} & \multicolumn{1}{c}{0.111} & \mult
 +           out=file.path(Outputs,"table_arcreg3OA4.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:05 AM
+% Date and time: Sat, Mar 16, 2024 - 03:33:01 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: ArcSinH Citations - Dynamic Effect } 
@@ -1324,7 +1324,7 @@ Adjusted R$^{2}$ & \multicolumn{1}{c}{0.169} & \multicolumn{1}{c}{0.332} & \mult
 +           )
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:06 AM
+% Date and time: Sat, Mar 16, 2024 - 03:33:01 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Arcsin Citations on Reproduction Outcomes, post-2012} 
@@ -1391,7 +1391,7 @@ Adjusted R$^{2}$ & \multicolumn{1}{c}{0.259} & \multicolumn{1}{c}{0.239} & \mult
 + )
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:06 AM
+% Date and time: Sat, Mar 16, 2024 - 03:33:02 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{OLS: Arcsin Citations on Reproduction Outcomes, post-2012} 
@@ -1466,7 +1466,7 @@ Adjusted R$^{2}$ & \multicolumn{1}{c}{0.237} & \multicolumn{1}{c}{0.208} & \mult
 +           out=file.path(Outputs,"table_stassessed.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:07 AM
+% Date and time: Sat, Mar 16, 2024 - 03:33:02 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Summary statistics} 
@@ -1501,7 +1501,7 @@ Min H-index & 273 & 9.360 & 7.340 & 1 & 52 \\
 +           out=file.path(Outputs,"table_stattempted.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 02:21:07 AM
+% Date and time: Sat, Mar 16, 2024 - 03:33:02 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Summary statistics} 
@@ -1527,4 +1527,4 @@ Min H-index & 180 & 9.710 & 7.630 & 1 & 52 \\
 > 
 > proc.time()
    user  system elapsed 
-  20.15    3.64   20.61 
+  20.20    3.66   20.36 

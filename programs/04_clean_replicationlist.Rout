@@ -185,4 +185,4 @@ Yes(?) Table 3 still unable to replicate
 > 
 > proc.time()
    user  system elapsed 
-  13.67    1.86   14.13 
+  13.10    1.94   13.54 

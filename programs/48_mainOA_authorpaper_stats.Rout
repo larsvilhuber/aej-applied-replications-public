@@ -232,7 +232,7 @@ In left_join(., biblio.derived %>% filter(!is.na(avghindex)) %>%  :
 +                   footnote.prod1k))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 12:58:10 AM
+% Date and time: Sat, Mar 16, 2024 - 03:31:48 AM
 \begin{table}[!htbp] \centering 
   \caption{Publication and Author Metrics} 
   \label{tab:metrics:OA} 
@@ -270,7 +270,7 @@ N & 121 & 18 & 66 & 68 \\
 +                   footnote.prod1k))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 12:58:10 AM
+% Date and time: Sat, Mar 16, 2024 - 03:31:48 AM
 \begin{table}[!htbp] \centering 
   \caption{Publication and Author Metrics (2012+)} 
   \label{tab:metrics:OA:zero} 
@@ -376,7 +376,7 @@ In left_join(pub_author_stats.doi.wos %>% distinct(DOI) %>% mutate(src = "wos"),
 +                   footnote.prod1k))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 12:58:11 AM
+% Date and time: Sat, Mar 16, 2024 - 03:31:48 AM
 \begin{table}[!htbp] \centering 
   \caption{Publication and Author Metrics for WoS sample} 
   \label{tab:metrics:OA:WoS} 
@@ -466,7 +466,7 @@ N & 14 & 52 & 45 \\
 +           out=file.path(Outputs,"table_ratios.tex"))
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 12:58:11 AM
+% Date and time: Sat, Mar 16, 2024 - 03:31:48 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Reproduction Rates} 
@@ -682,7 +682,7 @@ Joining with `by = join_by(names)`
 Number of obs in regression data: 113
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 12:58:11 AM
+% Date and time: Sat, Mar 16, 2024 - 03:31:48 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Probit: Determinants of Reproducibility, Year 0} 
@@ -724,7 +724,7 @@ Number of obs in regression data: 113
 \end{table} 
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 12:58:11 AM
+% Date and time: Sat, Mar 16, 2024 - 03:31:49 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Probit: Determinants of Reproducibility, Year 0} 
@@ -769,7 +769,7 @@ Joining with `by = join_by(names)`
 Number of obs in regression data: 152
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 12:58:12 AM
+% Date and time: Sat, Mar 16, 2024 - 03:31:49 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Probit: Determinants of Reproducibility, Year 4} 
@@ -810,7 +810,7 @@ Number of obs in regression data: 152
 \end{table} 
 
 % Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy Institute. E-mail: marek.hlavac at gmail.com
-% Date and time: Sat, Mar 16, 2024 - 12:58:12 AM
+% Date and time: Sat, Mar 16, 2024 - 03:31:50 AM
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Probit: Determinants of Reproducibility, Year 4} 
@@ -852,4 +852,4 @@ Number of obs in regression data: 152
 > 
 > proc.time()
    user  system elapsed 
-  16.07    1.91   16.82 
+  15.58    1.88   15.94 
