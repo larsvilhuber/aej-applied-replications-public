@@ -30,4 +30,4 @@ docker pull $space/$repo:$tag
 OPTIONS="-it --rm --entrypoint /bin/bash -w /home/rstudio"
 # OPTIONS="-e DISABLE_AUTH=true  --rm -p 8787:8787"
 
-docker run -v "$WORKSPACE":/home/rstudio $OPTIONS $space/$repo:$tag
+docker run -v "$WORKSPACE":/home/rstudio $OPTIONS $space/$repo:$tag $@
