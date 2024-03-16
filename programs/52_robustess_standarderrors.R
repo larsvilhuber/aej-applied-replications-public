@@ -171,7 +171,7 @@ robust.selowhp <- sqrt(diag(covlowhp))
 stargazer(avgh,toph, lowh, avghp, tophp, lowhp,
           title="OLS: Arcsin Citations on Reproducibility (OA)", align=TRUE,no.space=FALSE,
           notes.align = "l", notes.append = FALSE,
-          label="arcreg3alt:OA",se=list(NULL, robust.seavgh, robust.setoph,  robust.selowh, robust.seavghp, robust.setophp,  robust.selowhp),
+          label="arcreg3alt:OA:rob",se=list(NULL, robust.seavgh, robust.setoph,  robust.selowh, robust.seavghp, robust.setophp,  robust.selowhp),
           dep.var.labels = "Total Citations",
           style="aer", type="latex",
           column.sep.width = "-20pt",
@@ -208,7 +208,7 @@ robust.selowhp <- sqrt(diag(covlowhp))
 stargazer(avgh2,toph2, lowh2,avghp2, tophp2, lowhp2,
           title="OLS: Arcsin Citations on Reproducibility, control for region (OA)", align=TRUE,no.space=FALSE,
           notes.align = "l", notes.append = FALSE,
-          label="arcreg3cont:a:OA",
+          label="arcreg3cont:a:OA:rob",
           dep.var.labels = "Total Citations",
           style="aer", type="latex",
           column.sep.width = "-20pt",
@@ -218,152 +218,7 @@ stargazer(avgh2,toph2, lowh2,avghp2, tophp2, lowhp2,
                     footnote.full.partial,
                     footnote.region.us,
                     footnote.sample.attempted),
-          out=file.path(Outputs,"table_arcreg3OA2.tex"))
+          out=file.path(Outputs,"table_arcreg3OA2_rob.tex"))
 
 
-
-
-# Run Regression: citations on h-indices and replication success, control for US region
-avgh3 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Fully reproduced` * `Author at US university`*
-              `Highest Institution Publications` ,mainOA.4yr)
-toph3 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Fully reproduced` *  `Author at US university` *
-              `Highest Institution Publications`,mainOA.4yr)
-lowh3 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Fully reproduced` * `Author at US university` *
-              `Highest Institution Publications`,mainOA.4yr)
-
-avghp3 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Fully reproduced` * `Author at US university` *
-               `Highest Institution Publications` * `Highest Co-author Experience`,mainOA.4yr)
-tophp3 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Fully reproduced` * `Author at US university` *
-               `Highest Institution Publications` * `Highest Co-author Experience`,mainOA.4yr)
-lowhp3 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Fully reproduced` * `Author at US university` *
-               `Highest Institution Publications` * `Highest Co-author Experience`,mainOA.4yr)
-
-stargazer(avgh3,avghp3,
-          title="OLS: Arcsin Citations on Reproducibility, control for institution productivity (OA)",
-          align=TRUE,no.space=FALSE,
-          notes.align = "l", notes.append = FALSE,
-          label="arcreg3prod:a:OA",
-          dep.var.labels = "Total Citations",
-          style="aer", type="latex",
-          column.sep.width = "-20pt",
-          keep.stat = c("n"),
-          notes.label = "",
-          omit = c(
-
-            "`Avg. H-index`:`Fully reproduced`:`Author at US university`:`Highest Institution Publications`",
-            "`Avg. H-index`:`Fully reproduced`:`Author at US university`:`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Avg. H-index`:`Author at US university`:`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Fully reproduced`:`Author at US university`:`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Min H-index`:`Fully reproduced`:`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Max H-index`:`Fully reproduced`:`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Avg. H-index`:`Fully reproduced`:`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Min H-index`:`Fully reproduced`:`Author at US university`:`Highest Co-author Experience`",
-            "`Max H-index`:`Fully reproduced`:`Author at US university`:`Highest Co-author Experience`",
-            "`Avg. H-index`:`Fully reproduced`:`Author at US university`:`Highest Co-author Experience`",
-            "`Author at US university`:`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Fully reproduced`:`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Min H-index`:`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Max H-index`:`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Avg. H-index`:`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Fully reproduced`:`Author at US university`:`Highest Co-author Experience`",
-            "`Min H-index`:`Author at US university`:`Highest Co-author Experience`",
-            " `Min H-index`:`Fully reproduced`:`Highest Co-author Experience`",
-            "`Max H-index`:`Author at US university`:`Highest Co-author Experience`",
-            "`Max H-index`:`Fully reproduced`:`Highest Co-author Experience`",
-            "`Avg. H-index`:`Author at US university`:`Highest Co-author Experience`",
-            "`Avg. H-index`:`Fully reproduced`:`Highest Co-author Experience`",
-            "`Fully reproduced`:`Author at US university`:`Highest Institution Publications`",
-            "`Min H-index`:`Author at US university`:`Highest Institution Publications`",
-            "`Min H-index`:`Fully reproduced`:`Highest Institution Publications`",
-            "`Author at US university`:`Highest Co-author Experience`",
-            "`Author at US university`:`Highest Institution Publications`",
-            "`Highest Institution Publications`:`Highest Co-author Experience`",
-            "`Avg. H-index`:`Fully reproduced`:`Highest Institution Publications`"
-          ),
-          notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
-                    footnote.full.partial,
-                    footnote.region.us,footnote.productivity,footnote.experience,
-                    footnote.sample.attempted),
-          out=file.path(Outputs,"table_arcreg3OA3.tex"))
-
-
-# Do year since publication, allow for several years
-
-# RHS reproducible confidential dummy for "2019 or later" (année où des data editor ont été nommés)
-avgh <- lm(`AsinH(new citations)`~`Avg. H-index`*`Fully reproduced`,mainOA.allyears)
-avghY <- lm(`AsinH(new citations)`~`Avg. H-index`* `Fully reproduced`*`Years since publication`,mainOA.allyears)
-avghD2019 <- lm(`AsinH(new citations)`~`Avg. H-index`* `Fully reproduced`*`Year >= 2019` ,mainOA.allyears)
-avghD2019Y <- lm(`AsinH(new citations)`~`Avg. H-index`* `Fully reproduced`*`Year >= 2019` *
-                   `Years since publication`,mainOA.allyears)
-
-
-stargazer(avgh, avghY,avghD2019, avghD2019Y,
-          title="OLS: Arcsin Citations - Dynamic Effect (OA)", align=TRUE,no.space=FALSE,
-          notes.align = "l", notes.append = FALSE,
-          label="arcregdum:OA",
-          style="aer", type="latex",
-          column.sep.width = "-20pt",
-          keep.stat = c("n"),
-          notes.label = "",
-          dep.var.labels = "New Citations",
-          omit = c("`Years since publication`:`Year >= 2019`",
-                   "`Avg. H-index`:`Fully reproduced`:`Year >= 2019`TRUE:`Years since publication`",
-                   "`Fully reproduced`:`Year >= 2019`TRUE:`Years since publication`",
-                   "`Avg. H-index`:`Year >= 2019`TRUE:`Years since publication`"),
-          notes = c(footnote.base,"Notes: ",footnote.new.all,footnote.lag.hindex,
-                    footnote.full.partial,footnote.sample.attempted),
-          out=file.path(Outputs,"table_arcreg3OA4.tex"))
-
-
-###  Robustness regression:
-avgh12 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Fully reproduced`,mainOA.4yrpost2012)
-toph12 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Fully reproduced`,mainOA.4yrpost2012)
-lowh12 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Fully reproduced`,mainOA.4yrpost2012)
-
-avghp12 <- lm(`AsinH(YTD citations)`~`Avg. H-index`* `Full or Partial`,mainOA.4yrpost2012)
-tophp12 <- lm(`AsinH(YTD citations)`~`Max H-index`* `Full or Partial`,mainOA.4yrpost2012)
-lowhp12 <- lm(`AsinH(YTD citations)`~`Min H-index`* `Full or Partial`,mainOA.4yrpost2012)
-
-# Print table
-stargazer(avgh12,toph12, lowh12, avghp12, tophp12, lowhp12,
-          title="OLS: Arcsin Citations on Reproducibility (OA), post-2012", align=TRUE,no.space=FALSE,
-          notes.align = "l", notes.append = FALSE,
-          label="arcregp2012:OA",
-          dep.var.labels = "Total Citations",
-          style="aer", type="latex",
-          column.sep.width = "-20pt",
-          keep.stat = c("n"),
-          notes.label = "",
-          notes = c(footnote.base,"Notes: ",footnote.ytd4,footnote.lag.hindex,
-                    footnote.full.partial,footnote.sample.attempted,footnote.post2012),
-          out=file.path(Outputs,"table_arcregpost12OA.tex"))
-
-mainOAnoconf  <- readRDS(file=file.path(interwrk,"47_mainOA_noconf.Rds"))
-
-
-
-
-# table of summary stats
-st1 <- mainOA.4yr %>% select(`Fully reproduced`, `Full or Partial`, `AsinH(YTD citations)`,  `Avg. H-index`,`Max H-index`, `Min H-index`)
-st2 <- mainOA.4yr %>% filter(!is.na(Reproduced)) %>% select(`Fully reproduced`, `Full or Partial`, `AsinH(YTD citations)`,  `Avg. H-index`,`Max H-index`, `Min H-index`)
-
-stargazer(st1,
-          title="Summary statistics", align=TRUE,no.space=FALSE,
-          notes.align = "l", notes.append = FALSE,
-          label="tab:statdesc:assessed",
-          style="aer",
-          flip=FALSE,
-          font.size = fs,column.sep.width = cw,
-          notes = c("Notes: ", footnote.full.partial, footnote.sample.assessed),
-          out=file.path(Outputs,"table_stassessed.tex"))
-
-stargazer(st2,
-          title="Summary statistics", align=TRUE,no.space=FALSE,rownames=TRUE,
-          notes.align = "l", notes.append = FALSE,
-          label="tab:statdesc:attemped",
-          style="aer",
-          flip=FALSE,
-          font.size = fs,column.sep.width = cw,
-          notes = c("Notes: ", footnote.full.partial, footnote.sample.attempted),
-          out=file.path(Outputs,"table_stattempted.tex"))
 
