@@ -14,7 +14,7 @@
 <meta name="author" content="Flavio Stanchi" />
 <meta name="author" content="Lars Vilhuber" />
 
-<meta name="date" content="2024-03-16" />
+<meta name="date" content="2024-03-17" />
 
 <title>Code and Data for: Reproduce to Validate: a Comprehensive Study on the Reproducibility of Economics Research</title>
 
@@ -381,7 +381,7 @@ Comprehensive Study on the Reproducibility of Economics Research</h1>
 <h4 class="author">Hautahi Kingi</h4>
 <h4 class="author">Flavio Stanchi</h4>
 <h4 class="author">Lars Vilhuber</h4>
-<h4 class="date">2024-03-16</h4>
+<h4 class="date">2024-03-17</h4>
 
 </div>
 
@@ -461,6 +461,46 @@ made</strong> publicly available.</li>
 <li><input type="checkbox" disabled></input><strong>No data can be
 made</strong> publicly available.</li>
 </ul>
+<pre><code>## Warning: 3 files fail check - are present but should be absent</code></pre>
+<div id="files-failing-check" class="section level3" number="2.3.1">
+<h3><span class="header-section-number">2.3.1</span> Files failing
+check</h3>
+<table>
+<colgroup>
+<col width="19%" />
+<col width="51%" />
+<col width="14%" />
+<col width="14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Data Source</th>
+<th align="left">Filename</th>
+<th align="left">Provided.real</th>
+<th align="left">Provided.norm</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Kingi et al (2019)</td>
+<td align="left">./data/replication_data/entryQ_pub.Rds</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="even">
+<td align="left">Kingi et al (2019)</td>
+<td align="left">./data/replication_data/exitQ_pub.Rds</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="odd">
+<td align="left">Kingi et al (2019)</td>
+<td align="left">./data/replication_data/replication_list_pub.Rds</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+</tr>
+</tbody>
+</table>
 <table>
 <colgroup>
 <col width="52%" />
@@ -478,17 +518,17 @@ made</strong> publicly available.</li>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/entryQ_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 <tr class="even">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/exitQ_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/replication_list_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 <tr class="even">
 <td align="left">Crossref (2023)</td>
@@ -598,6 +638,7 @@ names</td>
 </tbody>
 </table>
 </div>
+</div>
 <div id="details-on-each-data-source" class="section level2" number="2.4">
 <h2><span class="header-section-number">2.4</span> Details on each Data
 Source</h2>
@@ -623,17 +664,17 @@ names replaced by random identifiers.</p>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/entryQ_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 <tr class="even">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/exitQ_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 <tr class="odd">
 <td align="left">Kingi et al (2019)</td>
 <td align="left">./data/replication_data/replication_list_pub.Rds</td>
-<td align="left">FALSE</td>
+<td align="left">TRUE</td>
 </tr>
 </tbody>
 </table>
@@ -1255,9 +1296,9 @@ in the paper were subsumed into the main document. Earlier versions used
 <code>\input</code> statements in LaTeX.</p>
 <table>
 <colgroup>
-<col width="11%" />
-<col width="45%" />
-<col width="42%" />
+<col width="12%" />
+<col width="38%" />
+<col width="48%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1329,9 +1370,8 @@ in the paper were subsumed into the main document. Earlier versions used
 </tr>
 <tr class="odd">
 <td align="left">13</td>
-<td align="left">programs/48_mainOA_authorpaper_stats.R +
-formatting</td>
-<td align="left">text/analysis/table_ratios_edited.tex</td>
+<td align="left">programs/48_mainOA_authorpaper_stats.R</td>
+<td align="left">text/analysis/table_ratios.tex</td>
 </tr>
 <tr class="even">
 <td align="left">14</td>
@@ -1588,7 +1628,7 @@ package info</h2>
 ##  ctype    en_US.UTF-8
 ##  tz       Etc/UTC
 ##  date     2024-03-16
-##  pandoc   2.19.2 @ /usr/lib/rstudio-server/bin/quarto/bin/tools/ (via rmarkdown)
+##  pandoc   2.19.2 @ /usr/local/bin/ (via rmarkdown)
 ## 
 ## ─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
 ##  package     * version date (UTC) lib source
@@ -1661,7 +1701,6 @@ package info</h2>
 ##  rlang         1.0.6   2022-09-24 [1] RSPM (R 4.2.0)
 ##  rmarkdown     2.20    2023-01-19 [1] RSPM (R 4.2.0)
 ##  rprojroot   * 2.0.3   2022-04-02 [1] RSPM (R 4.2.0)
-##  rstudioapi    0.14    2022-08-22 [1] RSPM (R 4.2.0)
 ##  sandwich    * 3.0-2   2022-06-15 [1] RSPM (R 4.2.0)
 ##  scales        1.2.1   2022-08-20 [1] RSPM (R 4.2.0)
 ##  sessioninfo   1.2.2   2021-12-06 [1] RSPM (R 4.2.0)
