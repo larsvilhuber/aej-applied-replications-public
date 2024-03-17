@@ -5,7 +5,7 @@ author:
   - Hautahi Kingi
   - Flavio Stanchi
   - Lars Vilhuber
-date: "2024-03-16"
+date: "2024-03-17"
 output:
   html_document: 
     keep_md: yes
@@ -61,14 +61,23 @@ All derivative data contained herein, if not otherwise encumbered, is available 
 
 
 
+```
+## Warning: 3 files fail check - are present but should be absent
+```
+### Files failing check 
 
+|Data Source        |Filename                                         |Provided.real |Provided.norm |
+|:------------------|:------------------------------------------------|:-------------|:-------------|
+|Kingi et al (2019) |./data/replication_data/entryQ_pub.Rds           |TRUE          |FALSE         |
+|Kingi et al (2019) |./data/replication_data/exitQ_pub.Rds            |TRUE          |FALSE         |
+|Kingi et al (2019) |./data/replication_data/replication_list_pub.Rds |TRUE          |FALSE         |
 
 
 |Data Source                                                       |Filename                                          |Provided |
 |:-----------------------------------------------------------------|:-------------------------------------------------|:--------|
-|Kingi et al (2019)                                                |./data/replication_data/entryQ_pub.Rds            |FALSE    |
-|Kingi et al (2019)                                                |./data/replication_data/exitQ_pub.Rds             |FALSE    |
-|Kingi et al (2019)                                                |./data/replication_data/replication_list_pub.Rds  |FALSE    |
+|Kingi et al (2019)                                                |./data/replication_data/entryQ_pub.Rds            |TRUE     |
+|Kingi et al (2019)                                                |./data/replication_data/exitQ_pub.Rds             |TRUE     |
+|Kingi et al (2019)                                                |./data/replication_data/replication_list_pub.Rds  |TRUE     |
 |Crossref (2023)                                                   |./data/crossref/crossref_info.csv                 |TRUE     |
 |Crossref (2023)                                                   |./data/crossref/crossref_info.Rds                 |TRUE     |
 |Crossref (2023)                                                   |./data/crossref/crossref_aejdois.Rds              |TRUE     |
@@ -101,9 +110,9 @@ The data were collected through the methods described in the paper. Data were co
 
 |Data Source        |Filename                                         |Provided |
 |:------------------|:------------------------------------------------|:--------|
-|Kingi et al (2019) |./data/replication_data/entryQ_pub.Rds           |FALSE    |
-|Kingi et al (2019) |./data/replication_data/exitQ_pub.Rds            |FALSE    |
-|Kingi et al (2019) |./data/replication_data/replication_list_pub.Rds |FALSE    |
+|Kingi et al (2019) |./data/replication_data/entryQ_pub.Rds           |TRUE     |
+|Kingi et al (2019) |./data/replication_data/exitQ_pub.Rds            |TRUE     |
+|Kingi et al (2019) |./data/replication_data/replication_list_pub.Rds |TRUE     |
 
 
 ### Crossref data
@@ -342,42 +351,42 @@ The provided code reproduces:
 The code also produces numerous tables which were not included in the paper. Note that following a request from copy-editors, all tables used in the paper were subsumed into the main document. Earlier versions used `\input` statements in LaTeX.
 
 
-|Table number |Program                                             |LaTeX file                                       |
-|:------------|:---------------------------------------------------|:------------------------------------------------|
-|1            |programs/40_supplementary1.R                        |text/includes/table_article_selection.tex        |
-|2            |NA                                                  |No code                                          |
-|3            |programs/30_results1.R                              |text/includes/table_data_availability.tex        |
-|4            |programs/30_results1.R                              |text/includes/table_data_prog.tex                |
-|5            |programs/30_results1.R                              |text/includes/table_difficult.tex                |
-|6            |programs/30_results1.R                              |text/includes/table_doc.tex                      |
-|7            |programs/31_results2.R                              |text/includes/table_results_both.tex             |
-|8            |programs/31_results2.R                              |text/includes/table_reason.tex                   |
-|9            |programs/31_results2.R                              |text/analysis/table_code.tex                     |
-|10           |programs/31_results2.R                              |text/analysis/table_reg1.tex                     |
-|11           |programs/48_mainOA_authorpaper_stats.R              |text/analysis/table_metrics_OA.tex               |
-|12           |programs/48_mainOA_authorpaper_stats.R              |text/analysis/table_reg_probit_0_full.tex        |
-|13           |programs/48_mainOA_authorpaper_stats.R + formatting |text/analysis/table_ratios_edited.tex            |
-|14           |programs/50_analysis_openAlex.R                     |text/analysis/table_reg2OA.tex                   |
-|15           |programs/50_analysis_openAlex.R                     |text/analysis/table_arcreg3OA.tex                |
-|16           |programs/50_analysis_openAlex.R                     |text/analysis/table_arcregpost12OA.tex           |
-|17           |programs/50_analysis_openAlex.R                     |text/analysis/table_arcreg3OA4.tex               |
-|A1           |programs/49_assignments.R                           |text/includes/table_assignments.tex              |
-|A2           |programs/30_results1.R                              |text/includes/table_absence.tex                  |
-|A3           |programs/31_results2.R                              |text/includes/table_results_by_year.tex          |
-|A4           |programs/48_mainOA_authorpaper_stats.R              |text/analysis/table_reg_probit_0_fullpartial.tex |
-|A5           |programs/48_mainOA_authorpaper_stats.R              |text/analysis/table_metrics_OA_app0.tex          |
-|A6           |programs/31_results2.R                              |text/analysis/table_metrics.tex                  |
-|A7           |programs/48_mainOA_authorpaper_stats.R              |text/analysis/table_metrics_OA_wos.tex           |
-|A8           |programs/50_analysis_openAlex.R                     |text/analysis/table_stassessed.tex               |
-|A9           |programs/50_analysis_openAlex.R                     |text/analysis/table_stattempted.tex              |
-|A10          |programs/50_analysis_openAlex.R                     |text/analysis/table_reg3OA.tex                   |
-|A11          |programs/50_analysis_openAlex.R                     |text/analysis/table_logreg3OA.tex                |
-|A12          |programs/51_analysis_Poisson.R                      |text/analysis/table_poissonreg.tex               |
-|A13          |programs/50_analysis_openAlex.R                     |text/analysis/table_arcreg3OA_partial.tex        |
-|A14          |programs/50_analysis_openAlex.R                     |text/analysis/table_reg3OA_partial.tex           |
-|A15          |programs/50_analysis_openAlex.R                     |text/analysis/table_logreg3OA_partial.tex        |
-|A16          |programs/51_analysis_Poisson.R                      |text/analysis/table_poissonreg_partial.tex       |
-|A17          |programs/50_analysis_openAlex.R                     |text/analysis/table_arcregpost12OA_partial.tex   |
+|Table number |Program                                |LaTeX file                                       |
+|:------------|:--------------------------------------|:------------------------------------------------|
+|1            |programs/40_supplementary1.R           |text/includes/table_article_selection.tex        |
+|2            |NA                                     |No code                                          |
+|3            |programs/30_results1.R                 |text/includes/table_data_availability.tex        |
+|4            |programs/30_results1.R                 |text/includes/table_data_prog.tex                |
+|5            |programs/30_results1.R                 |text/includes/table_difficult.tex                |
+|6            |programs/30_results1.R                 |text/includes/table_doc.tex                      |
+|7            |programs/31_results2.R                 |text/includes/table_results_both.tex             |
+|8            |programs/31_results2.R                 |text/includes/table_reason.tex                   |
+|9            |programs/31_results2.R                 |text/analysis/table_code.tex                     |
+|10           |programs/31_results2.R                 |text/analysis/table_reg1.tex                     |
+|11           |programs/48_mainOA_authorpaper_stats.R |text/analysis/table_metrics_OA.tex               |
+|12           |programs/48_mainOA_authorpaper_stats.R |text/analysis/table_reg_probit_0_full.tex        |
+|13           |programs/48_mainOA_authorpaper_stats.R |text/analysis/table_ratios.tex                   |
+|14           |programs/50_analysis_openAlex.R        |text/analysis/table_reg2OA.tex                   |
+|15           |programs/50_analysis_openAlex.R        |text/analysis/table_arcreg3OA.tex                |
+|16           |programs/50_analysis_openAlex.R        |text/analysis/table_arcregpost12OA.tex           |
+|17           |programs/50_analysis_openAlex.R        |text/analysis/table_arcreg3OA4.tex               |
+|A1           |programs/49_assignments.R              |text/includes/table_assignments.tex              |
+|A2           |programs/30_results1.R                 |text/includes/table_absence.tex                  |
+|A3           |programs/31_results2.R                 |text/includes/table_results_by_year.tex          |
+|A4           |programs/48_mainOA_authorpaper_stats.R |text/analysis/table_reg_probit_0_fullpartial.tex |
+|A5           |programs/48_mainOA_authorpaper_stats.R |text/analysis/table_metrics_OA_app0.tex          |
+|A6           |programs/31_results2.R                 |text/analysis/table_metrics.tex                  |
+|A7           |programs/48_mainOA_authorpaper_stats.R |text/analysis/table_metrics_OA_wos.tex           |
+|A8           |programs/50_analysis_openAlex.R        |text/analysis/table_stassessed.tex               |
+|A9           |programs/50_analysis_openAlex.R        |text/analysis/table_stattempted.tex              |
+|A10          |programs/50_analysis_openAlex.R        |text/analysis/table_reg3OA.tex                   |
+|A11          |programs/50_analysis_openAlex.R        |text/analysis/table_logreg3OA.tex                |
+|A12          |programs/51_analysis_Poisson.R         |text/analysis/table_poissonreg.tex               |
+|A13          |programs/50_analysis_openAlex.R        |text/analysis/table_arcreg3OA_partial.tex        |
+|A14          |programs/50_analysis_openAlex.R        |text/analysis/table_reg3OA_partial.tex           |
+|A15          |programs/50_analysis_openAlex.R        |text/analysis/table_logreg3OA_partial.tex        |
+|A16          |programs/51_analysis_Poisson.R         |text/analysis/table_poissonreg_partial.tex       |
+|A17          |programs/50_analysis_openAlex.R        |text/analysis/table_arcregpost12OA_partial.tex   |
 
 ---
 
@@ -410,7 +419,7 @@ This README based on the template created by @template-readme.
 ##  ctype    en_US.UTF-8
 ##  tz       Etc/UTC
 ##  date     2024-03-16
-##  pandoc   2.19.2 @ /usr/lib/rstudio-server/bin/quarto/bin/tools/ (via rmarkdown)
+##  pandoc   2.19.2 @ /usr/local/bin/ (via rmarkdown)
 ## 
 ## ─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
 ##  package     * version date (UTC) lib source
@@ -483,7 +492,6 @@ This README based on the template created by @template-readme.
 ##  rlang         1.0.6   2022-09-24 [1] RSPM (R 4.2.0)
 ##  rmarkdown     2.20    2023-01-19 [1] RSPM (R 4.2.0)
 ##  rprojroot   * 2.0.3   2022-04-02 [1] RSPM (R 4.2.0)
-##  rstudioapi    0.14    2022-08-22 [1] RSPM (R 4.2.0)
 ##  sandwich    * 3.0-2   2022-06-15 [1] RSPM (R 4.2.0)
 ##  scales        1.2.1   2022-08-20 [1] RSPM (R 4.2.0)
 ##  sessioninfo   1.2.2   2021-12-06 [1] RSPM (R 4.2.0)
