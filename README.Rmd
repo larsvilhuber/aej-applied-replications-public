@@ -26,6 +26,8 @@ bibliography:
 csl: _readme/chicago-author-date.csl
 ---
 
+> File prepared for **Canadian Journal of Economics**.
+
 ```{r setup,echo=FALSE, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(eval=FALSE)
@@ -98,7 +100,12 @@ check.files.failure <- nrow(datafiles) - check.files.true
 if ( is.numeric(check.files.failure) & check.files.failure > 0 ) {
   warning(paste0(check.files.failure," files fail check - are present but should be absent"))
 }
+check.files.duplicates <- datafiles %>% distinct(Filename) 
+check.files.duplicates.n <- nrow(datafiles) - nrow(check.files.duplicates)
 
+if ( is.numeric(check.files.duplicates.n) & check.files.duplicates.n > 0 ) {
+  warning(paste0(check.files.duplicates.n," files are duplicates - error!"))
+}
 
 ```
 ```{r print_check,echo=FALSE,results='asis',eval=TRUE}
@@ -113,6 +120,21 @@ if ( is.numeric(check.files.failure) & check.files.failure > 0 ) {
   kable()
 }
 
+```
+
+```{r print_check_dups,echo=FALSE,results='asis',eval=TRUE}
+
+if ( is.numeric(check.files.duplicates.n) & check.files.duplicates.n > 0 ) {
+  cat('### Files that are duplicates')
+   cat(' ')
+   datafiles %>% 
+     group_by(Filename) %>%
+     summarise(count=n()) %>%
+     filter(count>1) %>%
+     left_join(datafiles %>% select(`Data Source`,Filename)) %>%
+    select(`Data Source`,Filename,count) %>%
+  kable()
+}
 ```
 
 ```{r show_table,echo=FALSE,results='asis',eval=TRUE}
@@ -291,6 +313,7 @@ Of note, several programs leverage APIs, which can yield different results, and 
 - `r doi.file.Rds` - bibliographic information from Crossref for later analysis
 
 Internet access is required to run the programs, 
+
 - to download the key input files [@raw-data-2019]
 - when re-running queries to the APIs
 
