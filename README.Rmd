@@ -6,6 +6,7 @@ author:
   - Flavio Stanchi
   - Lars Vilhuber
 date: "`r Sys.Date()`"
+doi: "10.5683/SP3/GJVVLI"
 output:
   html_document: 
     keep_md: yes
@@ -27,6 +28,14 @@ csl: _readme/chicago-author-date.csl
 ---
 
 > File prepared for **Canadian Journal of Economics**.
+
+
+[![DOI:10.5683/SP3/GJVVLI](https://zenodo.org/badge/DOI/10.5683/SP3/GJVVLI.svg)](https://doi.org/10.5683/SP3/GJVVLI)
+
+# Cite as
+
+> Herbert, Sylvérie; Kingi, Hautahi; Stanchi, Flavio; Vilhuber, Lars, 2024, "Replication Data and Code for: Reproduce to Validate: a Comprehensive Study on the Reproducibility of Economics Research", https://doi.org/10.5683/SP3/GJVVLI, Borealis, V1, UNF:6:KAT43A8y80Ct+4PyDB3XYw== [fileUNF] 
+
 
 ```{r setup,echo=FALSE, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
